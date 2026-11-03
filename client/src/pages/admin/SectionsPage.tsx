@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { JsonEditor } from '@/components/admin/JsonEditor';
@@ -94,6 +94,10 @@ export default function SectionsPage() {
   const [params, setParams] = useSearchParams();
   const page = PAGES.some((p) => p.key === params.get('page')) ? params.get('page')! : 'home';
   const confirm = useConfirm();
+  const activeTab = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    activeTab.current?.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }, [page]);
   const q = useQuery({ queryKey: ['admin', 'sections', page], queryFn: () => api<AdminSection[]>(`/admin/sections?page=${page}`) });
   const [items, setItems] = useState<AdminSection[]>([]);
   const [adding, setAdding] = useState(false);
@@ -162,15 +166,20 @@ export default function SectionsPage() {
         }
       />
 
-      <div role="tablist" aria-label="Pages" className="mb-6 flex flex-wrap gap-2">
+      <div
+        role="tablist"
+        aria-label="Pages"
+        className="-mx-1 mb-6 flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain px-1 py-1 [-ms-overflow-style:none] [scrollbar-width:none] lg:flex-wrap lg:overflow-visible [&::-webkit-scrollbar]:hidden"
+      >
         {PAGES.map((p) => (
           <button
             key={p.key}
             role="tab"
             aria-selected={p.key === page}
+            ref={p.key === page ? activeTab : undefined}
             onClick={() => setParams({ page: p.key })}
             className={cn(
-              'rounded-pill border px-4 py-2 text-sm font-bold transition-colors max-lg:min-h-11',
+              'shrink-0 snap-start whitespace-nowrap rounded-pill border px-4 py-2 text-sm font-bold transition-colors max-lg:min-h-11',
               p.key === page ? 'border-brand bg-brand text-white' : 'border-line bg-white text-ink-700 hover:border-brand',
             )}
           >

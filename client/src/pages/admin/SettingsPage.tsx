@@ -15,7 +15,7 @@ function Block({ title, desc, children }: { title: string; desc?: string; childr
     <Card className="p-5 md:p-6">
       <h2 className="text-lg font-extrabold text-ink">{title}</h2>
       {desc && <p className="mb-4 mt-1 text-sm text-ink-700">{desc}</p>}
-      <div className={`grid gap-4 ${desc ? '' : 'mt-4'}`}>{children}</div>
+      <div className={`grid grid-cols-[minmax(0,1fr)] gap-4 ${desc ? '' : 'mt-4'}`}>{children}</div>
     </Card>
   );
 }
@@ -58,7 +58,7 @@ export default function SettingsPage() {
           </Btn>
         }
       />
-      <div className="grid gap-6">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
         <Block title="Brand">
           <Field label="Site name">
             <TextInput value={s.siteName} onChange={(e) => set('siteName', e.target.value)} required />
@@ -73,7 +73,7 @@ export default function SettingsPage() {
         </Block>
 
         <Block title="Contact details" desc="Shown on the Contact Us page.">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2 [&>*]:min-w-0">
             <Field label="Email">
               <TextInput type="text" value={s.email ?? ''} onChange={(e) => set('email', e.target.value)} />
             </Field>
