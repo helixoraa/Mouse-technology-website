@@ -1,4 +1,4 @@
-import { mediaUrl } from '@/lib/api';
+import { AnimatedMedia } from '@/components/ui/AnimatedMedia';
 import { Segments } from '@/components/ui/Heading';
 import type { BusFareContent } from './types';
 
@@ -27,10 +27,13 @@ export function BusFareSection({ content }: { content: BusFareContent }) {
         </div>
         <div className="flex w-full flex-col items-center gap-7 xl:flex-row">
           <div className="hidden w-full xl:block xl:flex-1">{first && <InfoCard {...first} />}</div>
-          <img
-            src={mediaUrl(content.image)}
-            alt={content.imageAlt}
-            className="aspect-[620/351] w-full max-w-[620px] object-cover xl:h-[351px] xl:w-[620px]"
+          <AnimatedMedia
+            src={content.animation.src}
+            staticSrc={content.animation.staticImage}
+            alt={content.animation.alt}
+            width={600}
+            height={340}
+            className="w-full max-w-[620px] xl:w-[620px]"
           />
           <div className="flex w-full flex-col gap-4 xl:flex-1">
             <div className="xl:hidden">{first && <InfoCard {...first} />}</div>

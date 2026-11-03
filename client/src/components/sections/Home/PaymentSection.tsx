@@ -1,4 +1,4 @@
-import { mediaUrl } from '@/lib/api';
+import { AnimatedMedia } from '@/components/ui/AnimatedMedia';
 import { Segments } from '@/components/ui/Heading';
 import type { PaymentContent } from './types';
 
@@ -23,10 +23,13 @@ export function PaymentSection({ content }: { content: PaymentContent }) {
             ))}
           </ol>
         </div>
-        <img
-          src={mediaUrl(content.image)}
-          alt={content.imageAlt}
-          className="aspect-[576/480] w-full max-w-[576px] object-cover xl:h-[480px] xl:w-[576px]"
+        <AnimatedMedia
+          src={content.animation.src}
+          staticSrc={content.animation.staticImage}
+          alt={content.animation.alt}
+          width={600}
+          height={500}
+          className="w-full max-w-[576px] xl:w-[576px]"
         />
       </div>
     </section>
