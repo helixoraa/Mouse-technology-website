@@ -105,6 +105,7 @@ model Post {
   image       String?
   author      String   @default("MAOUAJ Team")
   publishedAt DateTime @default(now())
+  dateLabel   String?
   visible     Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

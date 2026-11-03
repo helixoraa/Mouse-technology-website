@@ -22,14 +22,14 @@ export function ContactDetails({ content }: { content?: ContactDetailsContent })
     { label: content.addressLabel, value: site?.address },
   ];
   return (
-    <div className="flex h-fit flex-col gap-7 rounded-xl4 border border-white/25 bg-cta-card p-8 text-white md:px-12 md:pb-[26px] md:pt-12">
-      <p className="text-eyebrow font-semibold uppercase text-text-soft">{content.eyebrow}</p>
-      <h2 className="text-[28px] font-bold leading-tight md:text-[32px]">{content.title}</h2>
-      <dl className="mt-5 flex flex-col gap-[30px]">
+    <div className="flex h-fit flex-col gap-8 rounded-xl4 border border-white/25 bg-cta-card p-8 text-white md:p-12">
+      <p className="text-eyebrow font-semibold uppercase leading-4 text-text-soft">{content.eyebrow}</p>
+      <h2 className="text-[28px] font-extrabold leading-10 tracking-[-0.02em] md:text-[32px]">{content.title}</h2>
+      <dl className="flex flex-col gap-8">
         {rows.map((r) => (
           <div key={r.label} className="flex flex-col gap-1.5">
-            <dt className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-text-soft">{r.label}</dt>
-            <dd className="break-words text-xl font-medium leading-snug">
+            <dt className="text-xs font-semibold uppercase leading-4 tracking-[0.12em] text-text-soft">{r.label}</dt>
+            <dd className="break-words text-lg font-semibold leading-[27px]">
               {r.href ? (
                 <a href={r.href} className="hover:underline">
                   {r.value}

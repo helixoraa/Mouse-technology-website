@@ -25,6 +25,9 @@ const blog: PageSeed = {
         readLabel: 'Read article',
         emptyTitle: 'More articles soon',
         emptyText: 'New explainers and updates will appear here as our projects progress.',
+        pageSize: 3,
+        prevLabel: 'Prev',
+        nextLabel: 'Next',
       },
     },
     {
@@ -41,7 +44,7 @@ const blog: PageSeed = {
   ],
 };
 
-/** Posts shown on the blog frame, exported for collections.ts. `image` references server/seed-media (.webp). */
+/** The three posts shown on the Blog frame (Figma 19:256). dateLabel is the exact text drawn in the design. */
 export const blogPosts = [
   {
     slug: 'how-the-cashless-bus-fare-platform-will-work-explained',
@@ -49,27 +52,30 @@ export const blogPosts = [
     category: 'Product explainer',
     excerpt:
       'Passengers add balance, tap a supported transit card on the bus and receive a clear payment result, while operators review fare records.',
-    image: '/uploads/seed/home-blog-1.webp',
+    image: '/uploads/seed/blog-featured-bus.webp',
     author: 'MAOUAJ Team',
-    publishedAt: '2026-08-12',
+    publishedAt: '2026-12-30',
+    dateLabel: '08/12/2026',
   },
   {
     slug: 'payment-platform-introduction-steps',
     title: 'An introduction to the payment platform',
     category: 'Product explainer',
     excerpt: 'A look at the intended steps for sending money, reviewing costs and following a transfer’s progress.',
-    image: '/uploads/seed/home-blog-2.webp',
+    image: '/uploads/seed/blog-payment.webp',
     author: 'MAOUAJ Team',
-    publishedAt: '2026-12-24',
+    publishedAt: '2026-12-29',
+    dateLabel: '12/24/2026',
   },
   {
     slug: 'maouaj-technologys-current-projects-and-future-plans',
     title: 'MAOUAJ Technology’s current projects and future plans',
     category: 'Company News',
     excerpt: 'Our current priorities in bus fares and payments, and what comes next in ride-hailing and e-commerce.',
-    image: '/uploads/seed/home-blog-3.webp',
+    image: '/uploads/seed/blog-laptop.webp',
     author: 'MAOUAJ Team',
-    publishedAt: '2026-12-18',
+    publishedAt: '2026-12-28',
+    dateLabel: '18/24/2026',
   },
 ];
 

@@ -7,6 +7,7 @@ import { PlannedProducts, type PlannedProductsContent } from '@/components/secti
 
 export default function ProductsPage() {
   const { data } = usePage('products');
+  if (!data) return <div className="min-h-screen bg-hero" />;
   const cta = getSection<CtaContent>(data, 'cta');
   return (
     <>
