@@ -1,6 +1,5 @@
 import { Badge } from '@/components/admin/ui';
 import { Thumb, ResourcePage, type ResourceConfig } from '@/components/admin/ResourcePage';
-import { useAuth } from '@/lib/auth';
 import { fmtDate } from '@/lib/admin-api';
 
 const trunc = (s: unknown, n = 70) => {
@@ -146,41 +145,8 @@ const postsCfg: ResourceConfig = {
   ],
 };
 
-const usersCfg: ResourceConfig = {
-  path: 'users',
-  title: 'Users',
-  singular: 'User',
-  description: 'Admins can manage everything including users; editors can manage content and leads.',
-  defaults: { role: 'EDITOR' },
-  canDelete: (r, me) => r.id !== me,
-  columns: [
-    { key: 'name', label: 'Name', render: (r) => <span className="font-bold text-ink">{String(r.name)}</span> },
-    { key: 'email', label: 'Email' },
-    { key: 'role', label: 'Role', render: (r) => <Badge tone={r.role === 'ADMIN' ? 'brand' : 'neutral'}>{String(r.role)}</Badge> },
-  ],
-  fields: [
-    { name: 'name', label: 'Name', required: true },
-    { name: 'email', label: 'Email', type: 'email', required: true },
-    {
-      name: 'role',
-      label: 'Role',
-      type: 'select',
-      required: true,
-      options: [
-        { value: 'ADMIN', label: 'Admin' },
-        { value: 'EDITOR', label: 'Editor' },
-      ],
-    },
-    { name: 'password', label: 'Password', type: 'password', hint: 'Min. 8 characters. Leave empty on edit to keep the current password.' },
-  ],
-};
-
 export const ServicesPage = () => <ResourcePage cfg={servicesCfg} />;
 export const TestimonialsPage = () => <ResourcePage cfg={testimonialsCfg} />;
 export const TeamAdminPage = () => <ResourcePage cfg={teamCfg} />;
 export const FaqsAdminPage = () => <ResourcePage cfg={faqsCfg} />;
 export const PostsAdminPage = () => <ResourcePage cfg={postsCfg} />;
-export function UsersPage() {
-  const { user } = useAuth();
-  return <ResourcePage cfg={usersCfg} currentUserId={user?.id} />;
-}
