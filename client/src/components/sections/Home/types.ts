@@ -1,3 +1,4 @@
+import type { AnimationContent } from '@/components/ui/AnimatedMedia';
 import type { Segment } from '@/lib/types';
 
 export interface Cta {
@@ -63,16 +64,14 @@ export interface ProductsContent {
 export interface BusFareContent {
   title: Segment[];
   lead: string;
-  image: string;
-  imageAlt: string;
+  animation: AnimationContent;
   cards: { title: string; text: string }[];
 }
 
 export interface PaymentContent {
   title: Segment[];
   lead: string;
-  image: string;
-  imageAlt: string;
+  animation: AnimationContent;
   steps: { no: string; label: string }[];
 }
 
@@ -95,6 +94,8 @@ export interface FaqContent {
 }
 
 export interface BlogContent {
+  /** Slugs of the posts shown in the Home blog cards (in order). Falls back to the newest posts. */
+  postSlugs?: string[];
   title: Segment[];
   lead: string;
   linkLabel: string;

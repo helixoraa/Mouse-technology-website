@@ -41,3 +41,12 @@ Radii 9 (logo) · 12 · 16 · 18 · 20 (images) · 24 · 28 (cards) · 36 · 44 
 Shadows: card `0 10px 30px rgba(10,31,102,.08)`, policy `0 10px 15px rgba(10,31,102,.08)`.
 Layout: page width 1440, side gutter 72, content width 1296, section padding 110/72, section gap 56.
 Breakpoints: sm 640, md 768, lg 1024, xl 1280 (desktop nav), 2xl 1440 (Figma frame).
+
+## Additions from the Contact / Blog / Products / Privacy SVG exports
+
+- `navy.form` `#0b1430` — Contact inquiry form card · `line.form` `#d8e2f8` — its 1px border (`border-line-form`).
+- Contact form (dark): fields 54px high, radius 16, fill `white/4%`, border `white/20%`, label 13/600 `mock.label` (`#c6d2f0`), placeholder `mock.muted` (`#8fa0c8`),
+  textarea 150px, submit 52px pill (14.5/600). Business card 480px wide, form 792px; card padding 48 + 1px border.
+- Hero rhythm (Products/Blog/Contact/Privacy): eyebrow 16.4 · 35 · heading · 32.5 · lead (28/line) · 40 · 1px keyline · 80 bottom padding. Lead max width 655 (Products, Contact) / 745 (Blog, Privacy).
+- Blog: featured card 1296x422, radius 36, image 600x420 (centre-cover); article cards 410.667 / 410.667 / 1fr, 21px padding, 200px image radius 18.
+- Products: copy column 480, right column 752 (gap 64); capability card radius 28 padding 37; journey card radius 28; illustration slots 752x426 (bus fare) and 752x627 (payment), radius 36.

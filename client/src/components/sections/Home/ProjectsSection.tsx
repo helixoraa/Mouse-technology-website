@@ -23,7 +23,7 @@ export function ProjectsSection({ content }: { content: ProjectsContent }) {
           {content.items.map((p) => (
             <li
               key={p.title}
-              className="flex items-center gap-4 rounded-[26px] sm:gap-[22px] border border-white/[0.14] bg-white/[0.06] p-6 sm:p-[30px]"
+              className="flex items-center gap-4 rounded-[26px] max-sm:flex-col max-sm:items-start sm:gap-[22px] border border-white/[0.14] bg-white/[0.06] p-6 sm:p-[30px]"
             >
               <div className="flex shrink-0 items-start rounded-[18px] bg-tile-project p-4">
                 <img src={homeIcons[p.icon]} alt="" className="size-7" />

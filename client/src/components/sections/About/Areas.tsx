@@ -19,7 +19,7 @@ export function Areas({ content }: { content: AreasContent }) {
               <span className="text-[15px] font-bold text-brand">{a.number}</span>
               <StatusChip label={a.status} />
             </div>
-            <h3 className="break-words text-h-card font-bold text-ink">{a.title}</h3>
+            <h3 className="break-words text-h-card font-bold text-ink max-sm:text-xl">{a.title}</h3>
             <p className="text-body-sm text-ink-500">{a.text}</p>
           </li>
         ))}

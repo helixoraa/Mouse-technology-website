@@ -19,10 +19,10 @@ export function CtaCard({ content }: { content: CtaContent }) {
         <div aria-hidden className="pointer-events-none absolute left-[72px] top-[72px] hidden size-[360px] md:block">
           <img src={glow} alt="" className="absolute -inset-[19.44%] size-[138.88%] max-w-none" />
         </div>
-        <div aria-hidden className="pointer-events-none absolute right-[221px] top-[39px] hidden size-[220px] lg:block">
+        <div aria-hidden className="pointer-events-none absolute right-[221px] top-[39px] hidden size-[220px] xl:block">
           <img src={orb} alt="" className="absolute inset-0 size-full" />
         </div>
-        <div aria-hidden className="pointer-events-none absolute right-[251px] top-[75px] hidden h-10 w-[90px] lg:block">
+        <div aria-hidden className="pointer-events-none absolute right-[251px] top-[75px] hidden h-10 w-[90px] xl:block">
           <img src={highlight} alt="" className="absolute -inset-x-[11.11%] -inset-y-[25%] max-w-none" />
         </div>
         <div className="relative flex flex-col items-start gap-5">

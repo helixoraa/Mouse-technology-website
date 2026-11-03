@@ -50,7 +50,7 @@ export function SortableItem({
       type="button"
       aria-label="Drag to reorder"
       title="Drag to reorder (or focus and press Space, then arrow keys)"
-      className="cursor-grab touch-none rounded-lg px-2 py-1 text-lg leading-none text-ink-500 hover:bg-surface-tint active:cursor-grabbing"
+      className="cursor-grab touch-none rounded-lg px-2 py-1 text-lg leading-none text-ink-500 hover:bg-surface-tint active:cursor-grabbing max-lg:flex max-lg:min-h-11 max-lg:min-w-11 max-lg:items-center max-lg:justify-center"
       {...attributes}
       {...listeners}
     >

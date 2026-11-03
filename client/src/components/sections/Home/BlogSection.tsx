@@ -61,7 +61,10 @@ function Compact({ post }: { post: Post }) {
 
 export function BlogSection({ content }: { content: BlogContent }) {
   const { data: posts = [] } = usePosts();
-  const [featured, ...others] = posts.slice(0, 3);
+  const picked = content.postSlugs?.length
+    ? content.postSlugs.map((s) => posts.find((p) => p.slug === s)).filter((p): p is Post => !!p)
+    : posts;
+  const [featured, ...others] = picked.slice(0, 3);
   return (
     <section id="blog" aria-labelledby="blog-heading" className="bg-white px-5 py-16 md:px-10 xl:px-gutter xl:py-[100px]">
       <div className="mx-auto flex max-w-page flex-col gap-12">
@@ -75,7 +78,10 @@ export function BlogSection({ content }: { content: BlogContent }) {
             </h2>
             <p className="text-base text-ink-700">{content.lead}</p>
           </div>
-          <Link to={content.linkHref} className="flex items-center gap-2 text-sm font-semibold text-brand hover:text-brand-press">
+          <Link
+            to={content.linkHref}
+            className="flex items-center gap-2 text-sm font-semibold text-brand hover:text-brand-press max-xl:min-h-11"
+          >
             {content.linkLabel}
             <img src={arrowBlue} alt="" className="size-[15px]" />
           </Link>

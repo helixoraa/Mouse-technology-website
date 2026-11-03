@@ -45,7 +45,8 @@ export function AdminLayout() {
         id="admin-sidebar"
         className={cn(
           'fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-sidebar px-4 py-6 text-white transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0',
-          open ? 'translate-x-0' : '-translate-x-full',
+          // closed drawer is also removed from the tab order / a11y tree below lg (not just moved off-canvas)
+          open ? 'translate-x-0' : '-translate-x-full max-lg:invisible',
         )}
       >
         <div className="mb-8 px-2">
@@ -63,7 +64,7 @@ export function AdminLayout() {
                 end={n.end}
                 className={({ isActive }) =>
                   cn(
-                    'block rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors',
+                    'block rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors max-lg:py-3',
                     isActive ? 'bg-brand-press text-white' : 'text-text-onDark hover:bg-white/10',
                   )
                 }
@@ -83,14 +84,14 @@ export function AdminLayout() {
               href="/"
               target="_blank"
               rel="noreferrer"
-              className="flex-1 rounded-xl border border-white/25 px-3 py-2 text-center text-xs font-bold hover:bg-white/10"
+              className="flex flex-1 items-center justify-center rounded-xl border border-white/25 px-3 py-2 text-center text-xs font-bold hover:bg-white/10 max-lg:min-h-11"
             >
               View site ↗
             </a>
             <button
               type="button"
               onClick={() => void logout()}
-              className="flex-1 rounded-xl bg-white/10 px-3 py-2 text-xs font-bold hover:bg-white/20"
+              className="flex-1 rounded-xl bg-white/10 px-3 py-2 text-xs font-bold hover:bg-white/20 max-lg:min-h-11"
             >
               Sign out
             </button>

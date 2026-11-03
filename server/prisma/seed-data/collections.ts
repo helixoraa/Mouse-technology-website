@@ -136,7 +136,7 @@ export const homePosts = [
     excerpt: postText,
     image: seedImg('home-blog-1.webp'),
     author: 'MAOUAJ Team',
-    publishedAt: new Date('2026-12-30T09:00:00Z'),
+    publishedAt: new Date('2026-06-30T09:00:00Z'),
   },
   {
     slug: 'an-introduction-to-the-payment-platform',
@@ -145,7 +145,7 @@ export const homePosts = [
     excerpt: postText,
     image: seedImg('home-blog-2.webp'),
     author: 'MAOUAJ Team',
-    publishedAt: new Date('2026-12-29T09:00:00Z'),
+    publishedAt: new Date('2026-06-29T09:00:00Z'),
   },
   {
     slug: 'an-introduction-to-the-payment-platform-2',
@@ -154,7 +154,7 @@ export const homePosts = [
     excerpt: postText,
     image: seedImg('home-blog-3.webp'),
     author: 'MAOUAJ Team',
-    publishedAt: new Date('2026-12-28T09:00:00Z'),
+    publishedAt: new Date('2026-06-28T09:00:00Z'),
   },
 ];
 
@@ -167,9 +167,9 @@ export const settings = {
   siteName: 'MAOUAJ Technology',
   tagline: 'Technology for the way people move, pay and trade.',
   logoUrl: null as string | null,
-  email: '[BUSINESS EMAIL]',
-  phone: '[BUSINESS PHONE]',
-  address: '[BUSINESS ADDRESS]',
+  email: '[Business email]',
+  phone: '[Business telephone]',
+  address: '[Address and public business details]',
   socials: {} as Record<string, string>,
   nav: [
     { label: 'Products', href: '/our-products' },

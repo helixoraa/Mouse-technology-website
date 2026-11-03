@@ -29,7 +29,7 @@ function ProjectCard({ s, large }: { s: Service; large: boolean }) {
       </div>
       <h3 className={cn('font-extrabold text-ink', large ? 'text-h-card-lg' : 'text-h-card')}>{s.title}</h3>
       <p className="text-body-sm text-ink-500">{s.summary}</p>
-      <Link to={s.ctaHref || '/our-products'} className="flex w-fit items-center gap-2 font-semibold text-brand">
+      <Link to={s.ctaHref || '/our-products'} className="-my-3 flex w-fit items-center gap-2 py-3 font-semibold text-brand">
         <span className="text-[14.5px]">{s.ctaLabel || 'Learn more'}</span>
         <span aria-hidden className="text-[15px]">
           →

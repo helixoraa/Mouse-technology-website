@@ -52,6 +52,11 @@ back to the Figma content. Page content lives in `server/prisma/seed-data/<page>
 bcrypt password hashes, JWT in an httpOnly + SameSite=Lax cookie (8h), roles `ADMIN` / `EDITOR` (only admins manage users), login rate limit (10 / 15 min),
 lead form rate limit, helmet, CORS locked to `CLIENT_URL`, zod validation on every route, upload allow-list (jpg/png/webp/svg/gif, 5 MB).
 
+**Production secret guard.** With `NODE_ENV=production` the API (and the container entrypoint, before it migrates/seeds) exits with code 1 if
+`JWT_SECRET` or `ADMIN_PASSWORD` is empty, still an example/default value (`ChangeMe123!`, `change-me-to-a-long-random-string`, `changeme`, `password`, anything
+starting with `change-me`/`replace-me`/`your-`…) or too weak (`JWT_SECRET` < 32 chars, `ADMIN_PASSWORD` < 12 chars). The denylist lives in one file,
+`server/src/secrets.ts`. Generate values with `openssl rand -base64 48`. In development the guard is off.
+
 ## Storage
 
 Uploads go through the `StorageDriver` interface in `server/src/lib/storage.ts`. The local driver writes to `UPLOAD_DIR`. To use S3, add a driver that
@@ -64,18 +69,30 @@ implements `put`/`remove` (returning a public/CDN URL) and select it with `STORA
 ## Docker
 
 ```bash
-cp .env.example .env   # set JWT_SECRET and ADMIN_PASSWORD (required), optionally ADMIN_EMAIL, POSTGRES_PASSWORD, CLIENT_URL
+cp .env.docker.example .env   # then edit .env: set JWT_SECRET, ADMIN_PASSWORD and POSTGRES_PASSWORD (all required, no example values)
 docker compose up --build
 ```
 
-Site + admin: <http://localhost:8080> (nginx serves the build and proxies `/api` and `/uploads` to the server container).
-The server container runs `prisma db push`, the idempotent seed, then starts the API. Data lives in the `pgdata` and `uploads` volumes.
+- Compose runs the API with `NODE_ENV=production`, so the secret guard above applies: it refuses to start with example secrets. `JWT_SECRET`,
+  `ADMIN_PASSWORD` and `POSTGRES_PASSWORD` are required (`${VAR:?}`) and compose stops with a clear message if one is missing.
+  Use letters/digits for `POSTGRES_PASSWORD` (it is embedded in the `DATABASE_URL`).
+- Site + admin: <http://localhost:8080>. nginx serves the build and proxies `/api` and `/uploads` to the server container; Postgres is not published to the host.
+- On plain http (local compose) keep `COOKIE_SECURE=false`; the admin cookie is `Secure` by default in production, so set it back to `true` (or remove it) behind HTTPS.
+- The server entrypoint (`server/docker-entrypoint.sh`) checks the secrets, runs `prisma db push`, the idempotent seed, then starts the API.
+  Data lives in the `pgdata` and `uploads` volumes; `docker compose down -v` deletes them.
+- nginx compresses text/JSON/SVG with **gzip** (the stock nginx image has no brotli module), caches hashed `/assets/*` for a year and `/animations/*` for 30 days,
+  and never caches `index.html`.
+- Low on disk? `docker system prune -f` removes stopped containers, dangling images and unused networks (not volumes).
 
 ## Deployment
 
 1. Provision PostgreSQL and set `DATABASE_URL`.
-2. Server: `npm ci && npm run build -w server`, then `npx prisma db push && npm run db:seed -w server` once, then `npm start -w server`
-   (set `NODE_ENV=production`, a strong `JWT_SECRET`, `CLIENT_URL` = your site origin, and persist `UPLOAD_DIR`).
+2. Server: `npm ci && npm run build -w server`, then `npx prisma db push && npm run db:seed -w server` once, then `npm start -w server`.
+   Set `NODE_ENV=production`, a strong unique `JWT_SECRET` and `ADMIN_PASSWORD` (the server refuses to start otherwise), `CLIENT_URL` = your site origin, and persist `UPLOAD_DIR`.
 3. Client: `VITE_API_URL=https://api.example.com npm run build -w client` and host `client/dist` on any static host with an SPA fallback to `index.html`,
-   or serve both behind one domain with the provided nginx config (recommended: same origin keeps cookies first-party).
-4. Serve everything over HTTPS (cookies are `Secure` in production).
+   or serve both behind one domain with the provided nginx config (recommended: same origin keeps the cookie first-party and avoids CORS).
+4. Reverse proxy / TLS: terminate HTTPS at your proxy (nginx, Caddy, a cloud load balancer) and forward `X-Forwarded-Proto`; the API sets `trust proxy` so the
+   `Secure` admin cookie and the login/lead rate limits see the real client. Proxy `/api` and `/uploads` to the API; enable gzip for SVG/JSON.
+5. Secrets: keep `JWT_SECRET`, `ADMIN_PASSWORD`, `DATABASE_URL` in your platform's secret store, never in git. Rotate `JWT_SECRET` to sign everyone out.
+6. Uploads / S3: uploads go through the `StorageDriver` interface in `server/src/lib/storage.ts` (local driver by default). For multiple instances or ephemeral disks,
+   add an S3 driver that implements `put`/`remove` and returns a public/CDN URL, register it in `createStorage()`, and extend `STORAGE_DRIVER` in `server/src/env.ts`.

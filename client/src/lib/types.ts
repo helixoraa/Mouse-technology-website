@@ -80,6 +80,7 @@ export interface Post {
   image: string | null;
   author: string;
   publishedAt: string;
+  dateLabel: string | null;
   visible: boolean;
 }
 export interface Segment {

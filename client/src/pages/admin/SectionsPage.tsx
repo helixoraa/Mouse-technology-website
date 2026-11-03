@@ -149,7 +149,12 @@ export default function SectionsPage() {
         description="Edit text and images, reorder sections by dragging, and show or hide them. Changes appear on the public site immediately."
         actions={
           <>
-            <a href={pageMeta.path} target="_blank" rel="noreferrer" className="text-sm font-bold text-brand hover:underline">
+            <a
+              href={pageMeta.path}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center text-sm font-bold text-brand hover:underline max-lg:min-h-11"
+            >
               Preview page ↗
             </a>
             <Btn onClick={() => setAdding(true)}>+ Add section</Btn>
@@ -165,7 +170,7 @@ export default function SectionsPage() {
             aria-selected={p.key === page}
             onClick={() => setParams({ page: p.key })}
             className={cn(
-              'rounded-pill border px-4 py-2 text-sm font-bold transition-colors',
+              'rounded-pill border px-4 py-2 text-sm font-bold transition-colors max-lg:min-h-11',
               p.key === page ? 'border-brand bg-brand text-white' : 'border-line bg-white text-ink-700 hover:border-brand',
             )}
           >

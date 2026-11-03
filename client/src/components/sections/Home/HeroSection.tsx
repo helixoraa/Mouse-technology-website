@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { HeroShell } from '@/components/layout/HeroShell';
 import { Segments } from '@/components/ui/Heading';
 import ellipseHero from '@/assets/svg/home-ellipse-hero.svg';
+import ellipseSmall from '@/assets/svg/home-ellipse-small.svg';
 import arrowDark from '@/assets/svg/home-arrow-dark.svg';
 import orbLarge from '@/assets/svg/home-glass-orb-large.svg';
 import orbHighlight from '@/assets/svg/home-orb-highlight.svg';
@@ -41,7 +42,7 @@ function HeroStage({ c }: { c: HeroContent }) {
       </div>
 
       {/* Phone */}
-      <div className="absolute left-[210px] top-[70px] flex h-[520px] w-[262px] flex-col items-start gap-3.5 rounded-[40px] border-[1.5px] border-white/20 bg-mock-phone p-[18px] drop-shadow-[0px_30px_30px_rgba(0,0,0,0.55)]">
+      <div className="absolute left-[210px] top-[70px] flex h-[520px] w-[262px] flex-col items-start gap-3.5 rounded-[40px] border-[1.5px] border-white/20 bg-mock-phone p-[18px] drop-shadow-mock-phone">
         <div className="flex w-full items-center justify-between">
           <p className="text-xs font-semibold text-text-onDark">{phone.time}</p>
           <div className="h-3.5 w-[46px] rounded-[7px] bg-white/[0.12]" />
@@ -80,7 +81,7 @@ function HeroStage({ c }: { c: HeroContent }) {
       {/* Transit card */}
       <div className="absolute left-[30px] top-[318.47px] flex h-[258.249px] w-[353.758px] items-center justify-center">
         <div className="-rotate-12">
-          <div className="relative h-[196px] w-[320px] overflow-hidden rounded-[26px] border-[1.2px] border-white/35 bg-mock-card shadow-[0px_24px_50px_0px_rgba(0,0,0,0.5)]">
+          <div className="relative h-[196px] w-[320px] overflow-hidden rounded-[26px] border-[1.2px] border-white/35 bg-mock-card shadow-mock-card-lg">
             <img src={sheenA} alt="" className="absolute left-[148.8px] top-[-111.2px] size-[240px] max-w-none" />
             <img src={sheenB} alt="" className="absolute left-[-71.2px] top-[98.8px] size-[180px] max-w-none" />
             <img src={contactless} alt="" className="absolute left-[24.8px] top-[22.8px] size-[34px]" />
@@ -97,7 +98,7 @@ function HeroStage({ c }: { c: HeroContent }) {
       </div>
 
       {/* Transfer glass card */}
-      <div className="absolute left-[360px] top-[470px] flex h-[176px] w-[290px] flex-col items-start gap-3 rounded-3xl border border-white/[0.22] bg-white/[0.08] p-5 drop-shadow-[0px_20px_20px_rgba(0,0,0,0.4)] backdrop-blur-[12px]">
+      <div className="absolute left-[360px] top-[470px] flex h-[176px] w-[290px] flex-col items-start gap-3 rounded-3xl border border-white/[0.22] bg-white/[0.08] p-5 drop-shadow-mock-glass backdrop-blur-[12px]">
         <div className="flex w-full items-center justify-between">
           <p className="text-[15px] font-bold text-text-onDark">{transfer.title}</p>
           <span className="flex items-start rounded-pill bg-mock-violetChip px-2.5 py-1 text-[10.5px] font-semibold text-mock-violet">
@@ -135,7 +136,13 @@ function HeroStage({ c }: { c: HeroContent }) {
 
 export function HeroSection({ content }: { content: HeroContent }) {
   return (
-    <HeroShell ellipse={ellipseHero} className="xl:h-[860px]">
+    <HeroShell
+      ellipse={ellipseHero}
+      smallEllipse={ellipseSmall}
+      ellipseClass="left-[760px] top-[20px]"
+      smallEllipseClass="left-[980px] top-[380px]"
+      className="xl:h-[860px]"
+    >
       <div className="flex flex-col gap-10 pb-4 xl:pb-0">
         <div className="relative z-10 flex flex-col items-start gap-[26px] xl:absolute xl:left-0 xl:top-[186px]">
           <h1 className="max-w-[700px] text-[40px] font-bold leading-[1.15] tracking-[-0.03em] text-white sm:text-[52px] xl:text-[68px] xl:leading-[90px]">

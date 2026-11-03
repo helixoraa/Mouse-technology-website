@@ -41,6 +41,25 @@ async function seedMedia() {
   console.log(`Media: ${n} files -> ${dest}`);
 }
 
+/** Client-bundled animations (client/public/animations) are registered in the Media library so admins can see and reuse them. */
+async function seedBundledMedia() {
+  const dir = path.resolve(here, '../../client/public/animations');
+  if (!fs.existsSync(dir)) return;
+  const types: Record<string, string> = { '.svg': 'image/svg+xml', '.webp': 'image/webp' };
+  let n = 0;
+  for (const file of fs.readdirSync(dir)) {
+    const mimeType = types[path.extname(file).toLowerCase()];
+    if (!mimeType) continue;
+    const url = `/animations/${file}`;
+    const size = fs.statSync(path.join(dir, file)).size;
+    const existing = await prisma.media.findFirst({ where: { url } });
+    if (existing) await prisma.media.update({ where: { id: existing.id }, data: { filename: file, mimeType, size } });
+    else await prisma.media.create({ data: { url, filename: file, mimeType, size } });
+    n++;
+  }
+  console.log(`Bundled media registered: ${n}`);
+}
+
 async function seedAdmin() {
   const email = process.env.ADMIN_EMAIL?.toLowerCase();
   const password = process.env.ADMIN_PASSWORD;
@@ -128,6 +147,7 @@ async function seedCollections() {
 
 async function main() {
   await seedMedia();
+  await seedBundledMedia();
   await seedAdmin();
   const pages = await loadPageSeeds();
   await seedPages(pages);

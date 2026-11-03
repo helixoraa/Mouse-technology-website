@@ -264,6 +264,7 @@ crud(
     image: optStr,
     author: z.string().trim().max(160).default('MAOUAJ Team'),
     publishedAt: z.coerce.date().optional(),
+    dateLabel: optStr,
     visible: z.boolean().optional(),
   }),
   { ordered: false, defaultOrder: { publishedAt: 'desc' } },

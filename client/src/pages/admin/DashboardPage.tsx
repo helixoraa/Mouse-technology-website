@@ -43,7 +43,7 @@ export default function DashboardPage() {
           <h2 id="recent-leads" className="text-lg font-extrabold text-ink">
             Recent leads
           </h2>
-          <Link to="/admin/leads" className="text-sm font-bold text-brand hover:underline">
+          <Link to="/admin/leads" className="inline-flex items-center text-sm font-bold text-brand hover:underline max-lg:min-h-11">
             Open inbox →
           </Link>
         </div>

@@ -29,7 +29,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 /** Resolve an uploaded/seeded media URL against the API origin. */
 export function mediaUrl(src?: string | null): string {
   if (!src) return '';
-  if (/^(https?:|data:|blob:)/.test(src)) return src;
+  if (/^(https?:|data:|blob:)/.test(src) || src.startsWith('/animations/')) return src; // /animations/* ships with the client
   return `${BASE}${src}`;
 }
 

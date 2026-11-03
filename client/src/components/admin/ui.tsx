@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAt
 import { cn } from '@/lib/cn';
 
 export const inputCls =
-  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-500/60 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 disabled:bg-surface-soft';
+  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink max-lg:min-h-11 placeholder:text-ink-500/60 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 disabled:bg-surface-soft';
 
 export function Field({ label, hint, children, className }: { label: string; hint?: string; children: ReactNode; className?: string }) {
   return (
@@ -44,7 +44,7 @@ export function Btn({
       {...rest}
       className={cn(
         'inline-flex items-center justify-center gap-2 rounded-xl font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-        size === 'sm' ? 'px-3 py-1.5 text-xs' : 'px-4 py-2.5 text-sm',
+        size === 'sm' ? 'px-3 py-1.5 text-xs max-lg:min-h-11 max-lg:min-w-11 max-lg:px-4' : 'px-4 py-2.5 text-sm max-lg:min-h-11',
         variants[variant],
         className,
       )}
@@ -60,7 +60,11 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className={cn('relative h-6 w-11 shrink-0 rounded-pill transition-colors', checked ? 'bg-brand' : 'bg-line-dash')}
+      className={cn(
+        // before: invisible 44px-tall hit area around the 24px-tall switch
+        "relative h-6 w-11 shrink-0 rounded-pill transition-colors before:absolute before:-inset-y-2.5 before:inset-x-0 before:content-['']",
+        checked ? 'bg-brand' : 'bg-line-dash',
+      )}
     >
       <span className={cn('absolute top-0.5 size-5 rounded-full bg-white shadow transition-all', checked ? 'left-[22px]' : 'left-0.5')} />
     </button>

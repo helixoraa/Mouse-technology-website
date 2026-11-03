@@ -40,7 +40,7 @@ export function FaqSection({ content }: { content: FaqContent }) {
                     aria-expanded={open}
                     aria-controls={`faq-${f.id}`}
                     onClick={() => setOpenId(open ? null : f.id)}
-                    className="flex w-full items-center justify-between gap-4 text-left"
+                    className="flex w-full items-center justify-between gap-4 text-left max-xl:min-h-11"
                   >
                     <span className="text-lg font-bold text-ink-700">{f.question}</span>
                     <span className={cn('flex shrink-0 items-start rounded-pill p-2', open ? 'bg-mock-blue' : 'bg-line-dash')}>

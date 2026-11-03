@@ -10,10 +10,16 @@ const config: Config = {
     screens: { sm: '640px', md: '768px', lg: '1024px', xl: '1280px', '2xl': '1440px' },
     extend: {
       colors: {
-        navy: { 950: '#050a18', 900: '#0a1640', 800: '#0e2c56', 700: '#0a1e39' },
+        navy: { 950: '#050a18', 900: '#0a1640', 800: '#0e2c56', 700: '#0a1e39', form: '#0b1430' },
         ink: { DEFAULT: '#0a1330', 700: '#3a4670', 500: '#5a6791' },
         surface: { DEFAULT: '#ffffff', soft: '#f4f7ff', tint: '#eaf0ff' },
-        line: { DEFAULT: '#d3ddf3', dash: '#c9d6f5', chip: 'rgba(198, 210, 240, 0.4)', chipBg: 'rgba(198, 210, 240, 0.14)' },
+        line: {
+          DEFAULT: '#d3ddf3',
+          form: '#d8e2f8',
+          dash: '#c9d6f5',
+          chip: 'rgba(198, 210, 240, 0.4)',
+          chipBg: 'rgba(198, 210, 240, 0.14)',
+        },
         brand: {
           DEFAULT: '#2456ff',
           press: '#2c57f6',
@@ -66,7 +72,7 @@ const config: Config = {
           dark: '#060c26',
         },
       },
-      fontFamily: { sans: ['"Manrope Variable"', 'Manrope', 'system-ui', 'sans-serif'] },
+      fontFamily: { sans: ['"Manrope Variable"', '"Manrope Fallback"', 'Manrope', 'system-ui', 'sans-serif'] },
       fontSize: {
         nav: ['13.5px', { lineHeight: 'normal' }],
         eyebrow: ['12px', { lineHeight: 'normal', letterSpacing: '0.16em' }],
@@ -83,6 +89,16 @@ const config: Config = {
       boxShadow: {
         card: '0px 10px 30px 0px rgba(10, 31, 102, 0.08)',
         policy: '0px 10px 15px rgba(10, 31, 102, 0.08)',
+        // Home page mockup illustrations
+        'mock-card-lg': '0px 24px 50px 0px rgba(0, 0, 0, 0.5)',
+        'mock-card-md': '0px 20px 40px 0px rgba(0, 0, 0, 0.5)',
+      },
+      dropShadow: {
+        'mock-phone': '0px 30px 30px rgba(0, 0, 0, 0.55)',
+        'mock-glass': '0px 20px 20px rgba(0, 0, 0, 0.4)',
+        'mock-reader': '0px 24px 25px rgba(0, 0, 0, 0.5)',
+        'mock-panel': '0px 30px 30px rgba(0, 0, 0, 0.5)',
+        'mock-tile': '0px 18px 18px rgba(0, 0, 0, 0.4)',
       },
       backgroundImage: {
         hero: 'linear-gradient(to bottom, #050a18, #0a1640)',

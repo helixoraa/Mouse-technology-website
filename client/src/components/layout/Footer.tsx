@@ -16,10 +16,14 @@ export function Footer() {
           </div>
           <div className="flex flex-wrap gap-10 lg:gap-20">
             {footer.columns.map((col) => (
-              <div key={col.title} className="flex flex-col gap-3">
-                <h2 className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-brand-sky">{col.title}</h2>
+              <div key={col.title} className="flex min-w-[40%] flex-col gap-3 max-xl:gap-0 sm:min-w-0">
+                <h2 className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-brand-sky max-xl:mb-1">{col.title}</h2>
                 {col.links.map((l) => (
-                  <Link key={l.href + l.label} to={l.href} className="text-sm font-medium text-white hover:text-brand-sky">
+                  <Link
+                    key={l.href + l.label}
+                    to={l.href}
+                    className="text-sm font-medium text-white hover:text-brand-sky max-xl:flex max-xl:min-h-11 max-xl:items-center"
+                  >
                     {l.label}
                   </Link>
                 ))}

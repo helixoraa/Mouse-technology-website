@@ -11,6 +11,7 @@ export default tseslint.config(
       'server/uploads/**',
       'design-reference/**',
       '.figma-raw/**',
+      'qa-screenshots/**',
       'client/src/assets/**',
       '**/*.config.js',
     ],

@@ -17,7 +17,7 @@ const team: PageSeed = {
       content: {
         eyebrow: 'Our Team',
         title: [{ text: 'Meet  ' }, { text: 'people', accent: true }, { text: ' behind MAOUAJ Technology.' }],
-        lead: 'sThe leadership and team shaping our products and business portfolio, introduced through their names, roles and short biographies.',
+        lead: 'The leadership and team shaping our products and business portfolio, introduced through their names, roles and short biographies.',
       },
     },
     {

@@ -40,7 +40,7 @@ function BusVisual({ v }: { v: BusVisualContent }) {
       <img src={rippleB} alt="" className="absolute left-[300px] top-[160px] size-[260px] max-w-none" />
       <img src={rippleC} alt="" className="absolute left-[345px] top-[205px] size-[170px] max-w-none" />
 
-      <div className="absolute left-[360px] top-[130px] flex h-[300px] w-[200px] flex-col items-center justify-center gap-3.5 rounded-[30px] border-[1.5px] border-white/25 bg-mock-reader p-[18px] drop-shadow-[0px_24px_25px_rgba(0,0,0,0.5)]">
+      <div className="absolute left-[360px] top-[130px] flex h-[300px] w-[200px] flex-col items-center justify-center gap-3.5 rounded-[30px] border-[1.5px] border-white/25 bg-mock-reader p-[18px] drop-shadow-mock-reader">
         <div className="h-1.5 w-[60px] rounded-[3px] bg-white/20" />
         <div className="flex h-[150px] w-[160px] flex-col items-center justify-center gap-2.5 rounded-[20px] border border-mock-cyanBorder bg-mock-cyanBg p-5">
           <div className="flex items-start rounded-pill bg-mock-check p-3">
@@ -54,7 +54,7 @@ function BusVisual({ v }: { v: BusVisualContent }) {
 
       <div className="absolute left-[8.39px] top-[340px] flex h-[234.629px] w-[313.293px] items-center justify-center">
         <div className="rotate-[14deg]">
-          <div className="relative h-[172px] w-[280px] overflow-hidden rounded-3xl border-[1.2px] border-white/35 bg-mock-card shadow-[0px_20px_40px_0px_rgba(0,0,0,0.5)]">
+          <div className="relative h-[172px] w-[280px] overflow-hidden rounded-3xl border-[1.2px] border-white/35 bg-mock-card shadow-mock-card-md">
             <img src={cardEllipse} alt="" className="absolute left-[128.8px] top-[-101.2px] size-[220px] max-w-none" />
             <img src={contactlessSm} alt="" className="absolute left-[20.8px] top-[18.8px] size-7" />
             <p className="absolute left-[60.8px] top-[26.8px] text-[10px] font-semibold tracking-[0.18em] text-mock-cardText">
@@ -102,7 +102,7 @@ function MoneyVisual({ v }: { v: MoneyVisualContent }) {
         </div>
       </div>
 
-      <div className="absolute left-[110px] top-5 flex h-[470px] w-[400px] flex-col items-start gap-4 rounded-[30px] border border-white/[0.22] bg-mock-panel p-7 drop-shadow-[0px_30px_30px_rgba(0,0,0,0.5)]">
+      <div className="absolute left-[110px] top-5 flex h-[470px] w-[400px] flex-col items-start gap-4 rounded-[30px] border border-white/[0.22] bg-mock-panel p-7 drop-shadow-mock-panel">
         <div className="flex w-full items-center justify-between">
           <p className="text-lg font-bold text-text-onDark">{v.panelTitle}</p>
           <span className="flex items-start rounded-pill bg-mock-mintChip px-2.5 py-[5px] text-[11px] font-semibold text-mock-mint">
@@ -120,7 +120,7 @@ function MoneyVisual({ v }: { v: MoneyVisualContent }) {
         </div>
       </div>
 
-      <div className="absolute left-[349px] top-[226px] flex h-[126px] w-[250px] flex-col items-start gap-2.5 rounded-[22px] border border-white/25 bg-white/10 p-[18px] drop-shadow-[0px_18px_18px_rgba(0,0,0,0.4)] backdrop-blur-[12px]">
+      <div className="absolute left-[349px] top-[226px] flex h-[126px] w-[250px] flex-col items-start gap-2.5 rounded-[22px] border border-white/25 bg-white/10 p-[18px] drop-shadow-mock-tile backdrop-blur-[12px]">
         <p className="text-[13px] font-bold text-text-onDark">{v.trackerTitle}</p>
         {v.trackerSteps.map((s, i) => (
           <div key={s} className="flex items-center gap-2.5">
@@ -162,7 +162,10 @@ function ProductCard({ item, reverse }: { item: ProductItem; reverse?: boolean }
           ))}
         </ul>
         <p className="max-w-[560px] text-[12.5px] leading-[19px] text-ink-500">{item.note}</p>
-        <Link to={item.cta.href} className="flex items-center gap-2 text-[15px] font-bold text-brand hover:text-brand-press">
+        <Link
+          to={item.cta.href}
+          className="flex items-center gap-2 text-[15px] font-bold text-brand hover:text-brand-press max-xl:min-h-11"
+        >
           {item.cta.label}
           <img src={arrowBlue} alt="" className="size-4" />
         </Link>

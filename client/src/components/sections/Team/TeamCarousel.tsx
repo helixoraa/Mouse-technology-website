@@ -67,7 +67,7 @@ export function TeamCarousel({ content, members }: { content: TeamCarouselConten
   };
 
   const btn =
-    'flex size-[72px] flex-col items-center justify-center gap-1.5 rounded-full border border-line bg-surface-tint transition-opacity md:size-[104px]';
+    'flex size-[72px] shrink-0 flex-col items-center justify-center gap-1.5 rounded-full border border-line bg-surface-tint transition-opacity md:size-[104px]';
 
   return (
     <InnerBand tone="white" className="gap-10 xl:gap-16">
@@ -95,7 +95,10 @@ export function TeamCarousel({ content, members }: { content: TeamCarouselConten
             ←
           </span>
         </button>
-        <div className="flex items-center gap-2" role="group" aria-label="Carousel position">
+        <p aria-live="polite" className="text-sm font-semibold tabular-nums text-ink-700 sm:hidden">
+          {index + 1} / {max + 1}
+        </p>
+        <div className="hidden items-center sm:flex" role="group" aria-label="Carousel position">
           {Array.from({ length: max + 1 }, (_, i) => (
             <button
               key={i}
@@ -103,7 +106,7 @@ export function TeamCarousel({ content, members }: { content: TeamCarouselConten
               onClick={() => goTo(i)}
               aria-label={`Go to position ${i + 1}`}
               aria-current={i === index}
-              className="flex h-6 items-center"
+              className="flex h-11 items-center px-2 lg:px-1"
             >
               <span className={cn('block h-[3px] rounded-[2px] transition-all', i === index ? 'w-9 bg-brand-sky' : 'w-7 bg-line-dash')} />
             </button>

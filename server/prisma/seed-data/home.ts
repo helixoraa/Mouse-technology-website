@@ -113,8 +113,11 @@ const home: PageSeed = {
       content: {
         title: [{ text: 'Cashless ' }, { text: 'Bus Fare', accent: true }, { text: ' Platform' }],
         lead: 'Passengers tap a supported transit card; the system processes the fare and gives clear transaction information.',
-        image: '/uploads/seed/home-bus-fare.webp',
-        imageAlt: 'Passenger tapping a transit card on a bus fare reader',
+        animation: {
+          src: '/animations/bus-fare.svg',
+          staticImage: '/animations/bus-fare-static.webp',
+          alt: 'Animation: a passenger taps a transit card, the fare is paid and the card balance updates',
+        },
         cards: [
           { title: 'Cards & balances', text: 'Link a supported transit card, add balance and review your transaction history.' },
           { title: 'Fare payments', text: 'Tap the card on a supported reader and get a clear result.' },
@@ -128,8 +131,11 @@ const home: PageSeed = {
       content: {
         title: [{ text: 'Payment / ' }, { text: 'Money Transfer', accent: true }],
         lead: 'A payment product that makes transfer steps, transaction information and progress easy to follow.',
-        image: '/uploads/seed/home-money-transfer.webp',
-        imageAlt: 'Money transfer review and status screens',
+        animation: {
+          src: '/animations/global-transfer.svg',
+          staticImage: '/animations/global-transfer-static.webp',
+          alt: 'Animation: money transfers delivered around the world on a dotted globe',
+        },
         steps: [
           { no: '01', label: 'Choose a recipient' },
           { no: '02', label: 'Enter the amount' },
@@ -204,6 +210,11 @@ const home: PageSeed = {
       content: {
         title: [{ text: 'Blog & ' }, { text: 'Updates', accent: true }],
         lead: 'Product explanations, project progress and company news.',
+        postSlugs: [
+          'how-the-cashless-bus-fare-platform-will-work',
+          'an-introduction-to-the-payment-platform',
+          'an-introduction-to-the-payment-platform-2',
+        ],
         linkLabel: 'View all updates',
         linkHref: '/blog',
       },

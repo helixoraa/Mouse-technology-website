@@ -54,7 +54,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy-950/70 p-4 md:items-center"
+      className="fixed inset-0 z-50 flex justify-center overflow-y-auto bg-navy-950/70 px-4 py-6"
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
@@ -63,7 +63,8 @@ export function Modal({
         aria-modal="true"
         aria-label={title}
         className={cn(
-          'my-8 w-full rounded-2xl bg-white p-6 shadow-card',
+          // my-auto: centred when it fits, top-aligned + scrollable when taller than the viewport (no clipped top edge)
+          'my-auto w-full rounded-2xl bg-white p-6 shadow-card',
           size === 'sm' && 'max-w-md',
           size === 'md' && 'max-w-2xl',
           size === 'lg' && 'max-w-4xl',
@@ -75,7 +76,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="rounded-lg px-2 py-1 text-xl leading-none text-ink-500 hover:bg-surface-soft"
+            className="flex items-center justify-center rounded-lg px-2 py-1 text-xl leading-none text-ink-500 hover:bg-surface-soft max-lg:min-h-11 max-lg:min-w-11"
           >
             ×
           </button>
