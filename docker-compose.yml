@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: maouaj
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-maouaj}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (letters/digits only)}
       POSTGRES_DB: maouaj
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -25,11 +25,11 @@ services:
     environment:
       NODE_ENV: production
       PORT: 4000
-      DATABASE_URL: postgresql://maouaj:${POSTGRES_PASSWORD:-maouaj}@postgres:5432/maouaj?schema=public
-      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET (a long random string) in .env}
+      DATABASE_URL: postgresql://maouaj:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (letters/digits only)}@postgres:5432/maouaj?schema=public&pool_timeout=60&connect_timeout=30
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET (32+ random characters) in .env}
       CLIENT_URL: ${CLIENT_URL:-http://localhost:8080}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@maouaj.example}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD (12+ characters, not the example) in .env}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
       STORAGE_DRIVER: local
       UPLOAD_DIR: uploads

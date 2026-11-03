@@ -15,9 +15,11 @@ RUN npm run build -w server
 
 FROM base AS runtime
 ENV NODE_ENV=production
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/server ./server
+# The seed registers the client-bundled animations in the Media library (it reads ../../client/public/animations).
+COPY client/public/animations /app/client/public/animations
 WORKDIR /app/server
 EXPOSE 4000
-# Syncs the schema, seeds missing content (idempotent) and starts the API.
-CMD ["sh", "-c", "npx prisma db push --skip-generate && npm run db:seed && node dist/index.js"]
+# Checks secrets, syncs the schema, seeds missing content (idempotent) and starts the API.
+ENTRYPOINT ["sh", "/app/server/docker-entrypoint.sh"]

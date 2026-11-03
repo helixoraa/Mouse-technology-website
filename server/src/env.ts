@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { z } from 'zod';
+import { assertProductionSecrets } from './secrets.js';
 
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -20,6 +21,8 @@ if (!parsed.success) {
   console.error('Invalid environment configuration:', parsed.error.flatten().fieldErrors);
   process.exit(1);
 }
+
+assertProductionSecrets(parsed.data);
 
 export const env = parsed.data;
 export const isProd = env.NODE_ENV === 'production';

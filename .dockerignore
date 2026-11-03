@@ -1,0 +1,15 @@
+**/node_modules
+**/dist
+.git
+.github
+.env
+.env.*
+!.env.docker.example
+design-reference
+qa-screenshots
+.figma-raw
+docs
+*.log
+server/uploads/*
+!server/uploads/.gitkeep
+client/src/assets/raw
