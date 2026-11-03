@@ -21,6 +21,7 @@
     "admin:reset": "npm run admin:reset -w server --",
     "prod:deploy": "npm run prod:db:deploy -w server",
     "prod:seed": "npm run prod:db:seed -w server",
+    "prod:migrate-media": "npm run prod:migrate:media -w server --",
     "prod:admin-reset": "npm run prod:admin:reset -w server --"
   },
   "devDependencies": {

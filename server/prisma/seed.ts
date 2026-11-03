@@ -15,6 +15,7 @@ import sharp from 'sharp';
 import { PrismaClient, type Prisma } from '@prisma/client';
 import { assertProductionSecrets } from '../src/secrets.js';
 import { hashPassword } from '../src/lib/password.js';
+import { migrateLocalMedia, printMigrateSummary } from '../src/lib/media-migrate.js';
 import type { PageSeed } from './seed-data/types.js';
 import { faqs, posts, services, settings, team, testimonials } from './seed-data/collections.js';
 
@@ -227,6 +228,12 @@ async function main() {
   await seedPages(pages);
   await seedSettings(pages);
   await seedCollections();
+  if (useBlob) {
+    // Safety net: seeding never overwrites existing rows, so records created by an earlier local-storage seed (or edited
+    // in the admin) may still hold /uploads/... paths. Rewrite every one of them to its Blob URL.
+    const r = await migrateLocalMedia(prisma, { log: console.log });
+    printMigrateSummary(r, false);
+  }
 }
 
 main()
