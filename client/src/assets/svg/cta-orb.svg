@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Glass orb">
+<circle cx="110" cy="110" r="110" fill="url(#paint0_linear_0_8)"/>
+<circle cx="110" cy="110" r="109.5" stroke="white" stroke-opacity="0.4"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_8" x1="46.9066" y1="19.8933" x2="173.093" y2="200.107" gradientUnits="userSpaceOnUse">
+<stop stop-color="#F0F7FF"/>
+<stop offset="0.45" stop-color="#7DB2FF"/>
+<stop offset="1" stop-color="#1E2A78"/>
+</linearGradient>
+</defs>
+</svg>

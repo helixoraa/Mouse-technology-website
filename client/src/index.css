@@ -1,0 +1,20 @@
+@import '@fontsource-variable/manrope';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-navy-950 font-sans text-ink antialiased;
+    overflow-x: hidden;
+  }
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-brand-sky;
+  }
+  img {
+    @apply max-w-full;
+  }
+}
