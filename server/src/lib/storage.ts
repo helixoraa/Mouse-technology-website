@@ -9,12 +9,14 @@ export interface StoredFile {
 }
 
 /**
- * Storage abstraction. The local driver writes to UPLOAD_DIR and is served from /uploads.
- * To use S3, implement this interface (put -> PutObject, remove -> DeleteObject, return the CDN/public URL)
- * and select it in `createStorage` via STORAGE_DRIVER.
+ * Storage abstraction (STORAGE_DRIVER):
+ *  - "local": writes to UPLOAD_DIR, served from /uploads (development, docker).
+ *  - "blob":  Vercel Blob (serverless has no persistent disk). Public URLs are stored in Media rows.
+ * To use S3, implement this interface (put -> PutObject, remove -> DeleteObject, return the public/CDN URL)
+ * and select it in `createStorage`.
  */
 export interface StorageDriver {
-  put(buffer: Buffer, originalName: string): Promise<StoredFile>;
+  put(buffer: Buffer, originalName: string, contentType?: string): Promise<StoredFile>;
   remove(url: string): Promise<void>;
 }
 
@@ -36,8 +38,46 @@ class LocalStorage implements StorageDriver {
   }
 }
 
+/** Public Vercel Blob URLs look like https://<store-id>.public.blob.vercel-storage.com/<path>. */
+export const isBlobUrl = (url: string) => {
+  try {
+    return new URL(url).hostname.endsWith('.blob.vercel-storage.com');
+  } catch {
+    return false;
+  }
+};
+
+class VercelBlobStorage implements StorageDriver {
+  private token = env.BLOB_READ_WRITE_TOKEN as string;
+
+  async put(buffer: Buffer, originalName: string, contentType?: string): Promise<StoredFile> {
+    const { put } = await import('@vercel/blob'); // loaded lazily: local/docker runs never need it
+    const ext = path.extname(originalName).toLowerCase();
+    const base =
+      path
+        .basename(originalName, ext)
+        .replace(/[^a-z0-9-_]+/gi, '-')
+        .slice(0, 60) || 'file';
+    const blob = await put(`uploads/${base}${ext}`, buffer, {
+      access: 'public',
+      addRandomSuffix: true,
+      contentType,
+      token: this.token,
+    });
+    return { url: blob.url, filename: path.basename(blob.pathname) };
+  }
+
+  async remove(url: string): Promise<void> {
+    if (!isBlobUrl(url)) return; // never touch anything that is not a Blob URL (e.g. /animations/*)
+    const { del } = await import('@vercel/blob');
+    await del(url, { token: this.token });
+  }
+}
+
 export function createStorage(): StorageDriver {
   switch (env.STORAGE_DRIVER) {
+    case 'blob':
+      return new VercelBlobStorage();
     case 'local':
     default:
       return new LocalStorage();

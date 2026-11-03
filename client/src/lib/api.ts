@@ -22,6 +22,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   });
   if (res.status === 204) return undefined as T;
   const data = await res.json().catch(() => ({}));
+  if (res.status === 401 && path.startsWith('/admin')) window.dispatchEvent(new Event('maouaj:unauthorized'));
   if (!res.ok) throw new ApiError(res.status, data?.error ?? res.statusText, data?.details);
   return data as T;
 }

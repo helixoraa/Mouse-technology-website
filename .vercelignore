@@ -1,0 +1,8 @@
+# Files not needed to build or run the site (keeps `vercel deploy` uploads small; git-based deploys are unaffected).
+design-reference
+qa-screenshots
+.figma-raw
+docs
+server/uploads
+server/seed-media
+**/*.log
