@@ -43,7 +43,9 @@ export function Navbar() {
               <NavLink
                 to={l.href}
                 onClick={() => setOpen(false)}
-                className={({ isActive }) => cn('block rounded-lg px-3 py-2 text-nav font-medium hover:bg-white/10', isActive ? 'text-brand-sky' : 'text-white')}
+                className={({ isActive }) =>
+                  cn('block rounded-lg px-3 py-2 text-nav font-medium hover:bg-white/10', isActive ? 'text-brand-sky' : 'text-white')
+                }
               >
                 {l.label}
               </NavLink>

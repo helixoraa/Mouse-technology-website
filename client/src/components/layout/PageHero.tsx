@@ -9,7 +9,9 @@ export function PageHero({
   lead,
   headingClass = 'text-[40px] leading-[1.15] md:text-h-page',
   ellipse,
+  leadClass = 'text-lg leading-7 md:text-xl md:leading-7',
 }: {
+  leadClass?: string;
   eyebrow?: string;
   title: Segment[] | string;
   lead?: string;
@@ -25,7 +27,7 @@ export function PageHero({
             <h1 className={`font-bold tracking-[-0.03em] ${headingClass}`}>
               <Segments parts={title} accentClass="text-brand-sky" />
             </h1>
-            {lead && <p className="max-w-[655px] text-lg leading-7 md:text-xl md:leading-7">{lead}</p>}
+            {lead && <p className={`max-w-[655px] ${leadClass}`}>{lead}</p>}
           </div>
         </div>
         <div className="h-px w-full bg-keyline" />

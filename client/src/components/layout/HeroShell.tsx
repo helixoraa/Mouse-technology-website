@@ -4,7 +4,15 @@ import ellipseSmall from '@/assets/svg/ellipse-small.svg';
 import { Navbar } from './Navbar';
 
 /** Dark gradient hero wrapper with the glow ellipses and navigation, shared by every page frame. */
-export function HeroShell({ children, className = '', ellipse = ellipseHero }: { children: ReactNode; className?: string; ellipse?: string }) {
+export function HeroShell({
+  children,
+  className = '',
+  ellipse = ellipseHero,
+}: {
+  children: ReactNode;
+  className?: string;
+  ellipse?: string;
+}) {
   return (
     <header className={`relative overflow-hidden bg-hero px-5 pb-16 pt-[30px] md:px-10 xl:px-gutter xl:pb-20 ${className}`}>
       <div aria-hidden className="pointer-events-none absolute left-[52%] top-[21px] hidden size-[640px] md:block">

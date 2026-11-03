@@ -10,7 +10,13 @@ const styles: Record<Variant, string> = {
   glass: 'border border-white/40 bg-white/10 text-text-onDark hover:bg-white/20',
 };
 
-type Props = { to?: string; variant?: Variant; withArrow?: boolean; children: ReactNode; className?: string } & ButtonHTMLAttributes<HTMLButtonElement>;
+type Props = {
+  to?: string;
+  variant?: Variant;
+  withArrow?: boolean;
+  children: ReactNode;
+  className?: string;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
 export function Button({ to, variant = 'primary', withArrow, children, className, ...rest }: Props) {
   const cls = cn(

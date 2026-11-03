@@ -27,7 +27,10 @@ export function CtaCard({ content }: { content: CtaContent }) {
         </div>
         <div className="relative flex flex-col items-start gap-5">
           <p className="text-eyebrow font-semibold uppercase text-text-soft">{content.eyebrow}</p>
-          <h2 id="cta-heading" className="max-w-[640px] text-[34px] font-extrabold leading-[1.1] tracking-[-0.03em] text-text-onDark md:text-h-section">
+          <h2
+            id="cta-heading"
+            className="max-w-[640px] text-[34px] font-extrabold leading-[1.1] tracking-[-0.03em] text-text-onDark md:text-h-section"
+          >
             {content.lines.map((l) => (
               <span key={l} className="block">
                 {l}
