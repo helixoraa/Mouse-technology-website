@@ -1,13 +1,15 @@
 import { Router, type RequestHandler } from 'express';
-import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '../db.js';
+import { env } from '../env.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 import { HttpError, validate, wrap } from '../middleware/common.js';
 import { storage } from '../lib/storage.js';
 import { PAGE_KEYS } from './public.js';
+import { securityRouter } from './security.js';
+import { auditRouter, usersRouter } from './users.js';
 
 export const adminRouter = Router();
 adminRouter.use(requireAuth, requireRole('ADMIN', 'EDITOR'));
@@ -270,59 +272,10 @@ crud(
   { ordered: false, defaultOrder: { publishedAt: 'desc' } },
 );
 
-/* ---------- Users (ADMIN only) ---------- */
-const users = Router();
-users.use(requireRole('ADMIN'));
-const safeUser = { id: true, email: true, name: true, role: true, createdAt: true, updatedAt: true } as const;
-const userBody = z.object({
-  email: z.string().trim().toLowerCase().email(),
-  name: z.string().trim().min(1).max(120),
-  role: z.enum(['ADMIN', 'EDITOR']),
-  password: z.string().min(8, 'Password must be at least 8 characters').max(200),
-});
-
-users.get(
-  '/',
-  wrap(async (_req, res) => res.json(await prisma.user.findMany({ select: safeUser, orderBy: { createdAt: 'asc' } }))),
-);
-users.post(
-  '/',
-  validate({ body: userBody }),
-  wrap(async (req, res) => {
-    const b = req.body as z.infer<typeof userBody>;
-    const created = await prisma.user.create({
-      data: { email: b.email, name: b.name, role: b.role, password: await bcrypt.hash(b.password, 12) },
-      select: safeUser,
-    });
-    res.status(201).json(created);
-  }),
-);
-users.put(
-  '/:id',
-  validate({ params: idParams, body: userBody.partial() }),
-  wrap(async (req, res) => {
-    const { password, ...rest } = req.body as Partial<z.infer<typeof userBody>>;
-    if (req.params.id === req.user!.id && rest.role && rest.role !== 'ADMIN')
-      throw new HttpError(400, 'You cannot remove your own admin role');
-    res.json(
-      await prisma.user.update({
-        where: { id: req.params.id },
-        data: { ...rest, ...(password ? { password: await bcrypt.hash(password, 12) } : {}) },
-        select: safeUser,
-      }),
-    );
-  }),
-);
-users.delete(
-  '/:id',
-  validate({ params: idParams }),
-  wrap(async (req, res) => {
-    if (req.params.id === req.user!.id) throw new HttpError(400, 'You cannot delete your own account');
-    await prisma.user.delete({ where: { id: req.params.id } });
-    res.status(204).end();
-  }),
-);
-adminRouter.use('/users', users);
+/* ---------- Security, users and audit log ---------- */
+adminRouter.use('/security', securityRouter);
+adminRouter.use('/users', usersRouter);
+adminRouter.use('/audit', auditRouter);
 
 /* ---------- Leads ---------- */
 const csvCell = (v: unknown) => {
@@ -419,9 +372,11 @@ adminRouter.put(
 
 /* ---------- Media ---------- */
 const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif']);
+// Vercel functions accept request bodies up to 4.5 MB, so the Blob driver caps uploads at 4 MB (memory storage: no disk).
+const MAX_UPLOAD_BYTES = (env.STORAGE_DRIVER === 'blob' ? 4 : 5) * 1024 * 1024;
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+  limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 },
   fileFilter: (_req, file, cb) => (ALLOWED.has(file.mimetype) ? cb(null, true) : cb(new HttpError(400, 'Unsupported file type'))),
 });
 
@@ -434,7 +389,7 @@ adminRouter.post(
   upload.single('file') as RequestHandler,
   wrap(async (req, res) => {
     if (!req.file) throw new HttpError(400, 'No file uploaded (field name: file)');
-    const stored = await storage.put(req.file.buffer, req.file.originalname);
+    const stored = await storage.put(req.file.buffer, req.file.originalname, req.file.mimetype);
     const media = await prisma.media.create({
       data: { url: stored.url, filename: req.file.originalname, mimeType: req.file.mimetype, size: req.file.size },
     });

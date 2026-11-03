@@ -52,7 +52,7 @@ function move<T>(arr: T[], from: number, to: number): T[] {
 
 function SegmentsEditor({ label, value, onChange }: { label: string; value: Segment[]; onChange: (v: Segment[]) => void }) {
   return (
-    <fieldset className="rounded-xl border border-line p-3">
+    <fieldset className="min-w-0 rounded-xl border border-line p-3">
       <legend className="px-1 text-xs font-bold uppercase tracking-wider text-ink-700">{label} (heading words)</legend>
       <p className="mb-2 rounded-lg bg-navy-950 px-3 py-2 text-sm font-bold text-white" aria-label="Preview">
         <Segments parts={value} accentClass="text-brand-sky" />
@@ -113,16 +113,16 @@ function ArrayEditor({
   const allPrimitive = value.length > 0 && value.every((v) => typeof v === 'string');
   const template = value.length ? blank(value[value.length - 1]) : '';
   return (
-    <fieldset className="rounded-xl border border-line p-3">
+    <fieldset className="min-w-0 rounded-xl border border-line p-3">
       <legend className="px-1 text-xs font-bold uppercase tracking-wider text-ink-700">
         {label} ({value.length})
       </legend>
-      <div className="space-y-3">
+      <div className="min-w-0 space-y-3">
         {value.length === 0 && <p className="text-sm text-ink-500">No items yet.</p>}
         {value.map((item, i) => (
           <div key={i} className="rounded-xl border border-line-dash bg-surface-soft/60 p-3">
             <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="truncate text-sm font-bold text-ink">
+              <span className="min-w-0 truncate text-sm font-bold text-ink">
                 {i + 1}. {allPrimitive ? 'Text' : itemTitle(item, i)}
               </span>
               <div className="flex shrink-0 gap-1">
@@ -188,7 +188,7 @@ export function JsonNode({ name, fieldKey, value, onChange, depth = 0, bare }: N
   }
   if (isObj(value)) {
     const body = (
-      <div className="grid gap-4">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
         {Object.entries(value).map(([k, v]) => (
           <JsonNode
             key={k}
@@ -204,7 +204,7 @@ export function JsonNode({ name, fieldKey, value, onChange, depth = 0, bare }: N
     );
     if (bare || depth === 0) return body;
     return (
-      <fieldset className="rounded-xl border border-line p-3">
+      <fieldset className="min-w-0 rounded-xl border border-line p-3">
         <legend className="px-1 text-xs font-bold uppercase tracking-wider text-ink-700">{name}</legend>
         {body}
       </fieldset>

@@ -1,10 +1,15 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // rhel-openssl-3.0.x = the Vercel/AWS Lambda runtime (Node 20+/22). native = your machine (Windows/macOS/Linux).
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  // Neon: DATABASE_URL = pooled connection, DIRECT_URL = direct connection (used by migrations).
+  // Locally set DIRECT_URL equal to DATABASE_URL (scripts/prisma.mjs defaults it when unset).
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -18,13 +23,60 @@ enum LeadStatus {
 }
 
 model User {
+  id                 String       @id @default(cuid())
+  email              String       @unique
+  name               String
+  password           String
+  role               Role         @default(EDITOR)
+  active             Boolean      @default(true)
+  mustChangePassword Boolean      @default(false)
+  /// Bumped on every password/2FA/role/activation change: sessions carrying an older value are rejected.
+  sessionVersion     Int          @default(0)
+  /// AES-256-GCM encrypted TOTP secret (never returned by the API).
+  totpSecretEnc      String?
+  /// Secret generated during setup, promoted to totpSecretEnc once a valid code confirms it.
+  totpPendingEnc     String?
+  totpEnabled        Boolean      @default(false)
+  /// Last accepted TOTP time step: a code is rejected unless its step is newer (replay protection).
+  totpLastStep       Int?
+  lastLoginAt        DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  backupCodes        BackupCode[]
+}
+
+model BackupCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Kept after a user is deleted on purpose (userId has no relation).
+model AuditLog {
   id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String
-  role      Role     @default(EDITOR)
+  userId    String?
+  email     String   @default("")
+  action    String
+  success   Boolean  @default(true)
+  ip        String?
+  meta      Json?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([action, createdAt])
+  @@index([userId])
+}
+
+/// DB-backed rate limiting / lockouts (works on serverless where memory is not shared).
+model RateLimit {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
 }
 
 model PageSection {

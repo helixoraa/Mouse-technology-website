@@ -17,7 +17,9 @@ const nav: { to: string; label: string; end?: boolean; admin?: boolean; group?: 
   { to: '/admin/posts', label: 'Blog posts' },
   { to: '/admin/media', label: 'Media library' },
   { to: '/admin/settings', label: 'Site settings', group: 'Site' },
+  { to: '/admin/security', label: 'Security', group: 'Account' },
   { to: '/admin/users', label: 'Users', admin: true },
+  { to: '/admin/audit', label: 'Audit log', admin: true },
 ];
 
 export function AdminLayout() {

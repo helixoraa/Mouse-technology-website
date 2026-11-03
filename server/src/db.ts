@@ -1,3 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
-export const prisma = new PrismaClient();
+/** Singleton: cached on globalThis so serverless invocations / dev reloads reuse one client. */
+const globalForPrisma = globalThis as unknown as { __prisma?: PrismaClient };
+
+export const prisma = globalForPrisma.__prisma ?? new PrismaClient();
+globalForPrisma.__prisma = prisma;

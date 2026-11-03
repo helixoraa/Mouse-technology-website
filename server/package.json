@@ -5,24 +5,33 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && tsc -p tsconfig.build.json",
+    "build": "node scripts/prisma.mjs generate && tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "db:push": "prisma db push",
-    "db:generate": "prisma generate",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:generate": "node scripts/prisma.mjs generate",
+    "db:seed": "tsx prisma/seed.ts",
+    "admin:reset": "tsx scripts/admin-reset.ts",
+    "test": "vitest run",
+    "db:migrate": "node scripts/prisma.mjs migrate dev",
+    "db:deploy": "node scripts/prisma.mjs migrate deploy",
+    "db:status": "node scripts/prisma.mjs migrate status",
+    "prod:db:deploy": "node scripts/with-prod-env.mjs node scripts/prisma.mjs migrate deploy",
+    "prod:db:seed": "node scripts/with-prod-env.mjs tsx prisma/seed.ts",
+    "prod:admin:reset": "node scripts/with-prod-env.mjs tsx scripts/admin-reset.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "@vercel/blob": "^2.8.2",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "express-rate-limit": "^7.4.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -33,9 +42,13 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.9.0",
+    "@types/qrcode": "^1.5.6",
+    "@types/supertest": "^7.2.1",
     "prisma": "^5.22.0",
     "sharp": "^0.35.5",
+    "supertest": "^7.3.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.9"
   }
 }

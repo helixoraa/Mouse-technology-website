@@ -1,26 +1,96 @@
 /**
  * Seeds the database with the admin user and all Figma content.
  *   npm run db:seed            -> creates anything missing, never overwrites admin edits
- *   npm run db:seed -- --reset -> also resets sections/services/settings back to the Figma content
+ *   npm run db:seed -- --reset -> also resets sections/services/settings back to the Figma content (never touches users)
+ *   In production --reset is refused unless --force-production is also passed.
  * Images: every file in server/seed-media is copied to uploads/seed (png/jpg -> webp, svg/webp copied as-is).
+ *   With STORAGE_DRIVER=blob they are uploaded to Vercel Blob once instead (idempotent, tracked in the Media table) and every
+ *   /uploads/seed/<file> reference in the seed content is rewritten to the Blob URL before it is saved.
  */
 import 'dotenv/config';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
-import bcrypt from 'bcryptjs';
 import sharp from 'sharp';
 import { PrismaClient, type Prisma } from '@prisma/client';
+import { assertProductionSecrets } from '../src/secrets.js';
+import { hashPassword } from '../src/lib/password.js';
 import type { PageSeed } from './seed-data/types.js';
 import { faqs, posts, services, settings, team, testimonials } from './seed-data/collections.js';
+
+const isProduction = process.env.NODE_ENV === 'production';
+assertProductionSecrets(process.env); // never seed a production database with default secrets
 
 const prisma = new PrismaClient();
 const here = path.dirname(fileURLToPath(import.meta.url));
 const reset = process.argv.includes('--reset') || process.env.SEED_RESET === 'true';
+if (reset && isProduction && !process.argv.includes('--force-production')) {
+  console.error(
+    'Refusing to run the seed with --reset (or SEED_RESET=true) when NODE_ENV=production: it overwrites content edited in the admin.\n' +
+      'Pass --force-production as well if you really mean it.',
+  );
+  process.exit(1);
+}
 const json = (v: unknown) => v as Prisma.InputJsonValue;
+const useBlob = process.env.STORAGE_DRIVER === 'blob';
+/** '/uploads/seed/<file>' -> public Blob URL (filled by seedMediaToBlob). */
+const seedUrlMap = new Map<string, string>();
+
+/** Replaces /uploads/seed/<file> inside every string of a plain JSON-like value, in place. */
+function rewriteSeedUrls(node: unknown): void {
+  if (Array.isArray(node)) {
+    node.forEach((v, i) => {
+      if (typeof v === 'string') node[i] = replaceSeedUrls(v);
+      else rewriteSeedUrls(v);
+    });
+  } else if (node && typeof node === 'object' && Object.getPrototypeOf(node) === Object.prototype) {
+    const o = node as Record<string, unknown>;
+    for (const k of Object.keys(o)) {
+      if (typeof o[k] === 'string') o[k] = replaceSeedUrls(o[k] as string);
+      else rewriteSeedUrls(o[k]);
+    }
+  }
+}
+const replaceSeedUrls = (str: string) => str.replace(/\/uploads\/seed\/[\w.-]+/g, (m) => seedUrlMap.get(m) ?? m);
+
+/** Production/blob mode: upload server/seed-media to Vercel Blob once; Media rows (filename "seed/<file>") make re-runs idempotent. */
+async function seedMediaToBlob(src: string) {
+  const token = process.env.BLOB_READ_WRITE_TOKEN?.trim();
+  if (!token) throw new Error('STORAGE_DRIVER=blob requires BLOB_READ_WRITE_TOKEN');
+  const { put } = await import('@vercel/blob');
+  const types: Record<string, string> = { '.webp': 'image/webp', '.svg': 'image/svg+xml', '.gif': 'image/gif' };
+  let uploaded = 0;
+  let reused = 0;
+  for (const file of fs.readdirSync(src)) {
+    const ext = path.extname(file).toLowerCase();
+    const base = path.basename(file, ext);
+    const convert = ['.png', '.jpg', '.jpeg'].includes(ext);
+    if (!convert && !types[ext]) continue;
+    const outName = convert ? `${base}.webp` : file;
+    const key = `seed/${outName}`;
+    const existing = await prisma.media.findFirst({ where: { filename: key, url: { startsWith: 'https://' } } });
+    if (existing) {
+      seedUrlMap.set(`/uploads/seed/${outName}`, existing.url);
+      reused++;
+      continue;
+    }
+    const from = path.join(src, file);
+    const buffer = convert ? await sharp(from).webp({ quality: 86 }).toBuffer() : fs.readFileSync(from);
+    const contentType = convert ? 'image/webp' : types[ext];
+    const blob = await put(key, buffer, { access: 'public', addRandomSuffix: false, allowOverwrite: true, contentType, token });
+    await prisma.media.create({ data: { url: blob.url, filename: key, mimeType: contentType, size: buffer.length } });
+    seedUrlMap.set(`/uploads/seed/${outName}`, blob.url);
+    uploaded++;
+  }
+  console.log(`Media -> Vercel Blob: ${uploaded} uploaded, ${reused} already there`);
+}
 
 async function seedMedia() {
   const src = path.resolve(here, '../seed-media');
+  if (useBlob) {
+    if (fs.existsSync(src)) await seedMediaToBlob(src);
+    return;
+  }
   const dest = path.resolve(process.cwd(), process.env.UPLOAD_DIR ?? 'uploads', 'seed');
   fs.mkdirSync(dest, { recursive: true });
   if (!fs.existsSync(src)) return;
@@ -60,17 +130,20 @@ async function seedBundledMedia() {
   console.log(`Bundled media registered: ${n}`);
 }
 
+/** Creates the first admin only when missing. Never changes an existing account (password, 2FA, role), even with --reset. */
 async function seedAdmin() {
   const email = process.env.ADMIN_EMAIL?.toLowerCase();
   const password = process.env.ADMIN_PASSWORD;
   if (!email || !password) throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set to seed the admin user');
-  const hash = await bcrypt.hash(password, 12);
-  await prisma.user.upsert({
-    where: { email },
-    update: reset ? { password: hash, role: 'ADMIN' } : {},
-    create: { email, name: 'Administrator', password: hash, role: 'ADMIN' },
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    console.log(`Admin user exists, left unchanged: ${email}`);
+    return;
+  }
+  await prisma.user.create({
+    data: { email, name: 'Administrator', password: await hashPassword(password), role: 'ADMIN', mustChangePassword: true },
   });
-  console.log(`Admin user: ${email}`);
+  console.log(`Admin user created: ${email} (must change password and set up 2FA on first login)`);
 }
 
 async function loadPageSeeds(): Promise<PageSeed[]> {
@@ -150,6 +223,7 @@ async function main() {
   await seedBundledMedia();
   await seedAdmin();
   const pages = await loadPageSeeds();
+  if (useBlob) for (const data of [pages, services, posts, team, faqs, testimonials, settings]) rewriteSeedUrls(data);
   await seedPages(pages);
   await seedSettings(pages);
   await seedCollections();

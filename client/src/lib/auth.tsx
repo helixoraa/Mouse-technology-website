@@ -1,12 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from './api';
 import type { User } from './types';
 
 interface AuthState {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  /** Called by the login flow once the final step (2FA code / setup) has issued the session cookie. */
+  setUser: (u: User | null) => void;
   logout: () => Promise<void>;
 }
 
@@ -15,6 +17,7 @@ const AuthCtx = createContext<AuthState | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const qc = useQueryClient();
 
   useEffect(() => {
     let alive = true;
@@ -30,9 +33,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const r = await api<{ user: User }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
-    setUser(r.user);
+  // A revoked session (password/2FA reset, deactivation) surfaces as 401 on any admin call: drop to the login screen.
+  useEffect(() => {
+    // A 401 can also mean "wrong current password/code" on a security endpoint, so confirm the session is really gone first.
+    const onUnauthorized = () => {
+      api('/auth/me').catch((e) => {
+        if (e instanceof ApiError && e.status === 401) setUser(null);
+      });
+    };
+    window.addEventListener('maouaj:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('maouaj:unauthorized', onUnauthorized);
   }, []);
 
   const logout = useCallback(async () => {
@@ -40,10 +50,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await api('/auth/logout', { method: 'POST' });
     } finally {
       setUser(null);
+      qc.clear();
     }
-  }, []);
+  }, [qc]);
 
-  const value = useMemo(() => ({ user, loading, login, logout }), [user, loading, login, logout]);
+  const value = useMemo(() => ({ user, loading, setUser, logout }), [user, loading, logout]);
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
 

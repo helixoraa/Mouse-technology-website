@@ -52,6 +52,10 @@ export const PAGES: { key: string; label: string; path: string }[] = [
 export function errMsg(e: unknown): string {
   if (e instanceof ApiError) {
     const d = e.details;
+    // password-policy style details: { problems: string[] } -> readable sentence
+    if (d && typeof d === 'object' && Array.isArray((d as { problems?: unknown }).problems)) {
+      return (d as { problems: string[] }).problems.join(' ');
+    }
     if (Array.isArray(d) && d.length) {
       return `${e.message}: ${d.map((x) => (typeof x === 'string' ? x : (x?.message ?? JSON.stringify(x)))).join('; ')}`;
     }
@@ -87,3 +91,61 @@ export async function downloadLeadsCsv(): Promise<void> {
 export const fmtDate = (iso?: string) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '');
 
 export const fmtSize = (n: number) => (n > 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
+
+// ---- Auth v2 (docs/CONTRACT.md) ----
+export type PreAuthNext = 'change-password' | 'setup-2fa' | 'verify-code';
+export interface PreAuthResponse {
+  preAuthToken: string;
+  next: PreAuthNext;
+}
+export interface TwoFaSetup {
+  manualKey: string;
+  otpauthUrl: string;
+  qrDataUrl: string;
+}
+export interface SecurityStatus {
+  totpEnabled: boolean;
+  backupCodesRemaining: number;
+}
+export interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  role: 'ADMIN' | 'EDITOR';
+  active: boolean;
+  mustChangePassword: boolean;
+  totpEnabled: boolean;
+  lastLoginAt: string | null;
+  createdAt?: string;
+}
+export interface AuditItem {
+  id: string;
+  userId: string | null;
+  email: string | null;
+  action: string;
+  success: boolean;
+  ip: string | null;
+  meta?: unknown;
+  createdAt: string;
+}
+export const AUDIT_ACTIONS = [
+  'login.password.ok',
+  'login.password.fail',
+  'login.2fa.ok',
+  'login.2fa.fail',
+  '2fa.enabled',
+  '2fa.backup.used',
+  '2fa.backup.regenerated',
+  'password.changed',
+  'user.created',
+  'user.updated',
+  'user.deleted',
+  'user.deactivated',
+  'user.activated',
+  'user.password.reset',
+  'user.2fa.reset',
+  'session.logout',
+];
+
+/** True when the server is rate limiting / locking the account (HTTP 423 or 429). */
+export const isLockout = (e: unknown) => e instanceof ApiError && (e.status === 429 || e.status === 423);

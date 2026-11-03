@@ -1,6 +1,6 @@
 import type { ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from 'express';
 import { ZodError, type ZodTypeAny, type z } from 'zod';
-import { isProd } from '../env.js';
+import { env, isProd } from '../env.js';
 
 /** Wrap async handlers so rejected promises reach the error handler. */
 export const wrap =
@@ -42,7 +42,7 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   const code = (err as { code?: string })?.code;
   if (code === 'P2025') return res.status(404).json({ error: 'Not found' });
   if (code === 'P2002') return res.status(409).json({ error: 'A record with that unique value already exists' });
-  if (code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'File too large (max 5MB)' });
+  if (code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: `File too large (max ${env.STORAGE_DRIVER === 'blob' ? 4 : 5}MB)` });
   console.error(err);
   res.status(500).json({ error: isProd ? 'Internal server error' : String((err as Error)?.message ?? err) });
 };

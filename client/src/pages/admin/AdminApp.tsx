@@ -9,7 +9,10 @@ import LoginPage from './LoginPage';
 import MediaPage from './MediaPage';
 import SectionsPage from './SectionsPage';
 import SettingsPage from './SettingsPage';
-import { FaqsAdminPage, PostsAdminPage, ServicesPage, TeamAdminPage, TestimonialsPage, UsersPage } from './resources';
+import { FaqsAdminPage, PostsAdminPage, ServicesPage, TeamAdminPage, TestimonialsPage } from './resources';
+import AuditPage from './AuditPage';
+import SecurityPage from './SecurityPage';
+import UsersPage from './UsersPage';
 
 /** Mounted at /admin/* — all paths below are relative to /admin. */
 export default function AdminApp() {
@@ -36,6 +39,15 @@ export default function AdminApp() {
               <Route path="leads" element={<LeadsPage />} />
               <Route path="media" element={<MediaPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="security" element={<SecurityPage />} />
+              <Route
+                path="audit"
+                element={
+                  <ProtectedRoute roles={['ADMIN']}>
+                    <AuditPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="users"
                 element={

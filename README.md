@@ -17,68 +17,93 @@ docker run -d --name maouaj-pg -e POSTGRES_USER=maouaj -e POSTGRES_PASSWORD=maou
 # 2. Environment
 cp server/.env.example server/.env      # edit JWT_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD
 cp client/.env.example client/.env
-# 3. Schema + seed (creates the admin user and all Figma content)
-npm run db:push
+# 3. Migrations + seed (creates the tables, the first admin and all Figma content)
+npm run db:deploy
 npm run db:seed
 # 4. Run API (http://localhost:4000) and site (http://localhost:5173)
 npm run dev
 ```
 
 Admin: <http://localhost:5173/admin> — sign in with `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `server/.env`
-(defaults in `.env.example`: `admin@maouaj.example` / `ChangeMe123!` — change them before deploying).
+(defaults in `.env.example`: `admin@maouaj.example` / `ChangeMe123!`). **Every account uses two-factor authentication (Google Authenticator / any TOTP app).**
+The first sign-in of the seeded admin forces: new password (min 12 chars) → 2FA setup (scan the QR code, confirm with a code) → 10 one-time backup codes (shown once, save them).
+If the dev database already has an admin from before 2FA existed, that admin simply sets up 2FA on the next sign-in.
 
 ## Environment variables
 
-| App    | Variable                        | Purpose                                                                                               |
-| ------ | ------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| server | `DATABASE_URL`                  | PostgreSQL connection string                                                                          |
-| server | `JWT_SECRET`                    | Signs the httpOnly session cookie (>= 16 chars, random in production)                                 |
-| server | `CLIENT_URL`                    | The only origin allowed by CORS (credentials enabled)                                                 |
-| server | `PORT`                          | API port (default 4000)                                                                               |
-| server | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Admin account created/updated by the seed                                                             |
-| server | `STORAGE_DRIVER`, `UPLOAD_DIR`  | Upload storage (`local` -> `server/uploads`, served at `/uploads`)                                    |
-| server | `COOKIE_SECURE`                 | `true`/`false`; defaults to `true` when `NODE_ENV=production`. Use `false` only for plain-http setups |
-| client | `VITE_API_URL`                  | API origin. Leave empty in dev (Vite proxies `/api` + `/uploads`) and when nginx proxies the API      |
+| App    | Variable                        | Purpose                                                                                                                                                                                                |
+| ------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| server | `DATABASE_URL`                  | PostgreSQL connection string                                                                                                                                                                           |
+| server | `JWT_SECRET`                    | Signs the httpOnly session cookie (>= 16 chars, random in production)                                                                                                                                  |
+| server | `TOTP_ENCRYPTION_KEY`           | 32-byte AES-256-GCM key (64 hex chars or base64) encrypting 2FA secrets at rest. **Required in production** (`openssl rand -hex 32`). In development a key is derived from `JWT_SECRET` with a warning |
+| server | `DIRECT_URL`                    | Direct (non-pooled) database URL used by migrations (Neon). Locally leave it equal to `DATABASE_URL` (the `scripts/prisma.mjs` wrapper defaults it)                                                    |
+| server | `CLIENT_URL`                    | The only origin allowed by CORS (credentials enabled)                                                                                                                                                  |
+| server | `PORT`                          | API port (default 4000)                                                                                                                                                                                |
+| server | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | First admin, created by the seed **only if missing** with "must change password"; an existing account is never touched                                                                                 |
+| server | `STORAGE_DRIVER`, `UPLOAD_DIR`  | Upload storage (`local` -> `server/uploads`, served at `/uploads`)                                                                                                                                     |
+| server | `COOKIE_SECURE`                 | `true`/`false`; defaults to `true` when `NODE_ENV=production`. Use `false` only for plain-http setups                                                                                                  |
+| client | `VITE_API_URL`                  | API origin. Leave empty in dev (Vite proxies `/api` + `/uploads`) and when nginx proxies the API                                                                                                       |
 
 ## Seeding
 
 `npm run db:seed` is idempotent and **never overwrites admin edits**: it creates the admin user, converts everything in `server/seed-media/`
 (png/jpg -> webp, svg copied) into `server/uploads/seed/`, and creates any missing sections, services, team, FAQs, posts and settings from
-`server/prisma/seed-data/`. `npm run db:seed -w server -- --reset` resets sections, services, team, FAQs, posts, settings and the admin password
-back to the Figma content. Page content lives in `server/prisma/seed-data/<page>.ts` (one `PageSeed` per page); collections and site settings in `collections.ts`.
+`server/prisma/seed-data/`. `npm run db:seed -w server -- --reset` resets sections, services, team, FAQs, posts and settings back to the Figma content (it never touches users, passwords or 2FA).
+**In production `--reset` is refused** unless `--force-production` is also passed.
 
 ## Security
 
-bcrypt password hashes, JWT in an httpOnly + SameSite=Lax cookie (8h), roles `ADMIN` / `EDITOR` (only admins manage users), login rate limit (10 / 15 min),
-lead form rate limit, helmet, CORS locked to `CLIENT_URL`, zod validation on every route, upload allow-list (jpg/png/webp/svg/gif, 5 MB).
+- **Passwords:** bcrypt hashes; new passwords need 12+ characters, 3 of 4 character classes, no name/email/common words.
+- **Two-factor authentication (required for every account).** TOTP (RFC 6238, 30 s, 6 digits, ±1 step window). Sign-in is a multi-step flow and **no session exists
+  until the code is verified**:
+  1. email + password → a 5-minute signed _pre-auth token_ (JSON, not a cookie; useless as a session);
+  2. forced steps when needed: change the temporary password → set up 2FA (QR code + manual key, confirmed with a valid code before it is enabled) → 10 single-use
+     backup codes (bcrypt-hashed, shown once, regenerable on the Security page);
+  3. 6-digit code (or a backup code) → the httpOnly session cookie (`Secure` + `SameSite=Lax` in production, 8 h).
+     The TOTP secret is encrypted at rest (AES-256-GCM, `TOTP_ENCRYPTION_KEY`) and never returned after setup. A used code cannot be replayed (time step stored per user).
+- **Lockout:** 5 wrong codes per pre-auth token (10 per 15 min per account) lock the account for 15 minutes. Login attempts are limited per IP and per email+IP.
+  All limiters and locks are stored in the database (`RateLimit` table), so they work on serverless platforms.
+- **Sessions:** the session carries a `sessionVersion`; resetting a password or 2FA, changing role, deactivating or changing your own password increments it and every
+  older session is rejected on its next request. Deactivated users cannot sign in.
+- **Roles:** `ADMIN` (everything, users, audit log) and `EDITOR` (content). An admin creates users on **Admin → Users**: the system generates a strong temporary password,
+  shows it **once** (only its hash is stored), and the user must change it at first sign-in and set up 2FA. Admins can reset a user's password or 2FA, deactivate or delete
+  them; nobody can delete, demote or deactivate themselves, and the last active admin can never be removed. No email is sent anywhere: hand over the temporary password yourself.
+- **Audit log:** logins, 2FA, password and user changes (user, action, time, IP, success/fail), visible to admins at **Admin → Audit log** (`GET /api/admin/audit`).
+- **Lockout recovery** (nobody can sign in): `npm run admin:reset -w server -- --email you@example.com` prints a temporary password and clears that account's 2FA; the next sign-in
+  forces a new password and a new 2FA setup. It uses `DATABASE_URL` from the environment (for Vercel: `vercel env pull .env.production.local` first). In Docker:
+  `docker compose exec server npx tsx scripts/admin-reset.ts --email you@example.com`.
+- Also: helmet, CORS locked to `CLIENT_URL`, zod validation on every route, upload allow-list (jpg/png/webp/svg/gif, 5 MB), lead form rate limit.
 
-**Production secret guard.** With `NODE_ENV=production` the API (and the container entrypoint, before it migrates/seeds) exits with code 1 if
-`JWT_SECRET` or `ADMIN_PASSWORD` is empty, still an example/default value (`ChangeMe123!`, `change-me-to-a-long-random-string`, `changeme`, `password`, anything
-starting with `change-me`/`replace-me`/`your-`…) or too weak (`JWT_SECRET` < 32 chars, `ADMIN_PASSWORD` < 12 chars). The denylist lives in one file,
-`server/src/secrets.ts`. Generate values with `openssl rand -base64 48`. In development the guard is off.
+**Production secret guard.** With `NODE_ENV=production` the API, the container entrypoint (before it migrates/seeds) and the seed exit with code 1 if `JWT_SECRET`,
+`ADMIN_PASSWORD` or `TOTP_ENCRYPTION_KEY` is missing, still an example/default value (`ChangeMe123!`, `change-me-to-a-long-random-string`, `changeme`, `password`, anything
+starting with `change-me`/`replace-me`/`your-`…) or too weak (`JWT_SECRET` < 32 chars, `ADMIN_PASSWORD` < 12 chars, `TOTP_ENCRYPTION_KEY` not a 32-byte key). The denylist lives
+in one file, `server/src/secrets.ts`. Generate: `openssl rand -base64 48` (JWT) and `openssl rand -hex 32` (TOTP key). In development the guard is off.
+
+**Tests:** `npm test -w server` (vitest + supertest). It creates a separate `maouaj_test` database next to the dev one, so the dev data is never touched.
 
 ## Storage
 
-Uploads go through the `StorageDriver` interface in `server/src/lib/storage.ts`. The local driver writes to `UPLOAD_DIR`. To use S3, add a driver that
-implements `put`/`remove` (returning a public/CDN URL) and select it with `STORAGE_DRIVER`.
+Uploads go through the `StorageDriver` interface in `server/src/lib/storage.ts`. `STORAGE_DRIVER=local` (default) writes to `UPLOAD_DIR` and serves `/uploads` (dev, docker);
+`STORAGE_DRIVER=blob` stores files on Vercel Blob (needs `BLOB_READ_WRITE_TOKEN`; uploads are capped at 4 MB because Vercel functions accept 4.5 MB request bodies).
+For S3, add a driver that implements `put`/`remove` (returning a public/CDN URL) and select it in `createStorage()`.
 
 ## Scripts
 
-`npm run dev` (API + site) · `npm run build` · `npm run typecheck` · `npm run lint` · `npm run format` · `npm run db:push` · `npm run db:seed`
+`npm run dev` (API + site) · `npm run build` · `npm run typecheck` · `npm run lint` · `npm run format` · `npm run db:deploy` (apply migrations) · `npm run db:migrate` (create a migration while developing) · `npm run db:seed` · `npm run prod:deploy` / `prod:seed` / `prod:admin-reset` (run against the production env pulled into `.env.production.local`, see DEPLOY.md) · `npm test -w server` · `npm run admin:reset -w server -- --email you@example.com`
 
 ## Docker
 
 ```bash
-cp .env.docker.example .env   # then edit .env: set JWT_SECRET, ADMIN_PASSWORD and POSTGRES_PASSWORD (all required, no example values)
+cp .env.docker.example .env   # then edit .env: set JWT_SECRET, TOTP_ENCRYPTION_KEY, ADMIN_PASSWORD and POSTGRES_PASSWORD (all required, no example values)
 docker compose up --build
 ```
 
 - Compose runs the API with `NODE_ENV=production`, so the secret guard above applies: it refuses to start with example secrets. `JWT_SECRET`,
-  `ADMIN_PASSWORD` and `POSTGRES_PASSWORD` are required (`${VAR:?}`) and compose stops with a clear message if one is missing.
+  `TOTP_ENCRYPTION_KEY`, `ADMIN_PASSWORD` and `POSTGRES_PASSWORD` are required (`${VAR:?}`) and compose stops with a clear message if one is missing.
   Use letters/digits for `POSTGRES_PASSWORD` (it is embedded in the `DATABASE_URL`).
 - Site + admin: <http://localhost:8080>. nginx serves the build and proxies `/api` and `/uploads` to the server container; Postgres is not published to the host.
 - On plain http (local compose) keep `COOKIE_SECURE=false`; the admin cookie is `Secure` by default in production, so set it back to `true` (or remove it) behind HTTPS.
-- The server entrypoint (`server/docker-entrypoint.sh`) checks the secrets, runs `prisma db push`, the idempotent seed, then starts the API.
+- The server entrypoint (`server/docker-entrypoint.sh`) checks the secrets, runs `prisma migrate deploy`, the idempotent seed, then starts the API.
   Data lives in the `pgdata` and `uploads` volumes; `docker compose down -v` deletes them.
 - nginx compresses text/JSON/SVG with **gzip** (the stock nginx image has no brotli module), caches hashed `/assets/*` for a year and `/animations/*` for 30 days,
   and never caches `index.html`.
@@ -86,13 +111,14 @@ docker compose up --build
 
 ## Deployment
 
-1. Provision PostgreSQL and set `DATABASE_URL`.
-2. Server: `npm ci && npm run build -w server`, then `npx prisma db push && npm run db:seed -w server` once, then `npm start -w server`.
-   Set `NODE_ENV=production`, a strong unique `JWT_SECRET` and `ADMIN_PASSWORD` (the server refuses to start otherwise), `CLIENT_URL` = your site origin, and persist `UPLOAD_DIR`.
-3. Client: `VITE_API_URL=https://api.example.com npm run build -w client` and host `client/dist` on any static host with an SPA fallback to `index.html`,
-   or serve both behind one domain with the provided nginx config (recommended: same origin keeps the cookie first-party and avoids CORS).
-4. Reverse proxy / TLS: terminate HTTPS at your proxy (nginx, Caddy, a cloud load balancer) and forward `X-Forwarded-Proto`; the API sets `trust proxy` so the
-   `Secure` admin cookie and the login/lead rate limits see the real client. Proxy `/api` and `/uploads` to the API; enable gzip for SVG/JSON.
-5. Secrets: keep `JWT_SECRET`, `ADMIN_PASSWORD`, `DATABASE_URL` in your platform's secret store, never in git. Rotate `JWT_SECRET` to sign everyone out.
-6. Uploads / S3: uploads go through the `StorageDriver` interface in `server/src/lib/storage.ts` (local driver by default). For multiple instances or ephemeral disks,
-   add an S3 driver that implements `put`/`remove` and returns a public/CDN URL, register it in `createStorage()`, and extend `STORAGE_DRIVER` in `server/src/env.ts`.
+**Vercel (recommended): see [DEPLOY.md](DEPLOY.md).** One Vercel project serves the static client and the Express API as a serverless function at `/api` on the same domain,
+with Neon Postgres and Vercel Blob for uploads. `vercel.json` and `.env.production.example` hold the configuration.
+
+Self-hosting elsewhere (any VM or container platform):
+
+1. Provision PostgreSQL and set `DATABASE_URL` (and `DIRECT_URL`: the same value, or the direct connection).
+2. `npm ci && npm run build -w server`, then `npm run db:deploy && npm run db:seed` once, then `npm start -w server`.
+   Set `NODE_ENV=production`, a strong unique `JWT_SECRET`, `TOTP_ENCRYPTION_KEY` and `ADMIN_PASSWORD` (the server refuses to start otherwise), `CLIENT_URL` = your site origin, and persist `UPLOAD_DIR` (or use `STORAGE_DRIVER=blob`).
+3. Client: `npm run build -w client` and host `client/dist` on the same domain as the API with an SPA fallback to `index.html` (the provided nginx config does this), so the cookie stays first-party.
+4. TLS: terminate HTTPS at your proxy and forward `X-Forwarded-Proto`; the API sets `trust proxy`, so the `Secure` admin cookie and the DB-backed rate limits see the real client.
+5. Secrets live in your platform secret store, never in git. Rotating `JWT_SECRET` signs everyone out. **Never change `TOTP_ENCRYPTION_KEY` once users have set up 2FA** (reset their 2FA from Admin -> Users instead).

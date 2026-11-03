@@ -26,7 +26,9 @@ services:
       NODE_ENV: production
       PORT: 4000
       DATABASE_URL: postgresql://maouaj:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (letters/digits only)}@postgres:5432/maouaj?schema=public&pool_timeout=60&connect_timeout=30
+      DIRECT_URL: postgresql://maouaj:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (letters/digits only)}@postgres:5432/maouaj?schema=public&connect_timeout=30
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET (32+ random characters) in .env}
+      TOTP_ENCRYPTION_KEY: ${TOTP_ENCRYPTION_KEY:?Set TOTP_ENCRYPTION_KEY (openssl rand -hex 32) in .env}
       CLIENT_URL: ${CLIENT_URL:-http://localhost:8080}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@maouaj.example}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD (12+ characters, not the example) in .env}

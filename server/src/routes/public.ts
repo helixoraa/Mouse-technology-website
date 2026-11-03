@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import { prisma } from '../db.js';
 import { HttpError, validate, wrap } from '../middleware/common.js';
+import { rateLimit } from '../lib/ratelimit.js';
 
 export const PAGE_KEYS = ['home', 'vision', 'about', 'team', 'contact', 'products', 'projects', 'blog', 'terms', 'privacy'] as const;
 export type PageKey = (typeof PAGE_KEYS)[number];
@@ -90,11 +90,10 @@ publicRouter.get(
 );
 
 const leadLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  name: 'leads',
   limit: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many submissions, please try again later.' },
+  windowMs: 15 * 60 * 1000,
+  message: 'Too many submissions, please try again later.',
 });
 
 export const leadSchema = z.object({

@@ -13,8 +13,15 @@
     "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
-    "db:push": "npm run db:push -w server",
-    "db:seed": "npm run db:seed -w server"
+    "db:seed": "npm run db:seed -w server",
+    "db:deploy": "npm run db:deploy -w server",
+    "db:migrate": "npm run db:migrate -w server",
+    "db:generate": "npm run db:generate -w server",
+    "vercel-build": "npm run db:generate -w server && npm run build -w client",
+    "admin:reset": "npm run admin:reset -w server --",
+    "prod:deploy": "npm run prod:db:deploy -w server",
+    "prod:seed": "npm run prod:db:seed -w server",
+    "prod:admin-reset": "npm run prod:admin:reset -w server --"
   },
   "devDependencies": {
     "concurrently": "^9.0.1",
@@ -24,5 +31,8 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "globals": "^15.12.0",
     "prettier": "^3.3.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
