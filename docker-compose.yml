@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: maouaj
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-maouaj}
+      POSTGRES_DB: maouaj
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U maouaj -d maouaj']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://maouaj:${POSTGRES_PASSWORD:-maouaj}@postgres:5432/maouaj?schema=public
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET (a long random string) in .env}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:8080}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@maouaj.example}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      STORAGE_DRIVER: local
+      UPLOAD_DIR: uploads
+    volumes:
+      - uploads:/app/server/uploads
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - '8080:80'
+
+volumes:
+  pgdata:
+  uploads:
