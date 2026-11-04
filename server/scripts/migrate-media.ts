@@ -12,6 +12,17 @@ const dryRun = process.argv.includes('--dry-run');
 
 async function main() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set (run `vercel env pull .env.production.local` first)');
+  // wake a scaled-to-zero Neon database before the real work
+  for (let i = 1; ; i++) {
+    try {
+      await prisma.$queryRaw`select 1`;
+      break;
+    } catch (e) {
+      if (i >= 6) throw e;
+      console.log(`database not reachable yet (attempt ${i}), retrying...`);
+      await new Promise((r) => setTimeout(r, 4000));
+    }
+  }
   const r = await migrateLocalMedia(prisma, { dryRun, log: console.log });
   printMigrateSummary(r, dryRun);
 }

@@ -132,15 +132,14 @@ export async function migrateLocalMedia(prisma: PrismaClient, opts: MigrateOptio
   }
 
   // ---- 1) gather every local reference ----
-  const [medias, posts, team, services, testimonials, settings, sections] = await Promise.all([
-    prisma.media.findMany(),
-    prisma.post.findMany(),
-    prisma.teamMember.findMany(),
-    prisma.service.findMany(),
-    prisma.testimonial.findMany(),
-    prisma.siteSettings.findMany(),
-    prisma.pageSection.findMany(),
-  ]);
+  // sequential on purpose: Neon's pooled connection (connection_limit=1) can time out on parallel reads
+  const medias = await prisma.media.findMany();
+  const posts = await prisma.post.findMany();
+  const team = await prisma.teamMember.findMany();
+  const services = await prisma.service.findMany();
+  const testimonials = await prisma.testimonial.findMany();
+  const settings = await prisma.siteSettings.findMany();
+  const sections = await prisma.pageSection.findMany();
   const paths = new Set<string>();
   medias.forEach((m) => collect(m.url, paths));
   posts.forEach((p) => collect([p.image, p.body], paths));
