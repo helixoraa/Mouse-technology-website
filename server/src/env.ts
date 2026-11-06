@@ -9,8 +9,6 @@ const schema = z.object({
   /** Neon direct connection used by migrations. Defaults to DATABASE_URL (scripts/prisma.mjs) for local development. */
   DIRECT_URL: z.string().optional(),
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
-  /** 32-byte AES-256-GCM key (64 hex chars or base64) encrypting TOTP secrets. Required in production. */
-  TOTP_ENCRYPTION_KEY: z.string().optional(),
   CLIENT_URL: z.string().url().default('http://localhost:5173'),
   ADMIN_EMAIL: z.string().email().optional(),
   ADMIN_PASSWORD: z.string().min(8).optional(),

@@ -1,4 +1,5 @@
 import { api, ApiError, mediaUrl } from './api';
+import type { User } from './types';
 
 export interface MediaItem {
   id: string;
@@ -93,20 +94,8 @@ export const fmtDate = (iso?: string) => (iso ? new Date(iso).toLocaleString(und
 export const fmtSize = (n: number) => (n > 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
 // ---- Auth v2 (docs/CONTRACT.md) ----
-export type PreAuthNext = 'change-password' | 'setup-2fa' | 'verify-code';
-export interface PreAuthResponse {
-  preAuthToken: string;
-  next: PreAuthNext;
-}
-export interface TwoFaSetup {
-  manualKey: string;
-  otpauthUrl: string;
-  qrDataUrl: string;
-}
-export interface SecurityStatus {
-  totpEnabled: boolean;
-  backupCodesRemaining: number;
-}
+/** A session straight away, or a pre-auth token when a temporary password must be replaced first. */
+export type LoginResponse = { user: User } | { preAuthToken: string; next: 'change-password' };
 export interface AdminUser {
   id: string;
   email: string;
@@ -114,7 +103,6 @@ export interface AdminUser {
   role: 'ADMIN' | 'EDITOR';
   active: boolean;
   mustChangePassword: boolean;
-  totpEnabled: boolean;
   lastLoginAt: string | null;
   createdAt?: string;
 }
@@ -131,6 +119,7 @@ export interface AuditItem {
 export const AUDIT_ACTIONS = [
   'login.password.ok',
   'login.password.fail',
+  // No longer written; kept so past audit entries stay filterable.
   'login.2fa.ok',
   'login.2fa.fail',
   '2fa.enabled',

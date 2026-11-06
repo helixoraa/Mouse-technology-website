@@ -27,7 +27,7 @@ const PREAUTH_AUD = 'maouaj:preauth';
 /** Pre-auth tokens use a different secret (derived) and audience, so they can never be used as a session. */
 const preAuthSecret = () => crypto.createHmac('sha256', env.JWT_SECRET).update('maouaj:preauth:v1').digest('hex');
 
-export type PreAuthStage = 'change-password' | 'setup-2fa' | 'verify-code';
+export type PreAuthStage = 'change-password';
 export interface PreAuthPayload {
   sub: string;
   stage: PreAuthStage;

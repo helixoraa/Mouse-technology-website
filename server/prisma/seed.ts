@@ -131,7 +131,7 @@ async function seedBundledMedia() {
   console.log(`Bundled media registered: ${n}`);
 }
 
-/** Creates the first admin only when missing. Never changes an existing account (password, 2FA, role), even with --reset. */
+/** Creates the first admin only when missing. Never changes an existing account (password, role), even with --reset. */
 async function seedAdmin() {
   const email = process.env.ADMIN_EMAIL?.toLowerCase();
   const password = process.env.ADMIN_PASSWORD;
@@ -144,7 +144,7 @@ async function seedAdmin() {
   await prisma.user.create({
     data: { email, name: 'Administrator', password: await hashPassword(password), role: 'ADMIN', mustChangePassword: true },
   });
-  console.log(`Admin user created: ${email} (must change password and set up 2FA on first login)`);
+  console.log(`Admin user created: ${email} (must change password on first login)`);
 }
 
 async function loadPageSeeds(): Promise<PageSeed[]> {

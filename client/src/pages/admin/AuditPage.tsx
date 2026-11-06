@@ -25,7 +25,7 @@ export default function AuditPage() {
 
   return (
     <>
-      <PageHeader title="Audit log" description="Sign-ins, two-factor events, password and user changes. Visible to admins only." />
+      <PageHeader title="Audit log" description="Sign-ins, password and user changes. Visible to admins only." />
       <div className="mb-4 max-w-xs">
         <Field label="Filter by action">
           <Select

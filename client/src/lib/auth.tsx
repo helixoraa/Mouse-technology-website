@@ -7,7 +7,7 @@ import type { User } from './types';
 interface AuthState {
   user: User | null;
   loading: boolean;
-  /** Called by the login flow once the final step (2FA code / setup) has issued the session cookie. */
+  /** Called by the login flow once the server has issued the session cookie. */
   setUser: (u: User | null) => void;
   logout: () => Promise<void>;
 }
@@ -33,9 +33,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // A revoked session (password/2FA reset, deactivation) surfaces as 401 on any admin call: drop to the login screen.
+  // A revoked session (password reset, deactivation) surfaces as 401 on any admin call: drop to the login screen.
   useEffect(() => {
-    // A 401 can also mean "wrong current password/code" on a security endpoint, so confirm the session is really gone first.
+    // A 401 can also mean "wrong current password" on a security endpoint, so confirm the session is really gone first.
     const onUnauthorized = () => {
       api('/auth/me').catch((e) => {
         if (e instanceof ApiError && e.status === 401) setUser(null);

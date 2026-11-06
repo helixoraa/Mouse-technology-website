@@ -2,11 +2,10 @@ import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { STRONG, STRONG2, app, codeFor, hasSessionCookie, makeUser, newAgent, newSecret, prisma, resetDb, signIn } from './helpers.js';
+import { STRONG, STRONG2, app, hasSessionCookie, makeUser, newAgent, prisma, resetDb, signIn } from './helpers.js';
 import { TEST_ENV } from './test-env.js';
-import { decryptSecret, encryptSecret } from '../src/lib/crypto.js';
+import { lockAccount } from '../src/lib/ratelimit.js';
 import { productionSecretProblems } from '../src/secrets.js';
-import { replaceBackupCodes } from '../src/lib/totp.js';
 
 beforeEach(resetDb);
 
@@ -14,7 +13,7 @@ const login = (email: string, password: string) => request(app).post('/api/auth/
 
 describe('password step', () => {
   it('rejects a wrong password with a generic 401 and no cookie, and audits it', async () => {
-    const u = await makeUser({ totp: true });
+    const u = await makeUser({});
     const res = await login(u.user.email, 'Totally-Wrong-Pass-1!');
     expect(res.status).toBe(401);
     expect(res.body.error).toBe('Invalid email or password');
@@ -26,7 +25,7 @@ describe('password step', () => {
   });
 
   it('rate limits password attempts per email+IP (DB-backed) with 429', async () => {
-    const u = await makeUser({ totp: true });
+    const u = await makeUser({});
     const statuses: number[] = [];
     for (let i = 0; i < 11; i++) statuses.push((await login(u.user.email, 'Wrong-Password-1234!')).status);
     expect(statuses.slice(0, 10).every((s) => s === 401)).toBe(true);
@@ -35,12 +34,63 @@ describe('password step', () => {
   });
 });
 
-describe('no session before the second factor', () => {
-  it('returns only a pre-auth token after the password: no cookie, no access to /me or admin data', async () => {
-    const u = await makeUser({ totp: true, role: 'ADMIN' });
+describe('password-only sign in', () => {
+  it('a correct password issues the httpOnly session straight away, with no code step', async () => {
+    const u = await makeUser({ role: 'ADMIN' });
+    const agent = newAgent();
+    const res = await agent.post('/api/auth/login').send({ email: u.user.email, password: u.password });
+    expect(res.status).toBe(200);
+    expect(res.body.user).toMatchObject({ email: u.user.email, role: 'ADMIN' });
+    expect(res.body.preAuthToken).toBeUndefined();
+    expect(res.body.next).toBeUndefined();
+    expect(hasSessionCookie(res)).toBe(true);
+    expect((res.headers['set-cookie'] as unknown as string[]).find((c) => c.startsWith('token='))).toMatch(/HttpOnly/i);
+    expect((await agent.get('/api/auth/me')).status).toBe(200);
+    expect((await agent.get('/api/admin/stats')).status).toBe(200);
+    const row = await prisma.user.findUniqueOrThrow({ where: { id: u.user.id } });
+    expect(row.lastLoginAt).not.toBeNull();
+  });
+
+  it('ignores 2FA data left on the user row by accounts enrolled before 2FA was removed', async () => {
+    const u = await makeUser({ role: 'ADMIN' });
+    await prisma.user.update({ where: { id: u.user.id }, data: { totpEnabled: true, totpSecretEnc: 'v1:old:enrolled:secret' } });
+    const agent = await signIn(u);
+    expect((await agent.get('/api/admin/stats')).status).toBe(200);
+    const row = await prisma.user.findUniqueOrThrow({ where: { id: u.user.id } });
+    expect(row).toMatchObject({ totpEnabled: true, totpSecretEnc: 'v1:old:enrolled:secret' }); // data left in place
+  });
+
+  it('the 2FA endpoints are gone', async () => {
+    const u = await makeUser({ role: 'ADMIN' });
+    const other = await makeUser({});
+    const agent = await signIn(u);
+    for (const path of ['/api/auth/pre/2fa/setup', '/api/auth/pre/2fa/enable', '/api/auth/pre/verify'])
+      expect(
+        (
+          await request(app)
+            .post(path)
+            .send({ preAuthToken: 'x'.repeat(40), code: '123456' })
+        ).status,
+      ).toBe(404);
+    expect((await agent.post('/api/admin/security/backup-codes').send({ code: '123456' })).status).toBe(404);
+    expect((await agent.post(`/api/admin/users/${other.user.id}/reset-2fa`)).status).toBe(404);
+  });
+
+  it('an account lock still blocks a correct password', async () => {
+    const u = await makeUser({});
+    await lockAccount(u.user.id);
+    const res = await login(u.user.email, u.password);
+    expect(res.status).toBe(429);
+    expect(hasSessionCookie(res)).toBe(false);
+  });
+});
+
+describe('temporary password', () => {
+  it('returns only a pre-auth token: no cookie, no access to /me or admin data', async () => {
+    const u = await makeUser({ role: 'ADMIN', mustChangePassword: true });
     const res = await login(u.user.email, u.password);
     expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ next: 'verify-code' });
+    expect(res.body).toMatchObject({ next: 'change-password' });
     expect(typeof res.body.preAuthToken).toBe('string');
     expect(hasSessionCookie(res)).toBe(false);
     expect(res.body.user).toBeUndefined();
@@ -53,125 +103,19 @@ describe('no session before the second factor', () => {
     expect(asCookie.status).toBe(401);
     const asBearer = await request(app).get('/api/admin/stats').set('Authorization', `Bearer ${res.body.preAuthToken}`);
     expect(asBearer.status).toBe(401);
-  });
-
-  it('a pre-auth token only works for its own stage', async () => {
-    const u = await makeUser({ totp: true });
-    const { body } = await login(u.user.email, u.password);
-    const wrongStage = await request(app).post('/api/auth/pre/2fa/setup').send({ preAuthToken: body.preAuthToken });
-    expect(wrongStage.status).toBe(401);
     const garbage = await request(app)
-      .post('/api/auth/pre/verify')
-      .send({ preAuthToken: 'x'.repeat(40), code: '123456' });
+      .post('/api/auth/pre/change-password')
+      .send({ preAuthToken: 'x'.repeat(40), newPassword: STRONG2 });
     expect(garbage.status).toBe(401);
   });
-});
 
-describe('second factor', () => {
-  it('rejects a wrong code (no cookie) and accepts the right one (cookie, /me works)', async () => {
-    const u = await makeUser({ totp: true });
-    const { body } = await login(u.user.email, u.password);
-    const bad = await request(app)
-      .post('/api/auth/pre/verify')
-      .send({ preAuthToken: body.preAuthToken, code: codeFor(u.secret, 5) });
-    expect(bad.status).toBe(401);
-    expect(hasSessionCookie(bad)).toBe(false);
-    const agent = newAgent();
-    const ok = await agent.post('/api/auth/pre/verify').send({ preAuthToken: body.preAuthToken, code: codeFor(u.secret) });
-    expect(ok.status).toBe(200);
-    expect(hasSessionCookie(ok)).toBe(true);
-    expect(ok.body.user.email).toBe(u.user.email);
-    expect((await agent.get('/api/auth/me')).status).toBe(200);
-    // httpOnly cookie
-    expect((ok.headers['set-cookie'] as unknown as string[]).find((c) => c.startsWith('token='))).toMatch(/HttpOnly/i);
-  });
-
-  it('accepts the +-1 step window and rejects codes outside it', async () => {
-    const u = await makeUser({ totp: true });
-    const { body } = await login(u.user.email, u.password);
-    const far = await request(app)
-      .post('/api/auth/pre/verify')
-      .send({ preAuthToken: body.preAuthToken, code: codeFor(u.secret, 2) });
-    expect(far.status).toBe(401);
-    const prev = await request(app)
-      .post('/api/auth/pre/verify')
-      .send({ preAuthToken: body.preAuthToken, code: codeFor(u.secret, -1) });
-    expect(prev.status).toBe(200);
-  });
-
-  it('locks the account for 15 minutes after 5 wrong codes on one pre-auth token', async () => {
-    const u = await makeUser({ totp: true });
-    const { body } = await login(u.user.email, u.password);
-    const codes = [] as number[];
-    for (let i = 0; i < 5; i++)
-      codes.push(
-        (
-          await request(app)
-            .post('/api/auth/pre/verify')
-            .send({ preAuthToken: body.preAuthToken, code: codeFor(u.secret, 5) })
-        ).status,
-      );
-    expect(codes).toEqual([401, 401, 401, 401, 429]);
-    // even the correct code is refused while locked
-    const locked = await request(app)
-      .post('/api/auth/pre/verify')
-      .send({ preAuthToken: body.preAuthToken, code: codeFor(u.secret) });
-    expect(locked.status).toBe(429);
-    expect(hasSessionCookie(locked)).toBe(false);
-    // and a fresh password login is refused too (DB-backed lock, not per-token)
-    expect((await login(u.user.email, u.password)).status).toBe(429);
-    const lock = await prisma.rateLimit.findUnique({ where: { key: `lock:user:${u.user.id}` } });
-    expect(lock).not.toBeNull();
-    expect(lock!.resetAt.getTime() - Date.now()).toBeGreaterThan(14 * 60 * 1000);
-    expect(await prisma.auditLog.count({ where: { action: 'account.locked' } })).toBe(1);
-  });
-
-  it('rejects reuse of a TOTP code within its window (replay protection)', async () => {
-    const u = await makeUser({ totp: true });
-    const code = codeFor(u.secret);
-    const r1 = await login(u.user.email, u.password);
-    expect((await request(app).post('/api/auth/pre/verify').send({ preAuthToken: r1.body.preAuthToken, code })).status).toBe(200);
-    const r2 = await login(u.user.email, u.password);
-    const replay = await request(app).post('/api/auth/pre/verify').send({ preAuthToken: r2.body.preAuthToken, code });
-    expect(replay.status).toBe(401);
-    expect(hasSessionCookie(replay)).toBe(false);
-  });
-
-  it('backup codes work exactly once', async () => {
-    const u = await makeUser({ totp: true });
-    const codes = await replaceBackupCodes(u.user.id);
-    expect(codes).toHaveLength(10);
-    expect(codes[0]).toMatch(/^[a-z2-9]{5}-[a-z2-9]{5}$/);
-    const stored = await prisma.backupCode.findMany({ where: { userId: u.user.id } });
-    expect(stored).toHaveLength(10);
-    expect(stored.every((c) => c.codeHash.startsWith('$2'))).toBe(true); // bcrypt, never plaintext
-
-    const a = await login(u.user.email, u.password);
-    const ok = await request(app).post('/api/auth/pre/verify').send({ preAuthToken: a.body.preAuthToken, backupCode: codes[0] });
-    expect(ok.status).toBe(200);
-    expect(hasSessionCookie(ok)).toBe(true);
-    const b = await login(u.user.email, u.password);
-    const again = await request(app).post('/api/auth/pre/verify').send({ preAuthToken: b.body.preAuthToken, backupCode: codes[0] });
-    expect(again.status).toBe(401);
-    expect(await prisma.backupCode.count({ where: { userId: u.user.id, usedAt: null } })).toBe(9);
-    // a different unused code still works
-    const other = await request(app).post('/api/auth/pre/verify').send({ preAuthToken: b.body.preAuthToken, backupCode: codes[1] });
-    expect(other.status).toBe(200);
-  });
-});
-
-describe('forced password change and 2FA setup', () => {
-  it('temp password -> must change -> must set up 2FA -> backup codes shown once -> session', async () => {
+  it('temp password -> must change -> session; the next login needs only the new password', async () => {
     const temp = 'Temp-Password-Xk39!zQ';
     const u = await makeUser({ mustChangePassword: true, password: temp });
 
     const r1 = await login(u.user.email, temp);
     expect(r1.status).toBe(200);
     expect(r1.body.next).toBe('change-password');
-    expect(hasSessionCookie(r1)).toBe(false);
-
-    // wrong stage
-    expect((await request(app).post('/api/auth/pre/2fa/setup').send({ preAuthToken: r1.body.preAuthToken })).status).toBe(401);
 
     // strength / reuse rules
     const weak = await request(app)
@@ -185,12 +129,12 @@ describe('forced password change and 2FA setup', () => {
     const same = await request(app).post('/api/auth/pre/change-password').send({ preAuthToken: r1.body.preAuthToken, newPassword: temp });
     expect(same.status).toBe(400);
 
-    const changed = await request(app)
-      .post('/api/auth/pre/change-password')
-      .send({ preAuthToken: r1.body.preAuthToken, newPassword: STRONG2 });
+    const agent = newAgent();
+    const changed = await agent.post('/api/auth/pre/change-password').send({ preAuthToken: r1.body.preAuthToken, newPassword: STRONG2 });
     expect(changed.status).toBe(200);
-    expect(changed.body.next).toBe('setup-2fa');
-    expect(hasSessionCookie(changed)).toBe(false);
+    expect(changed.body.user.email).toBe(u.user.email);
+    expect(hasSessionCookie(changed)).toBe(true);
+    expect((await agent.get('/api/auth/me')).status).toBe(200);
 
     // the temporary password is dead; the old pre-auth token (older sessionVersion) too
     expect((await login(u.user.email, temp)).status).toBe(401);
@@ -198,54 +142,16 @@ describe('forced password change and 2FA setup', () => {
       (await request(app).post('/api/auth/pre/change-password').send({ preAuthToken: r1.body.preAuthToken, newPassword: STRONG })).status,
     ).toBe(401);
 
-    const setup = await request(app).post('/api/auth/pre/2fa/setup').send({ preAuthToken: changed.body.preAuthToken });
-    expect(setup.status).toBe(200);
-    expect(setup.body.manualKey).toMatch(/^[A-Z2-7]{16,}$/);
-    expect(setup.body.otpauthUrl).toMatch(/^otpauth:\/\/totp\//);
-    expect(setup.body.qrDataUrl).toMatch(/^data:image\/png;base64,/);
-    // pending secret is encrypted and 2FA is not enabled until a valid code confirms it
-    const pending = await prisma.user.findUniqueOrThrow({ where: { id: u.user.id } });
-    expect(pending.totpEnabled).toBe(false);
-    expect(pending.totpPendingEnc).toMatch(/^v1:/);
-    expect(pending.totpPendingEnc).not.toContain(setup.body.manualKey);
-
-    const agent = newAgent();
-    const wrong = await agent
-      .post('/api/auth/pre/2fa/enable')
-      .send({ preAuthToken: changed.body.preAuthToken, code: codeFor(setup.body.manualKey, 5) });
-    expect(wrong.status).toBe(401);
-    expect(hasSessionCookie(wrong)).toBe(false);
-    expect((await agent.get('/api/auth/me')).status).toBe(401);
-
-    const enabled = await agent
-      .post('/api/auth/pre/2fa/enable')
-      .send({ preAuthToken: changed.body.preAuthToken, code: codeFor(setup.body.manualKey) });
-    expect(enabled.status).toBe(200);
-    expect(hasSessionCookie(enabled)).toBe(true);
-    expect(enabled.body.backupCodes).toHaveLength(10);
-    expect((await agent.get('/api/auth/me')).status).toBe(200);
-
-    // never returned again, encrypted at rest
-    const after = await prisma.user.findUniqueOrThrow({ where: { id: u.user.id } });
-    expect(after.totpEnabled).toBe(true);
-    expect(after.totpPendingEnc).toBeNull();
-    expect(after.totpSecretEnc).toMatch(/^v1:/);
-    expect(after.totpSecretEnc).not.toContain(setup.body.manualKey);
-    expect(decryptSecret(after.totpSecretEnc!)).toBe(setup.body.manualKey);
-    const sec = await agent.get('/api/admin/security');
-    expect(sec.body).toMatchObject({ totpEnabled: true, backupCodesRemaining: 10 });
-    expect(JSON.stringify(sec.body)).not.toContain(setup.body.manualKey);
-
-    // next login now asks for the code
     const next = await login(u.user.email, STRONG2);
-    expect(next.body.next).toBe('verify-code');
+    expect(next.status).toBe(200);
+    expect(hasSessionCookie(next)).toBe(true);
   });
 });
 
 describe('sessions and account management', () => {
   async function adminAndEditor() {
-    const admin = await makeUser({ role: 'ADMIN', totp: true });
-    const editor = await makeUser({ role: 'EDITOR', totp: true });
+    const admin = await makeUser({ role: 'ADMIN' });
+    const editor = await makeUser({ role: 'EDITOR' });
     return { admin, editor, adminAgent: await signIn(admin), editorAgent: await signIn(editor) };
   }
 
@@ -267,17 +173,6 @@ describe('sessions and account management', () => {
     const row = await prisma.user.findUniqueOrThrow({ where: { id: editor.user.id } });
     expect(row.password).not.toContain(reset.body.temporaryPassword);
     expect(row.mustChangePassword).toBe(true);
-  });
-
-  it('admin 2FA reset invalidates sessions and forces a new setup', async () => {
-    const { editor, adminAgent, editorAgent } = await adminAndEditor();
-    expect((await adminAgent.post(`/api/admin/users/${editor.user.id}/reset-2fa`)).status).toBe(200);
-    expect((await editorAgent.get('/api/auth/me')).status).toBe(401);
-    const l = await login(editor.user.email, editor.password);
-    expect(l.body.next).toBe('setup-2fa');
-    const row = await prisma.user.findUniqueOrThrow({ where: { id: editor.user.id } });
-    expect(row.totpEnabled).toBe(false);
-    expect(row.totpSecretEnc).toBeNull();
   });
 
   it('deactivating blocks login and kills the session; reactivating restores access', async () => {
@@ -306,17 +201,16 @@ describe('sessions and account management', () => {
   });
 
   it('last-admin and self protection: nobody can delete, demote or deactivate themselves or the last admin', async () => {
-    const a = await makeUser({ role: 'ADMIN', totp: true });
+    const a = await makeUser({ role: 'ADMIN' });
     const agentA = await signIn(a);
     expect((await agentA.delete(`/api/admin/users/${a.user.id}`)).status).toBe(400);
     expect((await agentA.put(`/api/admin/users/${a.user.id}`).send({ role: 'EDITOR' })).status).toBe(400);
     expect((await agentA.post(`/api/admin/users/${a.user.id}/deactivate`)).status).toBe(400);
     expect((await agentA.post(`/api/admin/users/${a.user.id}/reset-password`)).status).toBe(400);
-    expect((await agentA.post(`/api/admin/users/${a.user.id}/reset-2fa`)).status).toBe(400);
     expect(await prisma.user.count({ where: { role: 'ADMIN', active: true } })).toBe(1);
 
     // with a second admin, the first can remove them, but then they are the last one
-    const b = await makeUser({ role: 'ADMIN', totp: true });
+    const b = await makeUser({ role: 'ADMIN' });
     expect((await agentA.delete(`/api/admin/users/${b.user.id}`)).status).toBe(204);
     expect((await agentA.delete(`/api/admin/users/${a.user.id}`)).status).toBe(400);
     expect(await prisma.user.count({ where: { role: 'ADMIN', active: true } })).toBe(1);
@@ -328,86 +222,41 @@ describe('sessions and account management', () => {
     expect((await editorAgent.post('/api/admin/users').send({ name: 'X', email: 'x@example.com', role: 'ADMIN' })).status).toBe(403);
     expect((await editorAgent.get('/api/admin/audit')).status).toBe(403);
     expect((await editorAgent.get('/api/admin/stats')).status).toBe(200);
-    expect((await editorAgent.get('/api/admin/security')).status).toBe(200);
     const audit = await adminAgent.get('/api/admin/audit?limit=100');
     expect(audit.status).toBe(200);
     expect(audit.body.total).toBeGreaterThan(0);
     const actions = (audit.body.items as { action: string }[]).map((i) => i.action);
-    expect(actions).toContain('login.2fa.ok');
     expect(actions).toContain('login.password.ok');
     expect(audit.body.items[0]).toHaveProperty('ip');
   });
 });
 
 describe('security page', () => {
-  it('changing the password needs the current password and a valid code, then logs out other sessions', async () => {
-    const u = await makeUser({ totp: true });
+  it('changing the password needs the current password, then logs out other sessions', async () => {
+    const u = await makeUser({});
     const a1 = await signIn(u);
     const a2 = await signIn(u);
 
-    await prisma.user.update({ where: { id: u.user.id }, data: { totpLastStep: null } });
-    const badPw = await a1
-      .post('/api/admin/security/change-password')
-      .send({ currentPassword: 'Nope-Nope-Nope-1!', newPassword: STRONG2, code: codeFor(u.secret) });
+    const badPw = await a1.post('/api/admin/security/change-password').send({ currentPassword: 'Nope-Nope-Nope-1!', newPassword: STRONG2 });
     expect(badPw.status).toBe(401);
-    const badCode = await a1
-      .post('/api/admin/security/change-password')
-      .send({ currentPassword: u.password, newPassword: STRONG2, code: codeFor(u.secret, 5) });
-    expect(badCode.status).toBe(401);
-    const weak = await a1
-      .post('/api/admin/security/change-password')
-      .send({ currentPassword: u.password, newPassword: 'weakpass', code: codeFor(u.secret) });
+    const weak = await a1.post('/api/admin/security/change-password').send({ currentPassword: u.password, newPassword: 'weakpass' });
     expect(weak.status).toBe(400);
 
-    await prisma.user.update({ where: { id: u.user.id }, data: { totpLastStep: null } });
-    const ok = await a1
-      .post('/api/admin/security/change-password')
-      .send({ currentPassword: u.password, newPassword: STRONG2, code: codeFor(u.secret) });
+    const ok = await a1.post('/api/admin/security/change-password').send({ currentPassword: u.password, newPassword: STRONG2 });
     expect(ok.status).toBe(200);
     expect((await a1.get('/api/auth/me')).status).toBe(200); // re-issued cookie
     expect((await a2.get('/api/auth/me')).status).toBe(401); // other session invalidated
     expect((await login(u.user.email, u.password)).status).toBe(401);
     expect((await login(u.user.email, STRONG2)).status).toBe(200);
   });
-
-  it('regenerating backup codes requires a code and replaces the old set', async () => {
-    const u = await makeUser({ totp: true });
-    const old = await replaceBackupCodes(u.user.id);
-    const agent = await signIn(u);
-    expect((await agent.post('/api/admin/security/backup-codes').send({ code: '000000' })).status).toBe(401);
-    await prisma.user.update({ where: { id: u.user.id }, data: { totpLastStep: null } });
-    const res = await agent.post('/api/admin/security/backup-codes').send({ code: codeFor(u.secret) });
-    expect(res.status).toBe(200);
-    expect(res.body.backupCodes).toHaveLength(10);
-    const fresh = await login(u.user.email, u.password);
-    const oldTry = await request(app).post('/api/auth/pre/verify').send({ preAuthToken: fresh.body.preAuthToken, backupCode: old[0] });
-    expect(oldTry.status).toBe(401);
-    const newTry = await request(app)
-      .post('/api/auth/pre/verify')
-      .send({ preAuthToken: fresh.body.preAuthToken, backupCode: res.body.backupCodes[0] });
-    expect(newTry.status).toBe(200);
-    expect((await agent.get('/api/admin/security')).body.backupCodesRemaining).toBe(9);
-  });
 });
 
-describe('crypto and production guards', () => {
-  it('AES-256-GCM round-trips and rejects tampering', () => {
-    const secret = newSecret();
-    const enc = encryptSecret(secret);
-    expect(enc).not.toContain(secret);
-    expect(decryptSecret(enc)).toBe(secret);
-    const parts = enc.split(':');
-    parts[3] = Buffer.from('tampered-ciphertext').toString('base64url');
-    expect(() => decryptSecret(parts.join(':'))).toThrow();
-  });
-
+describe('production guards', () => {
   it('refuses default or missing production secrets', () => {
-    const good = { JWT_SECRET: 'j'.repeat(40) + 'Xy', ADMIN_PASSWORD: 'Strong-Prod-Pass-2026!', TOTP_ENCRYPTION_KEY: 'ab'.repeat(32) };
+    const good = { JWT_SECRET: 'j'.repeat(40) + 'Xy', ADMIN_PASSWORD: 'Strong-Prod-Pass-2026!' };
     expect(productionSecretProblems(good)).toEqual([]);
     expect(productionSecretProblems({ ...good, ADMIN_PASSWORD: 'ChangeMe123!' }).join()).toMatch(/ADMIN_PASSWORD/);
     expect(productionSecretProblems({ ...good, JWT_SECRET: 'change-me-to-a-long-random-string' }).join()).toMatch(/JWT_SECRET/);
-    expect(productionSecretProblems({ ...good, TOTP_ENCRYPTION_KEY: undefined }).join()).toMatch(/TOTP_ENCRYPTION_KEY/);
-    expect(productionSecretProblems({ ...good, TOTP_ENCRYPTION_KEY: 'tooshort' }).join()).toMatch(/TOTP_ENCRYPTION_KEY/);
   });
 });
 
@@ -426,7 +275,6 @@ describe('seed and recovery CLI', () => {
       NODE_ENV: 'production',
       JWT_SECRET: 'p'.repeat(48),
       ADMIN_PASSWORD: 'Strong-Prod-Pass-2026!',
-      TOTP_ENCRYPTION_KEY: 'cd'.repeat(32),
     };
     const res = run(['prisma/seed.ts', '--reset'], prod);
     expect(res.status).toBe(1);
@@ -441,25 +289,20 @@ describe('seed and recovery CLI', () => {
       NODE_ENV: 'production',
       JWT_SECRET: 'p'.repeat(48),
       ADMIN_PASSWORD: 'ChangeMe123!',
-      TOTP_ENCRYPTION_KEY: 'cd'.repeat(32),
     });
     expect(res.status).toBe(1);
     expect(res.stderr).toMatch(/ADMIN_PASSWORD/);
   });
 
-  it('admin:reset prints a temp password, clears 2FA, forces a change and invalidates sessions', async () => {
-    const u = await makeUser({ role: 'ADMIN', totp: true });
-    await replaceBackupCodes(u.user.id);
+  it('admin:reset prints a temp password, forces a change and invalidates sessions', async () => {
+    const u = await makeUser({ role: 'ADMIN' });
     const agent = await signIn(u);
     const res = run(['scripts/admin-reset.ts', '--email', u.user.email], {});
     expect(res.status).toBe(0);
     const m = res.stdout.match(/Temporary password \(shown once\): (\S+)/);
     expect(m).not.toBeNull();
     const row = await prisma.user.findUniqueOrThrow({ where: { id: u.user.id } });
-    expect(row.totpEnabled).toBe(false);
-    expect(row.totpSecretEnc).toBeNull();
     expect(row.mustChangePassword).toBe(true);
-    expect(await prisma.backupCode.count({ where: { userId: u.user.id } })).toBe(0);
     expect((await agent.get('/api/auth/me')).status).toBe(401);
     const l = await login(u.user.email, m![1]);
     expect(l.body.next).toBe('change-password');
@@ -472,11 +315,11 @@ describe('seed and recovery CLI', () => {
     const first = run(['prisma/seed.ts'], env);
     expect(first.status, first.stderr).toBe(0);
     const admin = await prisma.user.findUniqueOrThrow({ where: { email: TEST_ENV.ADMIN_EMAIL } });
-    expect(admin).toMatchObject({ role: 'ADMIN', mustChangePassword: true, totpEnabled: false });
-    await prisma.user.update({ where: { id: admin.id }, data: { mustChangePassword: false, totpEnabled: true, name: 'Kept' } });
+    expect(admin).toMatchObject({ role: 'ADMIN', mustChangePassword: true });
+    await prisma.user.update({ where: { id: admin.id }, data: { mustChangePassword: false, name: 'Kept' } });
     const second = run(['prisma/seed.ts', '--reset'], env);
     expect(second.status, second.stderr).toBe(0);
     const after = await prisma.user.findUniqueOrThrow({ where: { id: admin.id } });
-    expect(after).toMatchObject({ mustChangePassword: false, totpEnabled: true, name: 'Kept' });
+    expect(after).toMatchObject({ mustChangePassword: false, name: 'Kept' });
   }, 240_000);
 });

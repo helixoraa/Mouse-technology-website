@@ -35,7 +35,7 @@ one component per section in `client/src/components/sections/<Page>/<Section>.ts
 
 ## Auth + Admin API (httpOnly JWT cookie `token`; roles ADMIN, EDITOR; users CRUD is ADMIN-only)
 
-- `POST /auth/login {email,password}` -> `{user}` (rate limited, sets cookie) · `POST /auth/logout` · `GET /auth/me` -> `{user}` or 401
+- `POST /auth/login {email,password}` -> sets the session cookie, `{user}`; or, when user.mustChangePassword, `{preAuthToken, next:'change-password'}` with no cookie. Wrong credentials: 401 generic error. Deactivated users cannot log in.
 - `GET /admin/stats` -> `{leads:{total,new,contacted}, recentLeads:Lead[], content:{sections,services,team,faqs,posts,testimonials,media,users}}`
 - Sections: `GET /admin/sections?page=` (all incl. hidden, ordered) · `POST /admin/sections {page,key,content,order?,visible?}` ·
   `PUT /admin/sections/:id {content?,visible?,key?}` · `DELETE /admin/sections/:id` · `PUT /admin/sections/reorder {page, ids:string[]}`
@@ -58,16 +58,13 @@ User, PageSection(page,key,content Json,order,visible, @@unique[page,key]), Serv
 - `PageSeed` type: `server/prisma/seed-data/types.ts`. Page files `seed-data/<page>.ts` default-export a `PageSeed` and are auto-discovered.
 - Env: `COOKIE_SECURE` optional (default = production). Health: `GET /api/health`.
 
-## Auth v2 (2FA + managed accounts, no email anywhere)
+## Auth v2 (managed accounts, no email anywhere)
 
-Login is a multi-step flow. Steps before the final one return a short-lived (5 min) signed **preAuthToken** in JSON (never a cookie, grants nothing else).
+Login is email + password. Only a temporary password adds a step: it returns a short-lived (5 min) signed **preAuthToken** in JSON (never a cookie, grants nothing else).
 
-- `POST /auth/login {email,password}` -> `{preAuthToken, next}` where `next` is `change-password` (user.mustChangePassword) | `setup-2fa` (no TOTP yet) | `verify-code`. Wrong credentials: 401 generic error. Deactivated users cannot log in. No session cookie yet.
-- `POST /auth/pre/change-password {preAuthToken,newPassword}` -> `{preAuthToken,next}`. min 12 chars, strength check, must differ from the temporary password. Clears mustChangePassword, bumps sessionVersion.
-- `POST /auth/pre/2fa/setup {preAuthToken}` -> `{manualKey, otpauthUrl, qrDataUrl}` (secret stored AES-256-GCM encrypted as pending, never returned again after this call).
-- `POST /auth/pre/2fa/enable {preAuthToken,code}` -> sets the session cookie, returns `{user, backupCodes:string[10]}` (shown once, bcrypt-hashed at rest, single use).
-- `POST /auth/pre/verify {preAuthToken, code}` or `{preAuthToken, backupCode}` -> sets the session cookie, `{user}`. 5 failed attempts per preAuthToken then the account is locked 15 min (DB-backed). A TOTP code cannot be reused within its window.
+- `POST /auth/login {email,password}` -> sets the session cookie, `{user}`; or, when user.mustChangePassword, `{preAuthToken, next:'change-password'}` with no cookie. Wrong credentials: 401 generic error. Deactivated users cannot log in.
+- `POST /auth/pre/change-password {preAuthToken,newPassword}` -> sets the session cookie, `{user}`. min 12 chars, strength check, must differ from the temporary password. Clears mustChangePassword, bumps sessionVersion.
 - `POST /auth/logout` · `GET /auth/me` -> `{user}` (user: id,email,name,role) or 401. Session JWT carries `sv` (sessionVersion); the middleware rejects it when it differs from the user row or the user is inactive.
-  Authenticated (any role): `GET /admin/security` -> `{totpEnabled, backupCodesRemaining}` · `POST /admin/security/backup-codes {code}` -> `{backupCodes}` (replaces old ones) · `POST /admin/security/change-password {currentPassword,newPassword,code}` -> `{ok:true}` (bumps sessionVersion, re-issues the cookie).
-  ADMIN only: `GET /admin/audit?page=&limit=&action=` -> `{items:[{id,userId,email,action,success,ip,meta,createdAt}],total}`; users: `GET /admin/users` (user rows add `active, mustChangePassword, totpEnabled, lastLoginAt`), `POST /admin/users {name,email,role}` -> `{user, temporaryPassword}` (shown once), `PUT /admin/users/:id {name?,role?}`, `POST /admin/users/:id/reset-password` -> `{temporaryPassword}` (sets mustChangePassword, bumps sessionVersion), `POST /admin/users/:id/reset-2fa` (clears TOTP + backup codes, bumps sessionVersion), `POST /admin/users/:id/deactivate` and `/activate`, `DELETE /admin/users/:id`. Guards: nobody can delete/demote/deactivate themselves; the last active ADMIN cannot be deleted/demoted/deactivated.
-  Audit actions: login.password.ok/fail, login.2fa.ok/fail, 2fa.enabled, 2fa.backup.used, 2fa.backup.regenerated, password.changed, user.created/updated/deleted/deactivated/activated, user.password.reset, user.2fa.reset, session.logout.
+  Authenticated (any role): `POST /admin/security/change-password {currentPassword,newPassword}` -> `{ok:true}` (bumps sessionVersion, re-issues the cookie).
+  ADMIN only: `GET /admin/audit?page=&limit=&action=` -> `{items:[{id,userId,email,action,success,ip,meta,createdAt}],total}`; users: `GET /admin/users` (user rows add `active, mustChangePassword, lastLoginAt`), `POST /admin/users {name,email,role}` -> `{user, temporaryPassword}` (shown once), `PUT /admin/users/:id {name?,role?}`, `POST /admin/users/:id/reset-password` -> `{temporaryPassword}` (sets mustChangePassword, bumps sessionVersion), `POST /admin/users/:id/deactivate` and `/activate`, `DELETE /admin/users/:id`. Guards: nobody can delete/demote/deactivate themselves; the last active ADMIN cannot be deleted/demoted/deactivated.
+  Audit actions: login.password.ok/fail, password.changed, user.created/updated/deleted/deactivated/activated, user.password.reset, session.logout.

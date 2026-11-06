@@ -3,7 +3,7 @@
 One Vercel project serves everything on **one domain**: the React site as static files, and the Express API as a serverless function at `/api`.
 The database is **Neon** (Postgres) and uploaded images live in **Vercel Blob**. Nothing sends email: accounts are handed over with a one-time temporary password.
 
-You need: a GitHub repo with this code, a Vercel account, Node 20+ on your computer, and Google Authenticator (or any TOTP app) on your phone.
+You need: a GitHub repo with this code, a Vercel account and Node 20+ on your computer.
 
 ## 1. Import the repo
 
@@ -28,19 +28,18 @@ Then fix the database variables under **Settings -> Environment Variables** (see
 
 Settings -> Environment Variables, scope **Production** (add Preview too if you want preview deployments to work). Generate every secret yourself, locally:
 
-| Variable                | Value                                                        | How to generate                                                                                        |
-| ----------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| `NODE_ENV`              | `production`                                                 |                                                                                                        |
-| `JWT_SECRET`            | 32+ random characters                                        | `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`                       |
-| `TOTP_ENCRYPTION_KEY`   | exactly 64 hex characters                                    | `openssl rand -hex 32` (or `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) |
-| `ADMIN_EMAIL`           | your admin e-mail address (used only as a login name)        |                                                                                                        |
-| `ADMIN_PASSWORD`        | 12+ characters, not an example                               | `node -e "console.log(require('crypto').randomBytes(18).toString('base64url'))"`                       |
-| `CLIENT_URL`            | `https://your-project.vercel.app` (later your custom domain) |                                                                                                        |
-| `STORAGE_DRIVER`        | `blob`                                                       |                                                                                                        |
-| `BLOB_READ_WRITE_TOKEN` | set by the Blob store                                        |                                                                                                        |
+| Variable                | Value                                                        | How to generate                                                                  |
+| ----------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `NODE_ENV`              | `production`                                                 |                                                                                  |
+| `JWT_SECRET`            | 32+ random characters                                        | `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` |
+| `ADMIN_EMAIL`           | your admin e-mail address (used only as a login name)        |                                                                                  |
+| `ADMIN_PASSWORD`        | 12+ characters, not an example                               | `node -e "console.log(require('crypto').randomBytes(18).toString('base64url'))"` |
+| `CLIENT_URL`            | `https://your-project.vercel.app` (later your custom domain) |                                                                                  |
+| `STORAGE_DRIVER`        | `blob`                                                       |                                                                                  |
+| `BLOB_READ_WRITE_TOKEN` | set by the Blob store                                        |                                                                                  |
 
-**Store `JWT_SECRET`, `TOTP_ENCRYPTION_KEY` and `ADMIN_PASSWORD` in your password manager.** The site refuses to start in production if any of them is missing,
-is still an example value, or `TOTP_ENCRYPTION_KEY` is not a valid 64-hex key.
+**Store `JWT_SECRET` and `ADMIN_PASSWORD` in your password manager.** The site refuses to start in production if either of them is missing
+or is still an example value.
 
 ## 4. Deploy, then create the tables and the first content (once)
 
@@ -71,24 +70,19 @@ is still an example value, or `TOTP_ENCRYPTION_KEY` is not a valid 64-hex key.
 ## 5. First login (you, the administrator)
 
 1. Go to `https://your-site/admin` and sign in with `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
-2. You are forced to **choose a new password** (12+ characters).
-3. Then forced to **set up two-factor authentication**: scan the QR code with Google Authenticator (or type the key), enter the 6-digit code.
-4. **Save the 10 backup codes** (shown once). Each works one time if you lose your phone.
-
-Everyone needs 2FA; there is no way to skip it.
+2. You are forced to **choose a new password** (12+ characters), then land on the dashboard.
 
 ## 6. Create the client's account and hand it over
 
 1. Admin -> **Users** -> **New user**: name, e-mail, role (**ADMIN** can manage users; **EDITOR** edits content only).
 2. A **temporary password** is shown **once** with a Copy button. Send it to the client through a private channel (phone call, a private chat message, in person). It is never stored or shown again.
-3. The client opens `/admin`, signs in with the temporary password, chooses a new password, sets up 2FA with their phone and saves their backup codes. The temporary password stops working as soon as they change it.
+3. The client opens `/admin`, signs in with the temporary password, and chooses a new password. The temporary password stops working as soon as they change it.
 
 Other actions on the Users page (ADMIN only):
 
 - **Reset password**: generates a new one-time temporary password; the user must change it on next login and all their sessions are signed out.
-- **Reset 2FA**: clears their authenticator and backup codes; they set it up again on next login (sessions signed out).
 - **Deactivate / Activate**, **Change role**, **Delete**. You cannot delete, demote or deactivate yourself, and the last active ADMIN can never be removed.
-- **Audit log** (Admin -> Audit log): every login, 2FA, password and user change with time and IP.
+- **Audit log** (Admin -> Audit log): every login, password and user change with time and IP.
 
 ## 7. If nobody can log in (recovery)
 
@@ -98,7 +92,7 @@ Run this on your computer with `.env.production.local` in place (pull it again w
 npm run prod:admin-reset -- --email someone@yourcompany.com
 ```
 
-It prints a **temporary password**, clears that account's 2FA and signs it out. They then log in, choose a new password and set up 2FA again.
+It prints a **temporary password** and signs that account out. They then log in and choose a new password.
 
 ## 8. Custom domain
 
@@ -107,8 +101,7 @@ It prints a **temporary password**, clears that account's 2FA and signs it out. 
 
 ## Things to know
 
-- **Rotating secrets.** Changing `JWT_SECRET` signs everyone out (fine; do it if you suspect a leak). **Never change `TOTP_ENCRYPTION_KEY`** once people have set up 2FA: every authenticator secret would become unreadable.
-  If you must, reset every user's 2FA from Admin -> Users afterwards.
+- **Rotating secrets.** Changing `JWT_SECRET` signs everyone out (fine; do it if you suspect a leak).
 - **Upload limit: 4 MB per file.** Vercel functions accept request bodies up to 4.5 MB, so the admin refuses larger images. Resize big photos first (WebP/JPEG at ~2000 px wide is plenty).
 - **Function limits.** The API function is configured for up to 30 seconds and 1 GB (`vercel.json`); normal requests take milliseconds. Your Vercel plan may cap this lower.
 - **Compression and caching.** Vercel compresses the HTML, JS, CSS and SVG automatically (brotli/gzip). `vercel.json` adds one-year caching for hashed files and fonts, 30 days for `/animations/*`, no caching for `index.html` and `no-store` for `/api`.
@@ -120,7 +113,7 @@ It prints a **temporary password**, clears that account's 2FA and signs it out. 
 
 | Symptom                                                                   | Fix                                                                                                                                                                                                           |
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/api/...` returns 500 and the log says `Refusing to start in production` | A required secret is missing, still an example, or `TOTP_ENCRYPTION_KEY` is not 64 hex characters (Project -> Logs shows which).                                                                              |
+| `/api/...` returns 500 and the log says `Refusing to start in production` | A required secret is missing or still an example (Project -> Logs shows which).                                                                                                                               |
 | Log says `STORAGE_DRIVER=blob requires BLOB_READ_WRITE_TOKEN`             | Connect the Blob store to the project and redeploy.                                                                                                                                                           |
 | `Can't reach database` / too many connections                             | `DATABASE_URL` must be the **pooled** URL with `&pgbouncer=true`; migrations use `DIRECT_URL`.                                                                                                                |
 | `Query engine library ... not found`                                      | The Prisma client must be generated for Vercel's Linux runtime: confirm the build log shows `prisma generate`, and that `binaryTargets` in `server/prisma/schema.prisma` still includes `rhel-openssl-3.0.x`. |

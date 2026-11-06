@@ -18,7 +18,6 @@ const publicUser = {
   role: true,
   active: true,
   mustChangePassword: true,
-  totpEnabled: true,
   lastLoginAt: true,
   createdAt: true,
   updatedAt: true,
@@ -115,30 +114,6 @@ usersRouter.post(
       meta: { targetId: target.id, targetEmail: target.email },
     });
     res.json({ temporaryPassword });
-  }),
-);
-
-usersRouter.post(
-  '/:id/reset-2fa',
-  validate({ params: idParams(z) }),
-  wrap(async (req, res) => {
-    const target = await loadTarget(req.params.id);
-    if (target.id === req.user!.id) throw new HttpError(400, 'You cannot reset your own two-factor authentication.');
-    await prisma.$transaction([
-      prisma.backupCode.deleteMany({ where: { userId: target.id } }),
-      prisma.user.update({
-        where: { id: target.id },
-        data: { totpSecretEnc: null, totpPendingEnc: null, totpEnabled: false, totpLastStep: null, sessionVersion: { increment: 1 } },
-      }),
-    ]);
-    await unlockAccount(target.id);
-    await audit(req, {
-      userId: req.user!.id,
-      email: req.user!.email,
-      action: 'user.2fa.reset',
-      meta: { targetId: target.id, targetEmail: target.email },
-    });
-    res.json({ ok: true });
   }),
 );
 

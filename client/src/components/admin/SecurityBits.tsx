@@ -1,7 +1,7 @@
-import { useEffect, useId, useRef, useState, type ClipboardEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/cn';
 import { passwordRules, passwordScore, strengthLabels } from '@/lib/password';
-import { Btn, inputCls } from './ui';
+import { Btn } from './ui';
 
 /** Copies text; falls back to a hidden textarea when the async clipboard API is unavailable (plain http, old browsers). */
 export async function copyText(text: string): Promise<boolean> {
@@ -74,99 +74,6 @@ export function PasswordStrength({ value }: { value: string }) {
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-/**
- * Six-digit one-time code field: numeric keypad, one-time-code autofill, paste support (strips spaces/dashes),
- * auto-submits via onComplete the moment six digits are present.
- */
-export function CodeInput({
-  value,
-  onChange,
-  onComplete,
-  disabled,
-  label = 'Authentication code',
-  autoFocus,
-  describedBy,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  onComplete?: (v: string) => void;
-  disabled?: boolean;
-  label?: string;
-  autoFocus?: boolean;
-  describedBy?: string;
-}) {
-  const id = useId();
-  const ref = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (autoFocus) ref.current?.focus();
-  }, [autoFocus]);
-  const apply = (raw: string) => {
-    const digits = raw.replace(/\D/g, '').slice(0, 6);
-    onChange(digits);
-    if (digits.length === 6) onComplete?.(digits);
-  };
-  return (
-    <div>
-      <label htmlFor={id} className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-700">
-        {label}
-      </label>
-      <input
-        id={id}
-        ref={ref}
-        value={value}
-        disabled={disabled}
-        inputMode="numeric"
-        pattern="[0-9]*"
-        autoComplete="one-time-code"
-        maxLength={7}
-        placeholder="000000"
-        aria-describedby={describedBy}
-        onChange={(e) => apply(e.target.value)}
-        onPaste={(e: ClipboardEvent<HTMLInputElement>) => {
-          e.preventDefault();
-          apply(e.clipboardData.getData('text'));
-        }}
-        className={cn(inputCls, 'text-center font-mono text-2xl font-bold tracking-[0.5em] max-lg:min-h-14')}
-      />
-    </div>
-  );
-}
-
-/** One-time backup codes: copy all, download .txt, and a required "I saved these" confirmation owned by the parent. */
-export function BackupCodes({ codes, filename = 'maouaj-backup-codes.txt' }: { codes: string[]; filename?: string }) {
-  const all = codes.join('\n');
-  const download = () => {
-    const blob = new Blob([`MAOUAJ admin backup codes\nEach code works once. Keep them somewhere safe.\n\n${all}\n`], {
-      type: 'text/plain',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
-  return (
-    <div>
-      <ul className="grid grid-cols-2 gap-2 rounded-2xl border border-line bg-surface-soft p-4" aria-label="Backup codes">
-        {codes.map((c) => (
-          <li key={c} className="rounded-lg bg-white px-3 py-2 text-center font-mono text-sm font-bold tracking-wider text-ink">
-            {c}
-          </li>
-        ))}
-      </ul>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <CopyButton text={all} label="Copy all" />
-        <Btn variant="secondary" size="sm" onClick={download}>
-          Download .txt
-        </Btn>
-      </div>
     </div>
   );
 }

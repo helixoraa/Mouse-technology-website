@@ -45,7 +45,7 @@ export async function purgeExpired(): Promise<void> {
 export const LOCK_MS = 15 * 60 * 1000;
 const lockKey = (userId: string) => `lock:user:${userId}`;
 
-/** Locks an account for 15 minutes (no 2FA attempts, no password login). */
+/** Locks an account for 15 minutes (no password login). */
 export async function lockAccount(userId: string): Promise<void> {
   const resetAt = new Date(Date.now() + LOCK_MS);
   await prisma.rateLimit.upsert({

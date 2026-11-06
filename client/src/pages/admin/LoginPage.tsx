@@ -16,7 +16,6 @@ export default function LoginPage() {
     document.title = 'Sign in | MAOUAJ admin';
   }, []);
 
-  // Only redirect when signed in and NOT in the middle of the flow (the backup-codes screen sets the user last).
   if (user) return <Navigate to={from} replace />;
 
   return (

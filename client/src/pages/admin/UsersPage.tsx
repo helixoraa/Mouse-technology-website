@@ -35,8 +35,8 @@ function TempPasswordModal({ issued, onClose }: { issued: Issued; onClose: () =>
   return (
     <Modal title={issued.title} size="sm" onClose={() => void close()}>
       <p className="text-sm text-ink-700">
-        Give this one-time password to <strong className="text-ink">{issued.email}</strong>. They must choose a new password and set up
-        two-factor authentication at their first sign in.
+        Give this one-time password to <strong className="text-ink">{issued.email}</strong>. They must choose a new password at their first
+        sign in.
       </p>
       <div className="my-4 rounded-2xl border border-line bg-surface-soft p-4">
         <p className="text-xs font-bold uppercase tracking-wider text-ink-700">Temporary password</p>
@@ -141,7 +141,6 @@ function Status({ u }: { u: AdminUser }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       <Badge tone={u.active ? 'success' : 'neutral'}>{u.active ? 'Active' : 'Deactivated'}</Badge>
-      <Badge tone={u.totpEnabled ? 'success' : 'warn'}>{u.totpEnabled ? '2FA on' : '2FA not set'}</Badge>
       {u.mustChangePassword && <Badge tone="warn">Must change password</Badge>}
     </div>
   );
@@ -161,10 +160,6 @@ export default function UsersPage() {
     (u: AdminUser) => api<{ temporaryPassword: string }>(`/admin/users/${u.id}/reset-password`, { method: 'POST' }),
     undefined,
     (r, u) => setIssued({ title: 'Password reset', email: u.email, password: r.temporaryPassword }),
-  );
-  const reset2fa = useAdminMutation(
-    (u: AdminUser) => api(`/admin/users/${u.id}/reset-2fa`, { method: 'POST' }),
-    '2FA reset. They will set it up again at next sign in.',
   );
   const setActive = useAdminMutation(
     (v: { u: AdminUser; active: boolean }) => api(`/admin/users/${v.u.id}/${v.active ? 'activate' : 'deactivate'}`, { method: 'POST' }),
@@ -195,22 +190,6 @@ export default function UsersPage() {
           }}
         >
           Reset password
-        </Btn>
-        <Btn
-          size="sm"
-          variant="secondary"
-          onClick={async () => {
-            if (
-              await confirm({
-                title: 'Reset 2FA?',
-                message: `Remove ${u.email}'s authenticator and backup codes? They are signed out everywhere and must set up 2FA again at next sign in.`,
-                confirmLabel: 'Reset 2FA',
-              })
-            )
-              reset2fa.mutate(u);
-          }}
-        >
-          Reset 2FA
         </Btn>
         <Btn
           size="sm"
@@ -251,7 +230,7 @@ export default function UsersPage() {
     <>
       <PageHeader
         title="Users"
-        description="Admins create accounts and hand over a one-time temporary password. No email is sent. Everyone must set a new password and two-factor authentication at first sign in."
+        description="Admins create accounts and hand over a one-time temporary password. No email is sent. Everyone must set a new password at first sign in."
         actions={<Btn onClick={() => setEditing('new')}>+ Create user</Btn>}
       />
       {q.isLoading ? (

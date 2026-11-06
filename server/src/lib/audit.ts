@@ -5,11 +5,6 @@ import { prisma } from '../db.js';
 export type AuditAction =
   | 'login.password.ok'
   | 'login.password.fail'
-  | 'login.2fa.ok'
-  | 'login.2fa.fail'
-  | '2fa.enabled'
-  | '2fa.backup.used'
-  | '2fa.backup.regenerated'
   | 'password.changed'
   | 'user.created'
   | 'user.updated'
@@ -17,7 +12,6 @@ export type AuditAction =
   | 'user.deactivated'
   | 'user.activated'
   | 'user.password.reset'
-  | 'user.2fa.reset'
   | 'session.logout'
   | 'account.locked'
   | 'cli.admin.reset';

@@ -20,7 +20,6 @@ export const TEST_ENV = {
   DATABASE_URL: TEST_DB_URL,
   DIRECT_URL: TEST_DB_URL,
   JWT_SECRET: 'test-jwt-secret-0123456789abcdef0123456789abcdef',
-  TOTP_ENCRYPTION_KEY: '00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff',
   CLIENT_URL: 'http://localhost:5173',
   BCRYPT_ROUNDS: '4',
   ADMIN_EMAIL: 'seed-admin@example.com',
