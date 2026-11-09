@@ -1,7 +1,7 @@
 import { PageHero } from '@/components/layout/PageHero';
 import { Seo } from '@/components/ui/Seo';
 import { Leadership, type LeadershipContent } from '@/components/sections/Team/Leadership';
-import { TeamCarousel, type TeamCarouselContent } from '@/components/sections/Team/TeamCarousel';
+import { TeamGrid, type TeamGridContent } from '@/components/sections/Team/TeamGrid';
 import { getSection, usePage, useTeam } from '@/lib/api';
 import type { Segment } from '@/lib/types';
 
@@ -17,13 +17,13 @@ export default function TeamPage() {
   if (!data) return <div className="min-h-screen bg-hero" />;
   const hero = getSection<HeroContent>(data, 'hero');
   const leadership = getSection<LeadershipContent>(data, 'leadership');
-  const team = getSection<TeamCarouselContent>(data, 'team-carousel');
+  const team = getSection<TeamGridContent>(data, 'team-carousel');
   return (
     <>
       <Seo {...data.seo} />
       {hero && <PageHero eyebrow={hero.eyebrow} title={hero.title} lead={hero.lead} leadClass="text-lg leading-[1.5]" />}
       {leadership && <Leadership content={leadership} />}
-      {team && <TeamCarousel content={team} members={members} />}
+      {team && <TeamGrid content={team} members={members} />}
     </>
   );
 }
