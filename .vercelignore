@@ -1,5 +1,5 @@
 # Files not needed to build or run the site (keeps `vercel deploy` uploads small; git-based deploys are unaffected).
-design-reference
+MAOUAJ combination theme
 qa-screenshots
 .figma-raw
 docs

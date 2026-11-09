@@ -5,11 +5,10 @@
 .env
 .env.*
 !.env.docker.example
-design-reference
+MAOUAJ combination theme
 qa-screenshots
 .figma-raw
 docs
 *.log
 server/uploads/*
 !server/uploads/.gitkeep
-client/src/assets/raw

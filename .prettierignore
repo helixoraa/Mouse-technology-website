@@ -3,6 +3,5 @@ dist
 package-lock.json
 server/uploads
 server/seed-media
-design-reference
 .figma-raw
 client/src/assets

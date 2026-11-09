@@ -9,7 +9,6 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/dist/**',
       'server/uploads/**',
-      'design-reference/**',
       '.figma-raw/**',
       'qa-screenshots/**',
       'client/src/assets/**',
