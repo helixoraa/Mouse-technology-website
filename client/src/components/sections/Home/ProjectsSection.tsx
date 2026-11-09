@@ -1,6 +1,7 @@
 import { Segments } from '@/components/ui/Heading';
 import { homeIcons } from './homeIcons';
 import type { ProjectsContent } from './types';
+import { BreakableText } from '@/components/ui/BreakableText';
 
 export function ProjectsSection({ content }: { content: ProjectsContent }) {
   return (
@@ -29,7 +30,9 @@ export function ProjectsSection({ content }: { content: ProjectsContent }) {
                 <img src={homeIcons[p.icon]} alt="" className="size-7" />
               </div>
               <div className="flex min-w-0 flex-col gap-2 font-medium text-white">
-                <h3 className="break-words text-[20px] tracking-[-0.01em] sm:text-[22px] xl:text-2xl">{p.title}</h3>
+                <h3 className="break-words text-[20px] tracking-[-0.01em] sm:text-[22px] xl:text-2xl">
+                  <BreakableText text={p.title} />
+                </h3>
                 <p className="text-base leading-[22px]" style={p.textWidth ? { maxWidth: p.textWidth } : undefined}>
                   {p.text}
                 </p>

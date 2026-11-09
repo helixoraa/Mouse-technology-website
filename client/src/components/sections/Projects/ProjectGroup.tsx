@@ -6,6 +6,7 @@ import { isExternalUrl } from '@/lib/links';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { StatusChip } from '@/components/ui/StatusChip';
 import { InnerBand } from '../InnerBand';
+import { BreakableText } from '@/components/ui/BreakableText';
 
 export interface ProjectGroupContent {
   header: { title: Segment[]; subtitle: string; description: string };
@@ -44,7 +45,9 @@ function ProjectCard({ s, large }: { s: Service; large: boolean }) {
       <div>
         <StatusChip label={s.status} />
       </div>
-      <h3 className={cn('font-extrabold text-ink', large ? 'text-h-card-lg' : 'text-h-card')}>{s.title}</h3>
+      <h3 className={cn('font-extrabold text-ink', large ? 'text-h-card-lg' : 'text-h-card')}>
+        <BreakableText text={s.title} />
+      </h3>
       <p className="text-body-sm text-ink-500">{s.summary}</p>
       {external ? (
         <a href={href} target="_blank" rel="noopener noreferrer" className={linkClass}>

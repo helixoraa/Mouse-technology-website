@@ -2,6 +2,7 @@ import type { Segment } from '@/lib/types';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { StatusChip } from '@/components/ui/StatusChip';
 import { InnerBand } from '../InnerBand';
+import { BreakableText } from '@/components/ui/BreakableText';
 
 export interface AreasContent {
   header: { title: Segment[]; subtitle: string; description: string };
@@ -19,7 +20,9 @@ export function Areas({ content }: { content: AreasContent }) {
               <span className="text-[15px] font-bold text-brand">{a.number}</span>
               <StatusChip label={a.status} />
             </div>
-            <h3 className="break-words text-h-card font-bold text-ink max-sm:text-xl">{a.title}</h3>
+            <h3 className="break-words text-h-card font-bold text-ink max-sm:text-xl">
+              <BreakableText text={a.title} />
+            </h3>
             <p className="text-body-sm text-ink-500">{a.text}</p>
           </li>
         ))}
