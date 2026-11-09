@@ -2,7 +2,9 @@
  * Seeds the database with the admin user and all Figma content.
  *   npm run db:seed            -> creates anything missing, never overwrites admin edits
  *   npm run db:seed -- --reset -> also resets sections/services/settings back to the Figma content (never touches users)
- *   In production --reset is refused unless --force-production is also passed.
+ * Refuses to run against production (NODE_ENV=production, or a database host listed in .env.production.local or
+ * PRODUCTION_DB_HOSTS) unless --force-production is passed. Services and posts are matched by their fixed seed id, so a
+ * renamed slug never produces a duplicate.
  * Images: every file in server/seed-media is copied to uploads/seed (png/jpg -> webp, svg/webp copied as-is).
  *   With STORAGE_DRIVER=blob they are uploaded to Vercel Blob once instead (idempotent, tracked in the Media table) and every
  *   /uploads/seed/<file> reference in the seed content is rewritten to the Blob URL before it is saved.
@@ -16,22 +18,26 @@ import { PrismaClient, type Prisma } from '@prisma/client';
 import { assertProductionSecrets } from '../src/secrets.js';
 import { hashPassword } from '../src/lib/password.js';
 import { migrateLocalMedia, printMigrateSummary } from '../src/lib/media-migrate.js';
+import { productionDbHosts, productionTargets } from '../src/lib/production-guard.js';
+import { adoptSeedIds } from './seed-ids.js';
 import type { PageSeed } from './seed-data/types.js';
 import { faqs, posts, services, settings, team, testimonials } from './seed-data/collections.js';
 
-const isProduction = process.env.NODE_ENV === 'production';
+const productionReasons = productionTargets(process.env, productionDbHosts(process.env));
+if (productionReasons.length && !process.argv.includes('--force-production')) {
+  console.error(
+    `Refusing to seed: this looks like the production database (${productionReasons.join('; ')}).\n` +
+      'The seed is for new and development databases. If you really mean to seed production, pass --force-production\n' +
+      '(npm run prod:seed -- --force-production).',
+  );
+  process.exit(1);
+}
 assertProductionSecrets(process.env); // never seed a production database with default secrets
 
 const prisma = new PrismaClient();
 const here = path.dirname(fileURLToPath(import.meta.url));
 const reset = process.argv.includes('--reset') || process.env.SEED_RESET === 'true';
-if (reset && isProduction && !process.argv.includes('--force-production')) {
-  console.error(
-    'Refusing to run the seed with --reset (or SEED_RESET=true) when NODE_ENV=production: it overwrites content edited in the admin.\n' +
-      'Pass --force-production as well if you really mean it.',
-  );
-  process.exit(1);
-}
+if (productionReasons.length) console.warn(`--force-production: seeding production${reset ? ' WITH --reset' : ''}.`);
 const json = (v: unknown) => v as Prisma.InputJsonValue;
 const useBlob = process.env.STORAGE_DRIVER === 'blob';
 /** '/uploads/seed/<file>' -> public Blob URL (filled by seedMediaToBlob). */
@@ -198,11 +204,13 @@ async function seedSettings(pages: PageSeed[]) {
 }
 
 async function seedCollections() {
+  const adopted = await adoptSeedIds(prisma, { log: console.log });
+  if (adopted) console.log(`Seed ids: ${adopted} existing row(s) re-keyed to their fixed id`);
   for (const s of services) {
-    await prisma.service.upsert({ where: { slug: s.slug }, update: reset ? s : {}, create: s });
+    await prisma.service.upsert({ where: { id: s.id }, update: reset ? s : {}, create: s });
   }
   for (const p of posts) {
-    await prisma.post.upsert({ where: { slug: p.slug }, update: reset ? p : {}, create: p });
+    await prisma.post.upsert({ where: { id: p.id }, update: reset ? p : {}, create: p });
   }
   if (reset || (await prisma.teamMember.count()) === 0) {
     await prisma.teamMember.deleteMany();

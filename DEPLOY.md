@@ -55,12 +55,12 @@ or is still an example value.
    ```bash
    npm install
    npm run prod:deploy     # applies the database migrations to Neon
-   npm run prod:seed       # creates the first admin and all content; uploads the images to Blob (takes a minute)
+   npm run prod:seed -- --force-production   # first setup: the admin, all content and the images (takes a minute)
    ```
 
    These commands use **only** `.env.production.local` (your local `server/.env` is ignored, so they can never touch your development database), force production mode, and print the target database host first: check that it is your Neon host before you continue.
 
-   `prod:seed` is safe to repeat: it never changes an existing user and never overwrites content edited in the admin. (`--reset` is refused in production.)
+   The seed refuses to touch production unless you add `-- --force-production`, so it can't run there by accident. It never changes an existing user, never overwrites content edited in the admin, and matches services and posts by a fixed id (a renamed slug can't create a duplicate).
 
 4. Open your site: all pages should load with the real content and images.
 
@@ -119,4 +119,4 @@ It prints a **temporary password** and signs that account out. They then log in 
 | `Query engine library ... not found`                                      | The Prisma client must be generated for Vercel's Linux runtime: confirm the build log shows `prisma generate`, and that `binaryTargets` in `server/prisma/schema.prisma` still includes `rhel-openssl-3.0.x`. |
 | Login says "Too many attempts"                                            | The DB-backed limiter locks an account for 15 minutes after 5 wrong codes. Wait, or use the recovery command above.                                                                                           |
 | Pages 404 on refresh                                                      | `vercel.json` must be at the repo root with the SPA rewrite; keep Framework Preset = Other.                                                                                                                   |
-| Images missing on the live site                                           | `npm run prod:seed` was not run (it uploads the seed images to Blob), or `STORAGE_DRIVER` is not `blob`.                                                                                                      |
+| Images missing on the live site                                           | `npm run prod:seed -- --force-production` was not run (it uploads the seed images to Blob), or `STORAGE_DRIVER` is not `blob`.                                                                                |

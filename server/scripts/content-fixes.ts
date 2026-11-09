@@ -2,21 +2,27 @@
  * One-off content corrections for data that already lives in the database (the seed only creates missing rows,
  * so editing seed files never changes an existing site). Safe to run more than once.
  *
- *   npm run content:fix -w server                 dry run against DATABASE_URL (prints what would change)
- *   npm run content:fix -w server -- --apply      write the changes
- *   npm run prod:content:fix -w server [-- --apply]   same, against production (.env.production.local)
+ *   npm run content:fix -w server [-- --step=<step>]            dry run against DATABASE_URL (prints what would change)
+ *   npm run content:fix -w server -- [--step=<step>] --apply    write the changes
+ *   npm run prod:content-fix [-- --step=<step>] [--apply]       same, against production (.env.production.local)
+ * Each step is separate; without --step the "names" step runs.
  *
- * Fixes:
+ * --step=names (Round 1)
  *  - business name "HussainandMuallima.com" (any spacing/case variant) -> "HossainandMoallema.com" in every page
  *    section and service, and the business card's link -> https://hossainandmoallema.com/
  *  - blog posts: clear the old hard-coded "dateLabel" (e.g. "18/24/2026"). The site no longer reads it and always
  *    shows the real publishedAt as "18 Nov 2026", so this is housekeeping only.
+ * --step=seed-ids
+ *  - re-keys the seed's services and posts to their fixed ids (prisma/seed-ids.ts), so a later seed run matches them by
+ *    id and can never duplicate a row whose slug was renamed. The seed does this itself too; this step just does it now.
  */
 import 'dotenv/config';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../src/db.js';
+import { adoptSeedIds } from '../prisma/seed-ids.js';
 
 const apply = process.argv.includes('--apply');
+const step = process.argv.find((a) => a.startsWith('--step='))?.slice('--step='.length) ?? 'names';
 
 const OLD_NAME = /hussain\s*(?:and|&)?\s*muallima/gi;
 const HAS_OLD_NAME = /hussain\s*(?:and|&)?\s*muallima/i;
@@ -85,15 +91,27 @@ async function dateLabels() {
   return posts.length;
 }
 
+const report = (n: number, what: string) => console.log(n ? `${n} ${what} ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
+
+const steps: Record<string, () => Promise<void>> = {
+  names: async () => {
+    console.log('Business name / link:');
+    report(await businessName(), 'row(s)');
+    console.log('Blog date labels:');
+    report(await dateLabels(), 'post(s)');
+  },
+  'seed-ids': async () => {
+    console.log('Seed services/posts -> fixed ids:');
+    report(await adoptSeedIds(prisma, { apply, log: console.log }), 'row(s)');
+  },
+};
+
 async function main() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
-  console.log(apply ? 'Applying content fixes…' : 'Dry run (nothing is written; pass --apply to write):');
-  console.log('Business name / link:');
-  const n = await businessName();
-  console.log(n ? `${n} row(s) ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
-  console.log('Blog date labels:');
-  const d = await dateLabels();
-  console.log(d ? `${d} post(s) ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
+  const run = steps[step];
+  if (!run) throw new Error(`Unknown --step=${step}. Steps: ${Object.keys(steps).join(', ')}`);
+  console.log(`Step "${step}": ${apply ? 'applying…' : 'dry run (nothing is written; pass --apply to write)'}`);
+  await run();
 }
 
 main()

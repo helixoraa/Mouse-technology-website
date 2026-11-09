@@ -7,8 +7,13 @@ import { blogPosts } from './blog.js';
 
 const seedImg = (name: string) => `/uploads/seed/${name}`;
 
+/**
+ * Services and posts have fixed ids: the seed finds its rows by id, never by slug, so a renamed slug can't create a
+ * duplicate (see prisma/seed-ids.ts). Never change an id; add the old slug to formerSlugs when a slug changes.
+ */
 export const services = [
   {
+    id: 'seed-service-bus-fare',
     slug: 'cashless-bus-fare-platform',
     title: 'Cashless Bus Fare Platform',
     category: 'product',
@@ -21,6 +26,7 @@ export const services = [
     order: 0,
   },
   {
+    id: 'seed-service-payment',
     slug: 'payment-money-transfer-platform',
     title: 'Payment / Money Transfer Platform',
     category: 'product',
@@ -33,6 +39,7 @@ export const services = [
     order: 1,
   },
   {
+    id: 'seed-service-ride-hailing',
     slug: 'ride-hailing-platform',
     title: 'Ride-Hailing Platform',
     category: 'planned',
@@ -46,6 +53,7 @@ export const services = [
     order: 2,
   },
   {
+    id: 'seed-service-ecommerce',
     slug: 'e-commerce-platform',
     title: 'E-commerce Platform',
     category: 'planned',
@@ -59,6 +67,7 @@ export const services = [
     order: 3,
   },
   {
+    id: 'seed-service-textile',
     slug: 'textile-business',
     title: 'Textile business',
     category: 'business',
@@ -71,6 +80,7 @@ export const services = [
     order: 4,
   },
   {
+    id: 'seed-service-hossainandmoallema',
     slug: 'hossainandmoallema-com',
     title: 'HossainandMoallema.com',
     category: 'business',
@@ -83,6 +93,11 @@ export const services = [
     order: 5,
   },
 ];
+
+/** Earlier slugs of seed records (by id), so rows created under an old slug are still recognised. */
+export const formerSlugs: Record<string, string[]> = {
+  'seed-service-hossainandmoallema': ['hussainandmuallima-com'],
+};
 
 // Figma "Team carousel": 8 placeholder members (names/roles/biographies "to be supplied").
 export const team = [
@@ -130,6 +145,7 @@ export const faqs = [
 const postText = 'Add balance, tap a supported transit card on the bus, receive the result and review your history.';
 export const homePosts = [
   {
+    id: 'seed-post-home-bus-fare',
     slug: 'how-the-cashless-bus-fare-platform-will-work',
     title: 'How the cashless bus fare platform will work',
     category: 'Product explainer',
@@ -139,6 +155,7 @@ export const homePosts = [
     publishedAt: new Date('2026-06-30T09:00:00Z'),
   },
   {
+    id: 'seed-post-home-payment',
     slug: 'an-introduction-to-the-payment-platform',
     title: 'An introduction to the payment platform',
     category: 'Product introduction',
@@ -148,6 +165,7 @@ export const homePosts = [
     publishedAt: new Date('2026-06-29T09:00:00Z'),
   },
   {
+    id: 'seed-post-home-payment-2',
     slug: 'an-introduction-to-the-payment-platform-2',
     title: 'An introduction to the payment platform',
     category: 'Product introduction',

@@ -270,22 +270,25 @@ describe('seed and recovery CLI', () => {
       timeout: 120_000,
     });
 
-  it('db:seed --reset refuses to run in production unless --force-production is passed', () => {
+  it('db:seed refuses to run in production (with or without --reset) unless --force-production is passed', () => {
     const prod = {
       NODE_ENV: 'production',
       JWT_SECRET: 'p'.repeat(48),
       ADMIN_PASSWORD: 'Strong-Prod-Pass-2026!',
     };
-    const res = run(['prisma/seed.ts', '--reset'], prod);
-    expect(res.status).toBe(1);
-    expect(res.stderr).toMatch(/Refusing to run the seed with --reset/);
-    expect(res.stderr).toMatch(/--force-production/);
-    const viaEnv = run(['prisma/seed.ts'], { ...prod, SEED_RESET: 'true' });
-    expect(viaEnv.status).toBe(1);
+    for (const res of [
+      run(['prisma/seed.ts'], prod),
+      run(['prisma/seed.ts', '--reset'], prod),
+      run(['prisma/seed.ts'], { ...prod, SEED_RESET: 'true' }),
+    ]) {
+      expect(res.status).toBe(1);
+      expect(res.stderr).toMatch(/Refusing to seed: .*NODE_ENV=production/);
+      expect(res.stderr).toMatch(/--force-production/);
+    }
   });
 
-  it('the seed refuses default secrets in production', () => {
-    const res = run(['prisma/seed.ts'], {
+  it('the seed refuses default secrets in production even with --force-production', () => {
+    const res = run(['prisma/seed.ts', '--force-production'], {
       NODE_ENV: 'production',
       JWT_SECRET: 'p'.repeat(48),
       ADMIN_PASSWORD: 'ChangeMe123!',

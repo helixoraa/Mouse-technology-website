@@ -46,7 +46,9 @@ Admin: <http://localhost:5173/admin> — sign in with `ADMIN_EMAIL` / `ADMIN_PAS
 `npm run db:seed` is idempotent and **never overwrites admin edits**: it creates the admin user, converts everything in `server/seed-media/`
 (png/jpg -> webp, svg copied) into `server/uploads/seed/`, and creates any missing sections, services, team, FAQs, posts and settings from
 `server/prisma/seed-data/`. `npm run db:seed -w server -- --reset` resets sections, services, team, FAQs, posts and settings back to the Figma content (it never touches users or passwords).
-**In production `--reset` is refused** unless `--force-production` is also passed.
+**The seed refuses to run against production** (`NODE_ENV=production`, or a database host found in `.env.production.local` or
+listed in `PRODUCTION_DB_HOSTS`) unless `--force-production` is passed. Services and posts are matched by a fixed seed id, never by
+slug, so renaming a slug can't create a duplicate.
 
 ## Security
 
@@ -108,7 +110,7 @@ with Neon Postgres and Vercel Blob for uploads. `vercel.json` and `.env.producti
 Self-hosting elsewhere (any VM or container platform):
 
 1. Provision PostgreSQL and set `DATABASE_URL` (and `DIRECT_URL`: the same value, or the direct connection).
-2. `npm ci && npm run build -w server`, then `npm run db:deploy && npm run db:seed` once, then `npm start -w server`.
+2. `npm ci && npm run build -w server`, then `npm run db:deploy && npm run db:seed -- --force-production` once, then `npm start -w server`.
    Set `NODE_ENV=production`, a strong unique `JWT_SECRET` and `ADMIN_PASSWORD` (the server refuses to start otherwise), `CLIENT_URL` = your site origin, and persist `UPLOAD_DIR` (or use `STORAGE_DRIVER=blob`).
 3. Client: `npm run build -w client` and host `client/dist` on the same domain as the API with an SPA fallback to `index.html` (the provided nginx config does this), so the cookie stays first-party.
 4. TLS: terminate HTTPS at your proxy and forward `X-Forwarded-Proto`; the API sets `trust proxy`, so the `Secure` admin cookie and the DB-backed rate limits see the real client.

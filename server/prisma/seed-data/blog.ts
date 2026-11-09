@@ -46,6 +46,7 @@ const blog: PageSeed = {
 /** The three posts shown on the Blog frame (Figma 19:256). The site shows each post's publishedAt ("18 Nov 2026"). */
 export const blogPosts = [
   {
+    id: 'seed-post-blog-bus-fare',
     slug: 'how-the-cashless-bus-fare-platform-will-work-explained',
     title: 'How the cashless bus fare platform will work',
     category: 'Product explainer',
@@ -56,6 +57,7 @@ export const blogPosts = [
     publishedAt: '2026-12-30',
   },
   {
+    id: 'seed-post-blog-payment',
     slug: 'payment-platform-introduction-steps',
     title: 'An introduction to the payment platform',
     category: 'Product explainer',
@@ -65,6 +67,7 @@ export const blogPosts = [
     publishedAt: '2026-12-29',
   },
   {
+    id: 'seed-post-blog-company-news',
     slug: 'maouaj-technologys-current-projects-and-future-plans',
     title: 'MAOUAJ Technology’s current projects and future plans',
     category: 'Company News',

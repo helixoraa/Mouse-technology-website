@@ -9,8 +9,9 @@ until node scripts/prisma.mjs migrate deploy; do
   echo "Retrying migrations ($i/5)..."; sleep 3
 done
 # 3. Seed missing content (idempotent). Retry: the first start can be CPU-heavy (image conversion + bcrypt).
+#    --force-production: this container seeds its own database on purpose (the seed refuses NODE_ENV=production otherwise).
 i=0
-until npm run db:seed; do
+until npm run db:seed -- --force-production; do
   i=$((i+1)); [ "$i" -ge 4 ] && { echo "Seeding failed" >&2; exit 1; }
   echo "Retrying seed ($i/4)..."; sleep 3
 done
