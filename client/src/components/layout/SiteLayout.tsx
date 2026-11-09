@@ -8,7 +8,8 @@ export function SiteLayout() {
     window.scrollTo(0, 0);
   }, [pathname]);
   return (
-    <div className="mx-auto flex min-h-screen max-w-[1440px] flex-col bg-navy-950">
+    // Section backgrounds run full width; each section caps its own content (gutter + max-w-page = the 1440 frame).
+    <div className="flex min-h-screen flex-col bg-navy-950">
       <main className="flex-1">
         <Outlet />
       </main>
