@@ -137,7 +137,6 @@ const postsCfg: ResourceConfig = {
     { name: 'category', label: 'Category label', required: true },
     { name: 'author', label: 'Author', required: true },
     { name: 'publishedAt', label: 'Publish date', type: 'date' },
-    { name: 'dateLabel', label: 'Date label shown on the site (optional, overrides the date)' },
     { name: 'excerpt', label: 'Excerpt', type: 'textarea', required: true },
     { name: 'body', label: 'Body (optional)', type: 'textarea', rows: 8 },
     { name: 'image', label: 'Image', type: 'image' },

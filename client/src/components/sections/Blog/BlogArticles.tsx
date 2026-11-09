@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { mediaUrl, usePosts } from '@/lib/api';
 import { cn } from '@/lib/cn';
 import type { Post } from '@/lib/types';
+import { formatDate } from '@/lib/date';
 
 export interface BlogArticlesContent {
   filters: string[];
@@ -14,10 +15,6 @@ export interface BlogArticlesContent {
   prevLabel?: string;
   nextLabel?: string;
 }
-
-const fmt = (iso: string) =>
-  new Date(iso).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', timeZone: 'UTC' });
-const dateText = (p: Post) => p.dateLabel || fmt(p.publishedAt);
 
 /** "Product explainers" filter matches posts whose category is "Product explainer" (singular), etc. */
 const matches = (filter: string, category: string) => {
@@ -63,7 +60,7 @@ function Featured({ post, readLabel }: { post: Post; readLabel: string }) {
         <div className="flex items-center gap-3.5">
           <CategoryChip>{post.category}</CategoryChip>
           <time dateTime={post.publishedAt} className="text-[13px] text-ink-500">
-            {dateText(post)}
+            {formatDate(post.publishedAt)}
           </time>
         </div>
         <h2 className="text-[28px] font-extrabold leading-[1.15] tracking-[-0.02em] text-ink md:text-[36px] md:leading-10">{post.title}</h2>
@@ -82,7 +79,7 @@ function Card({ post, readLabel }: { post: Post; readLabel: string }) {
         <div className="flex items-center gap-3">
           <CategoryChip>{post.category}</CategoryChip>
           <time dateTime={post.publishedAt} className="text-[12.5px] text-ink-700">
-            {dateText(post)}
+            {formatDate(post.publishedAt)}
           </time>
         </div>
         <h3 className="text-2xl font-bold leading-8 tracking-[-0.01em] text-ink">{post.title}</h3>

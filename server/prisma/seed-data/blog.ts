@@ -44,7 +44,7 @@ const blog: PageSeed = {
   ],
 };
 
-/** The three posts shown on the Blog frame (Figma 19:256). dateLabel is the exact text drawn in the design. */
+/** The three posts shown on the Blog frame (Figma 19:256). The site shows each post's publishedAt ("18 Nov 2026"). */
 export const blogPosts = [
   {
     slug: 'how-the-cashless-bus-fare-platform-will-work-explained',
@@ -55,7 +55,6 @@ export const blogPosts = [
     image: '/uploads/seed/blog-featured-bus.webp',
     author: 'MAOUAJ Team',
     publishedAt: '2026-12-30',
-    dateLabel: '08/12/2026',
   },
   {
     slug: 'payment-platform-introduction-steps',
@@ -65,7 +64,6 @@ export const blogPosts = [
     image: '/uploads/seed/blog-payment.webp',
     author: 'MAOUAJ Team',
     publishedAt: '2026-12-29',
-    dateLabel: '12/24/2026',
   },
   {
     slug: 'maouaj-technologys-current-projects-and-future-plans',
@@ -75,7 +73,6 @@ export const blogPosts = [
     image: '/uploads/seed/blog-laptop.webp',
     author: 'MAOUAJ Team',
     publishedAt: '2026-12-28',
-    dateLabel: '18/24/2026',
   },
 ];
 

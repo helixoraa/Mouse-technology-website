@@ -9,6 +9,8 @@
  * Fixes:
  *  - business name "HussainandMuallima.com" (any spacing/case variant) -> "HossainandMoallema.com" in every page
  *    section and service, and the business card's link -> https://hossainandmoallema.com/
+ *  - blog posts: clear the old hard-coded "dateLabel" (e.g. "18/24/2026"). The site no longer reads it and always
+ *    shows the real publishedAt as "18 Nov 2026", so this is housekeeping only.
  */
 import 'dotenv/config';
 import { Prisma } from '@prisma/client';
@@ -76,12 +78,22 @@ async function businessName() {
   return rows;
 }
 
+async function dateLabels() {
+  const posts = await prisma.post.findMany({ where: { dateLabel: { not: null } }, select: { id: true, slug: true, dateLabel: true } });
+  for (const p of posts) console.log(`  Post ${p.slug}: dateLabel ${JSON.stringify(p.dateLabel)} -> null`);
+  if (apply && posts.length) await prisma.post.updateMany({ where: { id: { in: posts.map((p) => p.id) } }, data: { dateLabel: null } });
+  return posts.length;
+}
+
 async function main() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
   console.log(apply ? 'Applying content fixes…' : 'Dry run (nothing is written; pass --apply to write):');
   console.log('Business name / link:');
   const n = await businessName();
   console.log(n ? `${n} row(s) ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
+  console.log('Blog date labels:');
+  const d = await dateLabels();
+  console.log(d ? `${d} post(s) ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
 }
 
 main()
