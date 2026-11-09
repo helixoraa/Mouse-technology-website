@@ -55,9 +55,8 @@ export function PolicyContent({ content }: { content?: PolicyContentData }) {
                 id={`policy-${a.number}`}
                 key={a.number}
                 className={cn(
-                  'flex scroll-mt-6 flex-col gap-[11px] rounded-2xl border border-solid bg-white px-5 pb-5 pt-6 shadow-card md:px-7',
+                  'flex scroll-mt-6 flex-col gap-[11px] rounded-2xl bg-white px-5 pb-5 pt-6 shadow-card md:px-7',
                   i === 0 ? 'xl:h-[210px]' : 'xl:h-[188px]',
-                  i % 2 === 0 ? 'border-policy-border' : 'border-policy-borderAlt',
                 )}
               >
                 <header className="flex h-[43px] items-center gap-4">

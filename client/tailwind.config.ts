@@ -47,7 +47,7 @@ const config: Config = {
         danger: { DEFAULT: '#c4263d', soft: '#fdecef' },
         success: { DEFAULT: '#15803d', soft: '#e7f7ed' },
         warn: { DEFAULT: '#b45309', soft: '#fef3e2' },
-        policy: { border: '#3267a5', borderAlt: '#263e65', sidebarBorder: '#2c5d96' },
+        policy: { sidebarBorder: '#2c5d96' },
         // Home page: hero/product UI mockups + inquiry form (Figma "MAOUAJ Homepage combination")
         mock: {
           cardText: '#e6eeff',

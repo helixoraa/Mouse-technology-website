@@ -72,15 +72,12 @@ export function PolicyArticles({ content }: { content: PolicyContent }) {
             </ul>
           </nav>
           <div className="flex min-w-0 flex-col gap-[22px]">
-            {content.articles.map((a, i) => (
+            {content.articles.map((a) => (
               <article
                 key={a.number}
                 id={anchor(a.number)}
                 data-number={a.number}
-                className={cn(
-                  'scroll-mt-6 rounded-2xl border bg-white px-5 pb-5 pt-6 shadow-policy md:px-7',
-                  i % 2 === 0 ? 'border-policy-border' : 'border-policy-borderAlt',
-                )}
+                className="scroll-mt-6 rounded-2xl bg-white px-5 pb-5 pt-6 shadow-policy md:px-7"
               >
                 <header className="mb-[11px] flex min-h-[43px] items-center gap-4">
                   <span

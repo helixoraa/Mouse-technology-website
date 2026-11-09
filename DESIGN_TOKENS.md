@@ -28,7 +28,7 @@ Navy: `950 #050a18` `900 #0a1640` `800 #0e2c56` `700 #0a1e39` · Ink `#0a1330` /
 Surface `#fff` `#f4f7ff` `#eaf0ff` · Line `#d3ddf3` `#c9d6f5` ·
 Brand `#2456ff` (press `#2c57f6`), sky `#6fb1ff`, cyan `#69c5ff`, ice `#81c1ff`, mist `#68a7f2`, pale `#9bd2ff`, bright `#3a8cff`, deep `#143c74`,
 steel `#144a8d`, navy `#0a1e86`, indigo `#1d4ed8`, violet `#6d28d9`, teal `#0e7490`, light `#60a5fa`, electric `#2f4bff` ·
-Text on dark `#eaf0ff`, muted `#9fb0d6`, soft `#c9dbff`, cta `#dde8ff` · Policy borders `#3267a5` `#263e65` `#2c5d96`.
+Text on dark `#eaf0ff`, muted `#9fb0d6`, soft `#c9dbff`, cta `#dde8ff` · Policy sidebar border `#2c5d96` (policy article cards have no border, only a soft shadow).
 
 ## Gradients
 
