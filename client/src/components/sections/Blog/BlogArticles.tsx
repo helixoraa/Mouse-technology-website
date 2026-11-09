@@ -49,7 +49,7 @@ function Featured({ post, readLabel }: { post: Post; readLabel: string }) {
   return (
     <article
       id={post.slug}
-      className="grid overflow-hidden rounded-xl3 border border-line bg-white shadow-card lg:grid-cols-2 xl:grid-cols-[minmax(0,600fr)_minmax(0,696fr)]"
+      className="grid overflow-hidden rounded-xl3 border border-line bg-white shadow-card lg:grid-cols-[minmax(0,600fr)_minmax(0,696fr)]"
     >
       <img
         src={mediaUrl(post.image)}

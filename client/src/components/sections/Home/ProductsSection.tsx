@@ -136,7 +136,7 @@ function MoneyVisual({ v }: { v: MoneyVisualContent }) {
 function ProductCard({ item, reverse }: { item: ProductItem; reverse?: boolean }) {
   return (
     <article
-      className={`flex flex-col overflow-hidden rounded-[40px] border border-line bg-white shadow-card xl:grid ${reverse ? 'xl:grid-cols-[minmax(0,620fr)_minmax(0,676fr)]' : 'xl:grid-cols-[minmax(0,676fr)_minmax(0,620fr)]'}`}
+      className={`flex flex-col overflow-hidden rounded-[40px] border border-line bg-white shadow-card lg:grid ${reverse ? 'lg:grid-cols-[minmax(0,620fr)_minmax(0,676fr)]' : 'lg:grid-cols-[minmax(0,676fr)_minmax(0,620fr)]'}`}
     >
       <div className="flex flex-1 flex-col items-start justify-center gap-[22px] p-6 sm:p-10 xl:p-[52px]">
         <h3 className="max-w-[560px] text-[30px] font-extrabold leading-9 tracking-[-0.02em] text-ink xl:text-[38px] xl:leading-[44px]">
@@ -173,7 +173,7 @@ function ProductCard({ item, reverse }: { item: ProductItem; reverse?: boolean }
         </Link>
       </div>
       <div
-        className={`relative self-stretch overflow-hidden ${item.key === 'bus' ? 'bg-mock-bus' : 'bg-mock-money'} ${reverse ? 'xl:order-first' : ''}`}
+        className={`relative self-stretch overflow-hidden ${item.key === 'bus' ? 'bg-mock-bus' : 'bg-mock-money'} ${reverse ? 'lg:order-first' : ''}`}
       >
         {item.key === 'bus' ? <BusVisual v={item.visual} /> : <MoneyVisual v={item.visual} />}
       </div>

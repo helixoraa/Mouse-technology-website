@@ -40,7 +40,7 @@ export function ProductFeature({ content, id }: { content?: ProductFeatureConten
         content.tone === 'soft' ? 'bg-surface-soft' : 'bg-white',
       )}
     >
-      <div className="mx-auto grid max-w-page items-start gap-10 xl:grid-cols-[minmax(0,480fr)_minmax(0,752fr)] xl:gap-16">
+      <div className="mx-auto grid max-w-page items-start gap-10 lg:grid-cols-[minmax(0,480fr)_minmax(0,752fr)] xl:gap-16">
         <div className="flex flex-col items-start gap-5">
           <StatusChip label={content.status} />
           <h2
@@ -92,7 +92,7 @@ export function ProductFeature({ content, id }: { content?: ProductFeatureConten
           )}
           <div className="rounded-xl2 border border-white/25 bg-cta-card p-6 text-white md:p-9">
             <h3 className="text-eyebrow font-semibold uppercase text-text-soft">{content.journeyTitle}</h3>
-            <ol className={cn('mt-5 grid gap-3 sm:grid-cols-2', content.steps.length > 4 ? 'lg:grid-cols-5' : 'lg:grid-cols-4')}>
+            <ol className={cn('mt-5 grid gap-3 sm:grid-cols-2', content.steps.length > 4 ? 'xl:grid-cols-5' : 'xl:grid-cols-4')}>
               {content.steps.map((s, i) => (
                 <li
                   key={s}

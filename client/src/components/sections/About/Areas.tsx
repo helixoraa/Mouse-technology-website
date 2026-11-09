@@ -13,7 +13,7 @@ export function Areas({ content }: { content: AreasContent }) {
   return (
     <InnerBand tone="white">
       <SectionHeader {...content.header} />
-      <ul className="grid grid-cols-1 gap-5 xl:gap-y-14 md:grid-cols-2 xl:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-5 xl:gap-y-14 md:grid-cols-2 lg:grid-cols-3">
         {content.items.map((a) => (
           <li key={a.number} className="flex flex-col gap-5 rounded-xl2 border border-line bg-white p-8 shadow-card">
             <div className="flex items-center justify-between">

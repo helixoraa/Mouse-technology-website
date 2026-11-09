@@ -146,8 +146,8 @@ export function HeroSection({ content }: { content: HeroContent }) {
     >
       {/* Copy and stage share one grid cell: the stage fills the right half (650 wide at 1440) and the headline may run
           over its empty left edge, as in the design, while both stay vertically centred and fluid. */}
-      <div className="flex flex-col gap-10 pb-4 xl:grid xl:items-center xl:pb-0">
-        <div className="relative z-10 flex flex-col items-start gap-[26px] xl:[grid-area:1/1]">
+      <div className="flex flex-col gap-10 pb-4 lg:grid lg:items-center lg:pb-0">
+        <div className="relative z-10 flex flex-col items-start gap-[26px] lg:max-w-[calc(50%-theme(spacing.6))] lg:[grid-area:1/1] xl:max-w-none">
           <h1 className="max-w-[700px] text-[40px] xl:max-w-[calc(700em/68)] font-bold leading-[1.15] tracking-[-0.03em] text-white sm:text-[52px] xl:text-[60px] xl:leading-[80px] 2xl:text-[68px] 2xl:leading-[90px]">
             <Segments parts={content.headline} accentClass="text-brand-sky" />
           </h1>
@@ -168,7 +168,7 @@ export function HeroSection({ content }: { content: HeroContent }) {
             </Link>
           </div>
         </div>
-        <div className="mx-auto w-full max-w-[650px] xl:mx-0 xl:w-1/2 xl:max-w-none xl:justify-self-end xl:[grid-area:1/1]">
+        <div className="mx-auto w-full max-w-[650px] lg:mx-0 lg:w-1/2 lg:max-w-none lg:justify-self-end lg:[grid-area:1/1]">
           <HeroStage c={content} />
         </div>
       </div>
