@@ -86,7 +86,7 @@ export const services = [
     category: 'business',
     status: 'Existing business',
     summary: 'An existing e-commerce business and part of our online retail interests. [Add what it offers customers.]',
-    image: seedImg('project-hussain.webp'),
+    image: seedImg('project-hossain-moallema.webp'),
     gradient: 'linear-gradient(159.16deg, #60a5fa 14.789%, #2f4bff 85.211%)',
     ctaLabel: 'Learn more',
     ctaHref: 'https://hossainandmoallema.com/',
