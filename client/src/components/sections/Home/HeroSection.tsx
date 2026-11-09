@@ -155,14 +155,14 @@ export function HeroSection({ content }: { content: HeroContent }) {
           <div className="flex flex-wrap gap-3.5">
             <Link
               to={content.primaryCta.href}
-              className="flex items-center gap-2.5 rounded-pill bg-white px-[26px] py-[15px] text-[14.5px] font-semibold text-ink transition-colors hover:bg-surface-tint"
+              className="flex items-center gap-2.5 rounded-pill bg-white px-[26px] py-[15px] text-[14.5px] font-semibold text-ink transition-colors hover:bg-surface-tint active:bg-line"
             >
               {content.primaryCta.label}
               <img src={arrowDark} alt="" className="size-[15px]" />
             </Link>
             <Link
               to={content.secondaryCta.href}
-              className="flex items-center rounded-pill border border-white/45 px-[26px] py-[15px] text-[14.5px] font-semibold text-text-onDark transition-colors hover:bg-white/10"
+              className="flex items-center rounded-pill border border-white/45 px-[26px] py-[15px] text-[14.5px] font-semibold text-text-onDark transition-colors hover:bg-white/10 active:bg-white/20"
             >
               {content.secondaryCta.label}
             </Link>

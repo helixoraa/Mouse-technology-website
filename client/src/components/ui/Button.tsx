@@ -5,9 +5,9 @@ import arrow from '@/assets/svg/arrow.svg';
 
 type Variant = 'primary' | 'white' | 'glass';
 const styles: Record<Variant, string> = {
-  primary: 'bg-brand text-white hover:bg-brand-press',
-  white: 'bg-white text-ink hover:bg-surface-tint',
-  glass: 'border border-white/40 text-white hover:bg-white/15',
+  primary: 'bg-brand text-white hover:bg-brand-indigo active:bg-brand-navy',
+  white: 'bg-white text-ink hover:bg-surface-tint active:bg-line',
+  glass: 'border border-white/40 text-white hover:bg-white/15 active:bg-white/25',
 };
 
 type Props = {

@@ -110,7 +110,7 @@ function Pager({
         type="button"
         disabled={page === 1}
         onClick={() => onChange(page - 1)}
-        className={cn(btn, 'border-line bg-surface-tint text-ink-700 hover:bg-white disabled:opacity-50')}
+        className={cn(btn, 'border-line bg-surface-tint text-ink-700 hover:bg-white active:bg-line disabled:opacity-50')}
       >
         <span aria-hidden>←</span>&nbsp;{prev}
       </button>
@@ -121,7 +121,10 @@ function Pager({
           aria-label={`Page ${n}`}
           aria-current={n === page ? 'page' : undefined}
           onClick={() => onChange(n)}
-          className={cn(btn, n === page ? 'border-brand bg-brand text-white' : 'border-line bg-white text-ink hover:bg-surface-tint')}
+          className={cn(
+            btn,
+            n === page ? 'border-brand bg-brand text-white' : 'border-line bg-white text-ink hover:bg-surface-tint active:bg-line',
+          )}
         >
           {n}
         </button>
@@ -130,7 +133,7 @@ function Pager({
         type="button"
         disabled={page === pages}
         onClick={() => onChange(page + 1)}
-        className={cn(btn, 'border-line bg-surface-tint text-ink-700 hover:bg-white disabled:opacity-50')}
+        className={cn(btn, 'border-line bg-surface-tint text-ink-700 hover:bg-white active:bg-line disabled:opacity-50')}
       >
         {next}&nbsp;<span aria-hidden>→</span>
       </button>
@@ -163,7 +166,7 @@ export function BlogArticles({ content }: { content?: BlogArticlesContent }) {
               onClick={() => setFilter(f)}
               className={cn(
                 'min-h-11 rounded-pill border px-[22px] py-3 text-[14.5px] font-semibold leading-5 transition-colors',
-                filter === f ? 'border-line bg-white text-ink' : 'border-line bg-surface-tint text-ink-700 hover:bg-white',
+                filter === f ? 'border-line bg-white text-ink' : 'border-line bg-surface-tint text-ink-700 hover:bg-white active:bg-line',
               )}
             >
               {f}

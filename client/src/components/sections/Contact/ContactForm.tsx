@@ -270,12 +270,14 @@ export function ContactForm({ content, className, variant = 'light', showConsent
         className={cn(
           'inline-flex items-center gap-2.5 transition-colors disabled:opacity-60',
           compact
-            ? 'h-[52px] w-full justify-center rounded-[14px] bg-send font-semibold text-white hover:opacity-90'
+            ? 'h-[52px] w-full justify-center rounded-[14px] bg-send font-semibold text-white hover:opacity-90 active:opacity-80'
             : cn(
                 dark
                   ? '-mt-0.5 h-[52px] self-start rounded-pill px-7 text-[14.5px] font-semibold'
                   : 'self-start rounded-pill px-7 py-[17px] text-[15px] font-bold',
-                dark ? 'bg-white text-ink hover:bg-surface-tint' : 'bg-brand text-white hover:bg-brand-press',
+                dark
+                  ? 'bg-white text-ink hover:bg-surface-tint active:bg-line'
+                  : 'bg-brand text-white hover:bg-brand-indigo active:bg-brand-navy',
               ),
         )}
       >
