@@ -142,10 +142,13 @@ export function HeroSection({ content }: { content: HeroContent }) {
       ellipseClass="left-[760px] top-[20px]"
       smallEllipseClass="left-[980px] top-[380px]"
       className="xl:h-[860px]"
+      contentClass="gap-12 xl:gap-6"
     >
-      <div className="flex flex-col gap-10 pb-4 xl:pb-0">
-        <div className="relative z-10 flex flex-col items-start gap-[26px] xl:absolute xl:left-0 xl:top-[186px]">
-          <h1 className="max-w-[700px] text-[40px] font-bold leading-[1.15] tracking-[-0.03em] text-white sm:text-[52px] xl:text-[68px] xl:leading-[90px]">
+      {/* Copy and stage share one grid cell: the stage fills the right half (650 wide at 1440) and the headline may run
+          over its empty left edge, as in the design, while both stay vertically centred and fluid. */}
+      <div className="flex flex-col gap-10 pb-4 xl:grid xl:items-center xl:pb-0">
+        <div className="relative z-10 flex flex-col items-start gap-[26px] xl:[grid-area:1/1]">
+          <h1 className="max-w-[700px] text-[40px] xl:max-w-[calc(700em/68)] font-bold leading-[1.15] tracking-[-0.03em] text-white sm:text-[52px] xl:text-[60px] xl:leading-[80px] 2xl:text-[68px] 2xl:leading-[90px]">
             <Segments parts={content.headline} accentClass="text-brand-sky" />
           </h1>
           <p className="max-w-[594px] text-lg leading-7 text-white xl:text-xl">{content.lead}</p>
@@ -165,7 +168,7 @@ export function HeroSection({ content }: { content: HeroContent }) {
             </Link>
           </div>
         </div>
-        <div className="mx-auto w-full max-w-[650px] xl:absolute xl:left-[643px] xl:top-[70px] xl:mx-0 xl:w-[650px]">
+        <div className="mx-auto w-full max-w-[650px] xl:mx-0 xl:w-1/2 xl:max-w-none xl:justify-self-end xl:[grid-area:1/1]">
           <HeroStage c={content} />
         </div>
       </div>

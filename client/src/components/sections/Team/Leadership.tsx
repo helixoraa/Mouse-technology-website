@@ -15,13 +15,13 @@ export function Leadership({ content }: { content: LeadershipContent }) {
   return (
     <InnerBand tone="soft">
       <SectionHeader {...content.header} />
-      <div className="flex flex-col items-center gap-10 lg:flex-row lg:gap-24">
+      <div className="flex flex-col items-center gap-10 lg:grid lg:grid-cols-[minmax(0,552fr)_minmax(0,648fr)] lg:gap-24">
         <img
           src={mediaUrl(content.image)}
           alt={content.imageAlt}
-          className="h-auto w-full max-w-[552px] rounded-xl4 border border-white/25 object-cover lg:h-[451px] lg:w-[552px] lg:shrink-0"
+          className="aspect-[552/451] h-auto w-full max-w-[552px] rounded-xl4 border border-white/25 object-cover lg:max-w-none"
         />
-        <div className="flex min-w-0 flex-1 flex-col gap-6 text-xl text-ink">
+        <div className="flex min-w-0 flex-col gap-6 text-xl text-ink">
           <p className="font-medium leading-[30px]">{lead}</p>
           {rest.map((p) => (
             <p key={p} className="font-normal leading-[27px]">

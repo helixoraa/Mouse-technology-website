@@ -40,7 +40,7 @@ export function ProductFeature({ content, id }: { content?: ProductFeatureConten
         content.tone === 'soft' ? 'bg-surface-soft' : 'bg-white',
       )}
     >
-      <div className="mx-auto grid max-w-page items-start gap-10 xl:grid-cols-[480px_752px] xl:gap-16">
+      <div className="mx-auto grid max-w-page items-start gap-10 xl:grid-cols-[minmax(0,480fr)_minmax(0,752fr)] xl:gap-16">
         <div className="flex flex-col items-start gap-5">
           <StatusChip label={content.status} />
           <h2

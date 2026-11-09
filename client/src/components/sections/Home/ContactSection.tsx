@@ -8,8 +8,8 @@ export function ContactSection({ content }: { content: ContactContent }) {
   const { data: site } = useSite();
   return (
     <section id="contact" aria-labelledby="contact-heading" className="bg-surface-soft px-5 py-16 md:px-10 xl:px-gutter xl:py-[100px]">
-      <div className="mx-auto flex max-w-page flex-col gap-10 xl:flex-row xl:items-start xl:gap-20">
-        <div className="flex flex-col items-start gap-6 xl:flex-1">
+      <div className="mx-auto flex max-w-page flex-col gap-10 xl:grid xl:grid-cols-[minmax(0,616fr)_minmax(0,600fr)] xl:items-start xl:gap-20">
+        <div className="flex flex-col items-start gap-6">
           <h2 id="contact-heading" className="text-[40px] font-bold leading-[1.15] tracking-[-0.025em] xl:text-[56px] xl:leading-[65px]">
             <Segments parts={content.title} accentClass="text-brand" baseClass="text-ink" />
           </h2>
@@ -28,7 +28,7 @@ export function ContactSection({ content }: { content: ContactContent }) {
             ))}
           </ul>
         </div>
-        <div className="w-full xl:w-[600px] xl:shrink-0">
+        <div className="w-full">
           <ContactForm content={content.form} variant="compact" />
         </div>
       </div>

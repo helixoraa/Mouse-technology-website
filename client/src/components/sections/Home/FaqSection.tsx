@@ -12,8 +12,8 @@ export function FaqSection({ content }: { content: FaqContent }) {
 
   return (
     <section id="faq" aria-labelledby="faq-heading" className="bg-surface-soft px-5 py-16 md:px-10 xl:px-gutter xl:py-[110px]">
-      <div className="mx-auto flex max-w-page flex-col gap-10 xl:flex-row xl:gap-20">
-        <div className="flex flex-col gap-[18px] xl:w-[440px] xl:shrink-0">
+      <div className="mx-auto flex max-w-page flex-col gap-10 xl:grid xl:grid-cols-[minmax(0,440fr)_minmax(0,776fr)] xl:gap-20">
+        <div className="flex flex-col gap-[18px]">
           <h2 id="faq-heading" className="text-[36px] font-extrabold leading-[1.1] tracking-[-0.03em] xl:text-h-section xl:leading-[58px]">
             {content.titleLines.map((l, i) => (
               <span key={i} className={cn('block', l.accent ? 'text-brand' : 'text-ink')}>

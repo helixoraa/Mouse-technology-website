@@ -11,6 +11,7 @@ export function HeroShell({
   smallEllipse = ellipseSmall,
   ellipseClass = 'left-[52%] top-[21px]',
   smallEllipseClass = 'left-[68%] top-[380px]',
+  contentClass = 'gap-12 xl:gap-[68px]',
 }: {
   children: ReactNode;
   className?: string;
@@ -19,6 +20,8 @@ export function HeroShell({
   smallEllipse?: string;
   ellipseClass?: string;
   smallEllipseClass?: string;
+  /** Gap between the navigation and the hero content. */
+  contentClass?: string;
 }) {
   return (
     <header className={`relative overflow-hidden bg-hero px-5 pb-16 pt-[30px] md:px-10 xl:px-gutter xl:pb-20 ${className}`}>
@@ -28,7 +31,7 @@ export function HeroShell({
       <div aria-hidden className={`pointer-events-none absolute ${smallEllipseClass} hidden size-[360px] md:block`}>
         <img src={smallEllipse} alt="" className="absolute -inset-[36.11%] size-[172.22%] max-w-none" />
       </div>
-      <div className="relative mx-auto flex w-full max-w-page flex-col gap-12 xl:gap-[68px]">
+      <div className={`relative mx-auto flex w-full max-w-page flex-col ${contentClass}`}>
         <Navbar />
         {children}
       </div>

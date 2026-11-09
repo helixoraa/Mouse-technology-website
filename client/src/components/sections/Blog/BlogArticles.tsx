@@ -52,7 +52,7 @@ function Featured({ post, readLabel }: { post: Post; readLabel: string }) {
   return (
     <article
       id={post.slug}
-      className="grid overflow-hidden rounded-xl3 border border-line bg-white shadow-card lg:grid-cols-2 xl:grid-cols-[600px_1fr]"
+      className="grid overflow-hidden rounded-xl3 border border-line bg-white shadow-card lg:grid-cols-2 xl:grid-cols-[minmax(0,600fr)_minmax(0,696fr)]"
     >
       <img
         src={mediaUrl(post.image)}
@@ -174,7 +174,7 @@ export function BlogArticles({ content }: { content?: BlogArticlesContent }) {
           ))}
         </div>
         {featured && <Featured post={featured} readLabel={content.readLabel} />}
-        <div className="grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[410.667px_410.667px_1fr]">
+        <div className="grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
           {rest.map((p) => (
             <Card key={p.id} post={p} readLabel={content.readLabel} />
           ))}

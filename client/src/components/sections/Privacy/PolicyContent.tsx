@@ -22,7 +22,7 @@ export function PolicyContent({ content }: { content?: PolicyContentData }) {
           {content.heading}
         </h2>
         <p className="mt-[15px] max-w-[1140px] text-base leading-6 text-ink-500">{content.intro}</p>
-        <div className="mt-10 grid gap-8 lg:grid-cols-[348px_1fr] lg:gap-9 xl:mt-[57px]">
+        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,348px)_minmax(0,1fr)] lg:gap-9 xl:mt-[57px]">
           <nav
             aria-label={content.sidebarTitle}
             className="h-fit rounded-[18px] border border-policy-sidebarBorder bg-sidebar px-3.5 pb-8 pt-[27px] lg:sticky lg:top-6 lg:mt-[3px] lg:min-h-[627px]"

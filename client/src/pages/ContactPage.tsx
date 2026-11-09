@@ -14,7 +14,7 @@ export default function ContactPage() {
       <ContactHero content={getSection<ContactHeroContent>(data, 'hero')} />
       <ContactTopics content={getSection<ContactTopicsContent>(data, 'topics')} />
       <section className="bg-white px-5 py-16 md:px-10 xl:px-gutter xl:py-[110px]" aria-label="Contact details and inquiry form">
-        <div className="mx-auto grid max-w-page items-start gap-6 lg:grid-cols-[480px_1fr]">
+        <div className="mx-auto grid max-w-page items-start gap-6 lg:grid-cols-[minmax(0,480fr)_minmax(0,792fr)]">
           <ContactDetails content={getSection<ContactDetailsContent>(data, 'details')} />
           <ContactForm variant="dark" showConsent={false} content={getSection<ContactFormContent>(data, 'form')} />
         </div>

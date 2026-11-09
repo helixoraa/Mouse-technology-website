@@ -43,10 +43,10 @@ export function PolicyArticles({ content }: { content: PolicyContent }) {
           {content.title}
         </h2>
         <p className="mt-[19px] max-w-[1140px] text-base leading-[1.45] text-ink-500">{content.intro}</p>
-        <div className="mt-10 flex flex-col gap-8 lg:mt-[54px] lg:flex-row lg:items-start lg:gap-9">
+        <div className="mt-10 flex flex-col gap-8 lg:mt-[54px] lg:grid lg:grid-cols-[minmax(0,348px)_minmax(0,1fr)] lg:items-start lg:gap-9">
           <nav
             aria-label={content.sidebarTitle}
-            className="w-full shrink-0 self-start rounded-[18px] border border-policy-sidebarBorder bg-sidebar p-3.5 pb-5 lg:sticky lg:top-6 lg:min-h-[627px] lg:w-[348px]"
+            className="w-full shrink-0 self-start rounded-[18px] border border-policy-sidebarBorder bg-sidebar p-3.5 pb-5 lg:sticky lg:top-6 lg:min-h-[627px]"
           >
             <p className="px-2.5 pb-[17px] pt-[13px] text-base font-bold uppercase leading-[1.2] text-white">{content.sidebarTitle}</p>
             <ul className="grid gap-1 md:grid-cols-2 lg:flex lg:flex-col lg:gap-[15px]">
@@ -71,7 +71,7 @@ export function PolicyArticles({ content }: { content: PolicyContent }) {
               })}
             </ul>
           </nav>
-          <div className="flex min-w-0 flex-1 flex-col gap-[22px]">
+          <div className="flex min-w-0 flex-col gap-[22px]">
             {content.articles.map((a, i) => (
               <article
                 key={a.number}

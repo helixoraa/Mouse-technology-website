@@ -25,17 +25,17 @@ export function BusFareSection({ content }: { content: BusFareContent }) {
           </h2>
           <p className="max-w-[580px] text-base leading-[25px] text-white">{content.lead}</p>
         </div>
-        <div className="flex w-full flex-col items-center gap-7 xl:flex-row">
-          <div className="hidden w-full xl:block xl:flex-1">{first && <InfoCard {...first} />}</div>
+        <div className="flex w-full flex-col items-center gap-7 xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="hidden w-full xl:block">{first && <InfoCard {...first} />}</div>
           <AnimatedMedia
             src={content.animation.src}
             staticSrc={content.animation.staticImage}
             alt={content.animation.alt}
             width={600}
             height={340}
-            className="w-full max-w-[620px] xl:w-[620px]"
+            className="w-full max-w-[620px] xl:max-w-none"
           />
-          <div className="flex w-full flex-col gap-4 xl:flex-1">
+          <div className="flex w-full flex-col gap-4">
             <div className="xl:hidden">{first && <InfoCard {...first} />}</div>
             {rest.map((c) => (
               <InfoCard key={c.title} {...c} />

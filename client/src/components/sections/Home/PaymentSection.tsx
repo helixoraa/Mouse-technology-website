@@ -5,8 +5,8 @@ import type { PaymentContent } from './types';
 export function PaymentSection({ content }: { content: PaymentContent }) {
   return (
     <section id="payment" aria-labelledby="payment-heading" className="bg-section-dark-rev px-5 py-16 md:px-10 xl:px-gutter xl:py-[100px]">
-      <div className="mx-auto flex max-w-page flex-col items-center gap-10 xl:flex-row xl:gap-[72px]">
-        <div className="flex w-full flex-col items-start gap-[22px] xl:flex-1">
+      <div className="mx-auto flex max-w-page flex-col items-center gap-10 xl:grid xl:grid-cols-[minmax(0,648fr)_minmax(0,576fr)] xl:gap-[72px]">
+        <div className="flex w-full flex-col items-start gap-[22px]">
           <h2
             id="payment-heading"
             className="max-w-[520px] text-[36px] font-bold leading-[1.1] tracking-[-0.025em] text-text-onDark xl:text-[56px] xl:leading-[53px]"
@@ -29,7 +29,7 @@ export function PaymentSection({ content }: { content: PaymentContent }) {
           alt={content.animation.alt}
           width={600}
           height={500}
-          className="w-full max-w-[576px] xl:w-[576px]"
+          className="w-full max-w-[576px] xl:max-w-none"
         />
       </div>
     </section>
