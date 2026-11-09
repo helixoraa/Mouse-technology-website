@@ -10,11 +10,17 @@ export interface BlogArticlesContent {
   readLabel: string;
   emptyTitle: string;
   emptyText: string;
-  /** Posts per page. The Figma frame shows 3 (1 featured + 2 cards). */
+  /** No longer used (stored content still has it): the page size is fixed at POSTS_PER_PAGE. */
   pageSize?: number;
   prevLabel?: string;
   nextLabel?: string;
 }
+
+/**
+ * The design shows every article on one page (featured, cards, then the "more articles soon" tile). The pager
+ * only appears once a filtered list has more than this many posts, and then pages by the same number.
+ */
+export const POSTS_PER_PAGE = 9;
 
 /** "Product explainers" filter matches posts whose category is "Product explainer" (singular), etc. */
 const matches = (filter: string, category: string) => {
@@ -141,18 +147,17 @@ function Pager({
   );
 }
 
-/** Filter chips, featured article, article cards and pager. Posts come from the Post API; labels from the page section. */
+/** Filter chips, featured article, article cards, and a pager only for long lists. Posts come from the Post API; labels from the page section. */
 export function BlogArticles({ content }: { content?: BlogArticlesContent }) {
   const { data: posts = [] } = usePosts();
   const [filter, setFilter] = useState('All');
   const [page, setPage] = useState(1);
   useEffect(() => setPage(1), [filter]);
   if (!content) return null;
-  const size = content.pageSize ?? 3;
   const list = posts.filter((p) => matches(filter, p.category));
-  const pages = Math.max(1, Math.ceil(list.length / size));
+  const pages = Math.max(1, Math.ceil(list.length / POSTS_PER_PAGE));
   const current = Math.min(page, pages);
-  const slice = list.slice((current - 1) * size, current * size);
+  const slice = list.slice((current - 1) * POSTS_PER_PAGE, current * POSTS_PER_PAGE);
   const [featured, ...rest] = slice;
   return (
     <section className="bg-surface-soft px-5 py-16 md:px-10 xl:px-gutter xl:py-[110px]" aria-label="Articles">
@@ -178,7 +183,7 @@ export function BlogArticles({ content }: { content?: BlogArticlesContent }) {
           {rest.map((p) => (
             <Card key={p.id} post={p} readLabel={content.readLabel} />
           ))}
-          {current === 1 && (
+          {current === pages && (
             <div className="flex flex-col items-center justify-center gap-3 rounded-xl2 border border-line bg-white p-8 shadow-card">
               <h3 className="text-[22px] font-bold text-ink">{content.emptyTitle}</h3>
               <p className="self-stretch text-[15px] leading-6 text-ink-500">{content.emptyText}</p>

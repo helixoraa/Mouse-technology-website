@@ -25,7 +25,6 @@ const blog: PageSeed = {
         readLabel: 'Read article',
         emptyTitle: 'More articles soon',
         emptyText: 'New explainers and updates will appear here as our projects progress.',
-        pageSize: 3,
         prevLabel: 'Prev',
         nextLabel: 'Next',
       },
