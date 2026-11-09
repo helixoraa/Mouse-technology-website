@@ -14,9 +14,10 @@ export function Footer() {
             <Logo siteName={site.siteName} logoUrl={site.logoUrl} />
             <p className="w-[300px] max-w-full text-[14.5px] leading-[22px] text-white">{footer.tagline}</p>
           </div>
-          <div className="flex flex-wrap gap-10 lg:gap-20">
+          {/* Phones: link groups flow into two balanced columns (each group kept whole); from 640 the groups sit in a row. */}
+          <div className="columns-2 gap-x-6 sm:flex sm:flex-wrap sm:gap-10 lg:gap-20">
             {footer.columns.map((col) => (
-              <div key={col.title} className="flex min-w-[40%] flex-col gap-3 max-xl:gap-0 sm:min-w-0">
+              <div key={col.title} className="mb-8 flex break-inside-avoid flex-col gap-3 max-xl:gap-0 sm:mb-0">
                 <h2 className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-brand-sky max-xl:mb-1">{col.title}</h2>
                 {col.links.map((l) => (
                   <Link
