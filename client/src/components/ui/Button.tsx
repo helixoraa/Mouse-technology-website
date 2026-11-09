@@ -7,7 +7,7 @@ type Variant = 'primary' | 'white' | 'glass';
 const styles: Record<Variant, string> = {
   primary: 'bg-brand text-white hover:bg-brand-press',
   white: 'bg-white text-ink hover:bg-surface-tint',
-  glass: 'border border-white/40 bg-white/10 text-text-onDark hover:bg-white/20',
+  glass: 'border border-white/40 text-white hover:bg-white/15',
 };
 
 type Props = {

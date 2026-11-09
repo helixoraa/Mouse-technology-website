@@ -10,7 +10,7 @@ export function ContactTopics({ content }: { content?: ContactTopicsContent }) {
       <ul className="mx-auto grid max-w-page gap-5 lg:grid-cols-3">
         {content.items.map((it) => (
           <li key={it.number} className="flex flex-col gap-5 rounded-xl2 border border-line bg-white p-8 shadow-card">
-            <span className="flex size-14 items-center justify-center rounded-2xl bg-logo text-[15px] font-bold text-white">
+            <span className="flex size-14 items-center justify-center rounded-2xl bg-icon-tile text-[15px] font-bold text-white">
               {it.number}
             </span>
             <h2 className="text-[28px] font-extrabold leading-9 tracking-[-0.02em] text-ink">{it.title}</h2>

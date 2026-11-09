@@ -97,11 +97,11 @@ export function ProductFeature({ content, id }: { content?: ProductFeatureConten
                 <li
                   key={s}
                   className={cn(
-                    'flex min-h-[88px] flex-col gap-2.5 rounded-[18px] border border-white/25 bg-white/10 p-4',
+                    'flex min-h-[88px] flex-col gap-2.5 rounded-[18px] border border-white/25 bg-white/5 p-4',
                     content.steps.length > 4 ? 'lg:min-h-[126px]' : 'lg:min-h-[146px]',
                   )}
                 >
-                  <span className="text-[13px] font-bold text-text-soft">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="text-[13px] font-bold text-text-onDark">{String(i + 1).padStart(2, '0')}</span>
                   <span className="text-[15px] font-bold leading-5">{s}</span>
                 </li>
               ))}

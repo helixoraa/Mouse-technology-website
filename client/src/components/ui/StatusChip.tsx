@@ -7,7 +7,7 @@ export function StatusChip({ label, tone, className }: { label: string; tone?: '
     <span
       className={cn(
         'inline-flex items-center whitespace-nowrap rounded-pill border px-3 py-1.5 text-xs font-semibold',
-        t === 'brand' ? 'border-brand/40 bg-brand/10 text-brand' : 'border-line-chip bg-line-chipBg text-ink-700',
+        t === 'brand' ? 'border-brand/40 bg-brand/10 text-brand-indigo' : 'border-line-chip bg-line-chipBg text-ink-700',
         className,
       )}
     >

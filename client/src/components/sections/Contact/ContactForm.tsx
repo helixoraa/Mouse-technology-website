@@ -67,8 +67,8 @@ export function ContactForm({ content, className, variant = 'light', showConsent
     dark
       ? 'border-white/20 bg-white/[0.04] text-white placeholder:text-mock-muted'
       : compact
-        ? 'border-line bg-mock-field text-ink placeholder:text-mock-placeholder focus-visible:border-brand'
-        : 'border-line bg-white text-ink placeholder:text-ink-500/70 focus-visible:border-brand',
+        ? 'border-line bg-mock-field text-ink placeholder:text-ink-500 focus-visible:border-brand'
+        : 'border-line bg-white text-ink placeholder:text-ink-500 focus-visible:border-brand',
   );
   const labelCls = cn(
     compact ? 'text-[12.5px] font-medium' : dark ? 'text-[13px] font-semibold leading-4' : 'text-xs font-semibold',
@@ -220,7 +220,7 @@ export function ContactForm({ content, className, variant = 'light', showConsent
           options={f.interest?.options ?? []}
           placeholder={f.interest?.placeholder ?? 'Select an area'}
           triggerClassName={cn(input, 'focus-visible:outline-brand-sky', dark ? 'h-[54px]' : '')}
-          placeholderClassName={dark ? 'text-mock-muted' : compact ? 'text-mock-placeholder' : 'text-ink-500/70'}
+          placeholderClassName={dark ? 'text-mock-muted' : 'text-ink-500'}
           listClassName={dark ? 'border-white/20 bg-navy-form text-white' : 'border-line bg-white text-ink'}
           chevron={dark ? <span className="text-base text-mock-muted">⌄</span> : undefined}
         />,

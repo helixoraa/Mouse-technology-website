@@ -26,7 +26,7 @@ export function CtaCard({ content }: { content: CtaContent }) {
           <img src={highlight} alt="" className="absolute -inset-x-[11.11%] -inset-y-[25%] max-w-none" />
         </div>
         <div className="relative flex flex-col items-start gap-5">
-          <p className="text-eyebrow font-semibold uppercase text-text-soft">{content.eyebrow}</p>
+          <p className="text-eyebrow font-semibold uppercase text-text-onDark">{content.eyebrow}</p>
           <h2
             id="cta-heading"
             className="max-w-[640px] text-[34px] font-extrabold leading-[1.1] tracking-[-0.03em] text-text-onDark md:text-h-section"

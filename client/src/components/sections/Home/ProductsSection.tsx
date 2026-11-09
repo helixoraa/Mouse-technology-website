@@ -146,7 +146,7 @@ function ProductCard({ item, reverse }: { item: ProductItem; reverse?: boolean }
         <ol className="flex flex-wrap gap-2" aria-label="How it works">
           {item.journey.map((j, i) => (
             <li key={j} className="flex items-center gap-2 rounded-pill border border-line bg-surface-tint px-3 py-2">
-              <span className="flex size-[18px] items-center justify-center rounded-pill bg-mock-blue/90 text-[10px] font-bold text-ink-700">
+              <span className="flex size-[18px] items-center justify-center rounded-pill bg-mock-blue/90 text-[10px] font-bold text-ink">
                 {i + 1}
               </span>
               <span className="text-[12.5px] font-medium text-ink-700">{j}</span>
