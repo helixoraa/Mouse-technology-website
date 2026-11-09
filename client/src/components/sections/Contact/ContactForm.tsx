@@ -37,6 +37,17 @@ const schema = z.object({
 
 type Errors = Partial<Record<keyof z.infer<typeof schema>, string>>;
 
+/** Field ids in visual order, so a failed submit can move focus to the first field that needs fixing. */
+const FIELD_IDS: [keyof Errors, string][] = [
+  ['name', 'cf-name'],
+  ['email', 'cf-email'],
+  ['phone', 'cf-phone'],
+  ['organisation', 'cf-org'],
+  ['interest', 'cf-interest'],
+  ['message', 'cf-message'],
+  ['consent', 'cf-consent'],
+];
+
 interface Props {
   content?: ContactFormContent;
   className?: string;
@@ -86,7 +97,8 @@ export function ContactForm({ content, className, variant = 'light', showConsent
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const raw = {
       name: String(fd.get('name') ?? ''),
       email: String(fd.get('email') ?? ''),
@@ -101,6 +113,8 @@ export function ContactForm({ content, className, variant = 'light', showConsent
       const next: Errors = {};
       for (const issue of parsed.error.issues) next[issue.path[0] as keyof Errors] ??= issue.message;
       setErrors(next);
+      const firstInvalid = FIELD_IDS.find(([key]) => next[key]);
+      if (firstInvalid) form.querySelector<HTMLElement>(`#${firstInvalid[1]}`)?.focus();
       return;
     }
     setErrors({});
