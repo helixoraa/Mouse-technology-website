@@ -13,10 +13,7 @@ export function PolicyContent({ content }: { content?: PolicyContentData }) {
   const [active, setActive] = useState(0);
   if (!content) return null;
   return (
-    <section
-      className="bg-surface-soft px-5 py-16 md:px-10 xl:px-gutter xl:min-h-[1730px] xl:pb-[40px] xl:pt-[70px]"
-      aria-labelledby="policy-heading"
-    >
+    <section className="bg-surface-soft px-5 py-16 md:px-10 xl:px-gutter xl:pb-[40px] xl:pt-[70px]" aria-labelledby="policy-heading">
       <div className="mx-auto max-w-page">
         <h2 id="policy-heading" className="text-[28px] font-bold leading-10 text-ink md:text-[34px]">
           {content.heading}
@@ -25,7 +22,7 @@ export function PolicyContent({ content }: { content?: PolicyContentData }) {
         <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,348px)_minmax(0,1fr)] lg:gap-9 xl:mt-[57px]">
           <nav
             aria-label={content.sidebarTitle}
-            className="h-fit rounded-[18px] border border-policy-sidebarBorder bg-sidebar px-3.5 pb-8 pt-[27px] lg:sticky lg:top-6 lg:mt-[3px] lg:min-h-[627px]"
+            className="h-fit rounded-[18px] border border-policy-sidebarBorder bg-sidebar px-3.5 pb-8 pt-[27px] lg:sticky lg:top-6 lg:mt-[3px]"
           >
             <p className="px-2.5 text-base font-bold leading-[1.2] text-white">{content.sidebarTitle}</p>
             <ol className="mt-5 grid gap-1 md:grid-cols-2 lg:flex lg:flex-col lg:gap-[15px]">
@@ -36,7 +33,7 @@ export function PolicyContent({ content }: { content?: PolicyContentData }) {
                     onClick={() => setActive(i)}
                     aria-current={active === i ? 'true' : undefined}
                     className={cn(
-                      'flex min-h-11 gap-[3px] rounded-xl px-[15px] py-2 transition-colors lg:h-[69px] lg:py-0',
+                      'flex min-h-11 gap-[3px] rounded-xl px-[15px] py-2 transition-colors lg:min-h-[69px] lg:py-0',
                       active === i
                         ? 'items-center bg-brand-press font-bold text-white'
                         : 'items-center font-medium text-brand-pale hover:bg-white/5 lg:items-start lg:pt-[12px]',
@@ -54,12 +51,9 @@ export function PolicyContent({ content }: { content?: PolicyContentData }) {
               <article
                 id={`policy-${a.number}`}
                 key={a.number}
-                className={cn(
-                  'flex scroll-mt-6 flex-col gap-[11px] rounded-2xl bg-white px-5 pb-5 pt-6 shadow-card md:px-7',
-                  i === 0 ? 'xl:h-[210px]' : 'xl:h-[188px]',
-                )}
+                className="flex scroll-mt-6 flex-col gap-[11px] rounded-2xl bg-white px-5 pb-5 pt-6 shadow-card md:px-7"
               >
-                <header className="flex h-[43px] items-center gap-4">
+                <header className="flex min-h-[43px] items-center gap-4">
                   <span
                     className={cn(
                       'flex h-[33px] w-[35px] shrink-0 items-center justify-center rounded-chip text-xs font-bold leading-[1.2]',
