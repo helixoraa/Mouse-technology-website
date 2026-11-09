@@ -18,7 +18,9 @@
     "prod:db:deploy": "node scripts/with-prod-env.mjs node scripts/prisma.mjs migrate deploy",
     "prod:db:seed": "node scripts/with-prod-env.mjs tsx prisma/seed.ts",
     "prod:migrate:media": "node scripts/with-prod-env.mjs tsx scripts/migrate-media.ts",
-    "prod:admin:reset": "node scripts/with-prod-env.mjs tsx scripts/admin-reset.ts"
+    "prod:admin:reset": "node scripts/with-prod-env.mjs tsx scripts/admin-reset.ts",
+    "content:fix": "tsx scripts/content-fixes.ts",
+    "prod:content:fix": "node scripts/with-prod-env.mjs tsx scripts/content-fixes.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

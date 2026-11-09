@@ -186,7 +186,7 @@ const home: PageSeed = {
           },
           {
             icon: 'retail',
-            title: 'HussainandMuallima.com',
+            title: 'HossainandMoallema.com',
             text: 'Our existing online retail business and what it offers customers.',
             textWidth: 439,
           },
@@ -257,7 +257,7 @@ const home: PageSeed = {
                 'Ride-Hailing Platform',
                 'E-commerce Platform',
                 'Textile business',
-                'HussainandMuallima.com',
+                'HossainandMoallema.com',
                 'Partnership',
                 'Other',
               ],

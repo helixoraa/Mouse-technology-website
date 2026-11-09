@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import type { Segment, Service } from '@/lib/types';
 import { mediaUrl } from '@/lib/api';
 import { cn } from '@/lib/cn';
+import { isExternalUrl } from '@/lib/links';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { StatusChip } from '@/components/ui/StatusChip';
 import { InnerBand } from '../InnerBand';
@@ -11,6 +12,22 @@ export interface ProjectGroupContent {
 }
 
 function ProjectCard({ s, large }: { s: Service; large: boolean }) {
+  const href = s.ctaHref || '/our-products';
+  const external = isExternalUrl(href);
+  const linkClass = '-my-3 flex w-fit items-center gap-2 py-3 font-semibold text-brand';
+  const linkBody = (
+    <>
+      <span className="text-[14.5px]">{s.ctaLabel || 'Learn more'}</span>
+      <span aria-hidden className="text-[15px]">
+        →
+      </span>
+      <span className="sr-only">
+        {' '}
+        about {s.title}
+        {external && ' (opens in a new tab)'}
+      </span>
+    </>
+  );
   return (
     <li
       className={cn(
@@ -29,13 +46,15 @@ function ProjectCard({ s, large }: { s: Service; large: boolean }) {
       </div>
       <h3 className={cn('font-extrabold text-ink', large ? 'text-h-card-lg' : 'text-h-card')}>{s.title}</h3>
       <p className="text-body-sm text-ink-500">{s.summary}</p>
-      <Link to={s.ctaHref || '/our-products'} className="-my-3 flex w-fit items-center gap-2 py-3 font-semibold text-brand">
-        <span className="text-[14.5px]">{s.ctaLabel || 'Learn more'}</span>
-        <span aria-hidden className="text-[15px]">
-          →
-        </span>
-        <span className="sr-only"> about {s.title}</span>
-      </Link>
+      {external ? (
+        <a href={href} target="_blank" rel="noopener noreferrer" className={linkClass}>
+          {linkBody}
+        </a>
+      ) : (
+        <Link to={href} className={linkClass}>
+          {linkBody}
+        </Link>
+      )}
     </li>
   );
 }
