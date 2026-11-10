@@ -43,10 +43,18 @@ export function productionDbHosts(env: NodeJS.ProcessEnv = process.env, envFile:
   return hosts;
 }
 
-/** Why this process looks like it targets production; empty when it does not. */
-export function productionTargets(env: NodeJS.ProcessEnv, prodHosts: Set<string>): string[] {
+/**
+ * Why this process looks like it targets production; empty when it does not.
+ * allowProductionEnv drops only the NODE_ENV=production reason (a self-hosted container seeding its own database);
+ * a database URL on a production host is always reported.
+ */
+export function productionTargets(
+  env: NodeJS.ProcessEnv,
+  prodHosts: Set<string>,
+  { allowProductionEnv = false }: { allowProductionEnv?: boolean } = {},
+): string[] {
   const reasons: string[] = [];
-  if (env.NODE_ENV === 'production') reasons.push('NODE_ENV=production');
+  if (env.NODE_ENV === 'production' && !allowProductionEnv) reasons.push('NODE_ENV=production');
   for (const v of URL_VARS) {
     const host = dbHost(env[v]);
     if (host && prodHosts.has(host)) reasons.push(`${v} points at the production database host (${host})`);

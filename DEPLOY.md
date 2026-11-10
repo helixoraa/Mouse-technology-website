@@ -60,7 +60,7 @@ or is still an example value.
 
    These commands use **only** `.env.production.local` (your local `server/.env` is ignored, so they can never touch your development database), force production mode, and print the target database host first: check that it is your Neon host before you continue.
 
-   The seed refuses to touch production unless you add `-- --force-production`, so it can't run there by accident. It never changes an existing user, never overwrites content edited in the admin, and matches services and posts by a fixed id (a renamed slug can't create a duplicate).
+   The seed refuses to touch production unless you add `-- --force-production`, so it can't run there by accident (`--allow-production-env`, used by the Docker setup for its own database, does not get past the production-host check). It never changes an existing user, never overwrites content edited in the admin, and matches services and posts by a fixed id (a renamed slug can't create a duplicate).
 
 4. Open your site: all pages should load with the real content and images.
 

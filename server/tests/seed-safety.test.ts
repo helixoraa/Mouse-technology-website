@@ -39,6 +39,57 @@ describe('production guard', () => {
     expect(productionTargets({ NODE_ENV: 'development', DIRECT_URL: NEON }, prod).join()).toMatch(/DIRECT_URL/);
     expect(productionTargets({ NODE_ENV: 'development', DATABASE_URL: TEST_ENV.DATABASE_URL }, prod)).toEqual([]);
   });
+
+  it('allowProductionEnv drops only the NODE_ENV reason, never a production host', () => {
+    const prod = new Set([dbHost(NEON)!]);
+    expect(productionTargets({ NODE_ENV: 'production', DATABASE_URL: TEST_ENV.DATABASE_URL }, prod, { allowProductionEnv: true })).toEqual(
+      [],
+    );
+    const both = productionTargets({ NODE_ENV: 'production', DATABASE_URL: NEON_POOLED }, prod, { allowProductionEnv: true });
+    expect(both).toHaveLength(1);
+    expect(both[0]).toMatch(/DATABASE_URL points at the production database host/);
+  });
+});
+
+describe('seed production flags (CLI)', () => {
+  const tsx = createRequire(import.meta.url).resolve('tsx/cli');
+  const seed = (args: string[], env: Record<string, string>) =>
+    spawnSync(process.execPath, [tsx, 'prisma/seed.ts', ...args], {
+      cwd: process.cwd(),
+      env: { ...process.env, ...TEST_ENV, ...env },
+      encoding: 'utf8',
+      timeout: 180_000,
+    });
+  /** What the Docker container sets: production mode with strong secrets. */
+  const dockerEnv = { NODE_ENV: 'production', JWT_SECRET: 'p'.repeat(48), ADMIN_PASSWORD: 'Strong-Prod-Pass-2026!' };
+  // The test database runs on localhost, so PRODUCTION_DB_HOSTS=localhost makes it "the production database host".
+  const productionHost = { PRODUCTION_DB_HOSTS: 'localhost' };
+
+  it('Docker flag (--allow-production-env) + production host -> refuses', () => {
+    const res = seed(['--allow-production-env'], { ...dockerEnv, ...productionHost });
+    expect(res.status).toBe(1);
+    expect(res.stderr).toMatch(/Refusing to seed: .*DATABASE_URL points at the production database host \(localhost\)/);
+    expect(res.stderr).not.toMatch(/NODE_ENV=production/);
+  });
+
+  it('--force-production + production host -> runs', async () => {
+    const res = seed(['--force-production'], { ...dockerEnv, ...productionHost });
+    expect(res.status, res.stderr).toBe(0);
+    expect(res.stderr).toMatch(/--force-production: seeding production/);
+    expect(await prisma.service.count()).toBe(services.length);
+  }, 240_000);
+
+  it('Docker flag + NODE_ENV=production on its own database -> runs; --reset is still refused', () => {
+    const ok = seed(['--allow-production-env'], dockerEnv);
+    expect(ok.status, ok.stderr).toBe(0);
+    for (const res of [
+      seed(['--allow-production-env', '--reset'], dockerEnv),
+      seed(['--allow-production-env'], { ...dockerEnv, SEED_RESET: 'true' }),
+    ]) {
+      expect(res.status).toBe(1);
+      expect(res.stderr).toMatch(/Refusing to seed with --reset/);
+    }
+  }, 240_000);
 });
 
 describe('seed identity', () => {

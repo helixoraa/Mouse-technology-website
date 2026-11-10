@@ -3,7 +3,9 @@
  *   npm run db:seed            -> creates anything missing, never overwrites admin edits
  *   npm run db:seed -- --reset -> also resets sections/services/settings back to the Figma content (never touches users)
  * Refuses to run against production (NODE_ENV=production, or a database host listed in .env.production.local or
- * PRODUCTION_DB_HOSTS) unless --force-production is passed. Services and posts are matched by their fixed seed id, so a
+ * PRODUCTION_DB_HOSTS) unless --force-production is passed. --allow-production-env is narrower: it accepts
+ * NODE_ENV=production (a self-hosted container seeding its own database) but still refuses a production database host,
+ * and still refuses --reset under NODE_ENV=production. Services and posts are matched by their fixed seed id, so a
  * renamed slug never produces a duplicate.
  * Images: every file in server/seed-media is copied to uploads/seed (png/jpg -> webp, svg/webp copied as-is).
  *   With STORAGE_DRIVER=blob they are uploaded to Vercel Blob once instead (idempotent, tracked in the Media table) and every
@@ -23,8 +25,11 @@ import { adoptSeedIds } from './seed-ids.js';
 import type { PageSeed } from './seed-data/types.js';
 import { faqs, posts, services, settings, team, testimonials } from './seed-data/collections.js';
 
-const productionReasons = productionTargets(process.env, productionDbHosts(process.env));
-if (productionReasons.length && !process.argv.includes('--force-production')) {
+const force = process.argv.includes('--force-production');
+const allowProductionEnv = process.argv.includes('--allow-production-env');
+const reset = process.argv.includes('--reset') || process.env.SEED_RESET === 'true';
+const productionReasons = productionTargets(process.env, productionDbHosts(process.env), { allowProductionEnv });
+if (productionReasons.length && !force) {
   console.error(
     `Refusing to seed: this looks like the production database (${productionReasons.join('; ')}).\n` +
       'The seed is for new and development databases. If you really mean to seed production, pass --force-production\n' +
@@ -32,11 +37,17 @@ if (productionReasons.length && !process.argv.includes('--force-production')) {
   );
   process.exit(1);
 }
+if (reset && process.env.NODE_ENV === 'production' && !force) {
+  console.error(
+    'Refusing to seed with --reset (or SEED_RESET=true) when NODE_ENV=production: it overwrites content edited in the admin.\n' +
+      '--allow-production-env does not cover this; pass --force-production if you really mean it.',
+  );
+  process.exit(1);
+}
 assertProductionSecrets(process.env); // never seed a production database with default secrets
 
 const prisma = new PrismaClient();
 const here = path.dirname(fileURLToPath(import.meta.url));
-const reset = process.argv.includes('--reset') || process.env.SEED_RESET === 'true';
 if (productionReasons.length) console.warn(`--force-production: seeding production${reset ? ' WITH --reset' : ''}.`);
 const json = (v: unknown) => v as Prisma.InputJsonValue;
 const useBlob = process.env.STORAGE_DRIVER === 'blob';
