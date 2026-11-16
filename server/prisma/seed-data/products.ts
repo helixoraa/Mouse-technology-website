@@ -77,7 +77,7 @@ const products: PageSeed = {
         animation: {
           src: '/animations/global-transfer.svg',
           staticImage: '/animations/global-transfer-static.webp',
-          alt: 'Globe showing live transfers, including $2,300.00 to New York and R12,800 to Johannesburg, both delivered',
+          alt: 'Animation: money transfers delivered on a dotted globe, each shown with its amount and a delivered status',
         },
         imageWidth: 752,
         imageHeight: 627,
