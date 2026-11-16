@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/cn';
+import { RichText } from '@/components/ui/RichText';
 
 export interface PolicyContent {
   title: string;
-  intro: string;
+  /** One paragraph, or several (RichText blocks: **bold**, [links](/path), "- " lists). */
+  intro: string | string[];
   sidebarTitle: string;
+  /** Each paragraph is a RichText block. */
   articles: { number: string; title: string; paragraphs: string[] }[];
 }
 
@@ -42,11 +45,13 @@ export function PolicyArticles({ content }: { content: PolicyContent }) {
         <h2 id="policy-heading" className="text-[28px] font-bold leading-[1.2] text-ink md:text-[34px]">
           {content.title}
         </h2>
-        <p className="mt-[19px] max-w-[1140px] text-base leading-[1.45] text-ink-500">{content.intro}</p>
+        <div className="mt-[19px] flex max-w-[1140px] flex-col gap-3 text-base leading-[1.45] text-ink-500">
+          <RichText blocks={content.intro} />
+        </div>
         <div className="mt-10 flex flex-col gap-8 lg:mt-[54px] lg:grid lg:grid-cols-[minmax(0,348px)_minmax(0,1fr)] lg:items-start lg:gap-9">
           <nav
             aria-label={content.sidebarTitle}
-            className="w-full shrink-0 self-start rounded-[18px] border border-policy-sidebarBorder bg-sidebar p-3.5 pb-5 lg:sticky lg:top-6"
+            className="w-full shrink-0 self-start rounded-[18px] border border-policy-sidebarBorder bg-sidebar p-3.5 pb-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-theme(spacing.12))] lg:overflow-y-auto"
           >
             <p className="px-2.5 pb-[17px] pt-[13px] text-base font-bold uppercase leading-[1.2] text-white">{content.sidebarTitle}</p>
             <ul className="grid gap-1 md:grid-cols-2 lg:flex lg:flex-col lg:gap-[15px]">
@@ -90,10 +95,8 @@ export function PolicyArticles({ content }: { content: PolicyContent }) {
                   </span>
                   <h3 className="text-xl font-bold leading-[1.28] text-ink md:text-[25px]">{a.title}</h3>
                 </header>
-                <div className="text-[15px] leading-[1.48] text-ink-700 [&>p+p]:mt-[22px]">
-                  {a.paragraphs.map((p, k) => (
-                    <p key={k}>{p}</p>
-                  ))}
+                <div className="text-[15px] leading-[1.48] text-ink-700 [&>*+*]:mt-[22px]">
+                  <RichText blocks={a.paragraphs} />
                 </div>
               </article>
             ))}
