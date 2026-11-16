@@ -8,6 +8,7 @@ import { requireAuth, requireRole } from '../middleware/auth.js';
 import { HttpError, validate, wrap } from '../middleware/common.js';
 import { storage } from '../lib/storage.js';
 import { PAGE_KEYS } from './public.js';
+import { cmsEmail, cmsLink, cmsMedia, cmsPhone, cmsWebUrl } from '../shared/validation.js';
 import { securityRouter } from './security.js';
 import { auditRouter, usersRouter } from './users.js';
 
@@ -22,6 +23,10 @@ const optStr = z
   .max(2000)
   .nullish()
   .transform((v) => (v === '' ? null : (v ?? null)));
+/** Optional typed field (link, image): "" / null / missing -> null; anything else must pass `s`. */
+const opt = (s: z.ZodTypeAny) => s.nullish().transform((v) => (v === '' ? null : (v ?? null)));
+/** Required text: trimmed, not empty. */
+const req = (max: number) => z.string().trim().min(1, 'Required').max(max);
 const jsonValue = z.custom<Prisma.InputJsonValue>((v) => v !== undefined, 'Required');
 const nullableJson = z.custom<Prisma.InputJsonValue | null>(() => true).nullish();
 
@@ -202,13 +207,13 @@ crud(
       .regex(/^[a-z0-9-]+$/, 'Use lowercase letters, numbers and dashes'),
     title: z.string().trim().min(1).max(200),
     category: z.enum(['product', 'planned', 'business']),
-    status: z.string().trim().max(80).default(''),
-    summary: z.string().trim().max(2000).default(''),
+    status: req(80),
+    summary: req(2000),
     description: optStr,
-    image: optStr,
+    image: opt(cmsMedia()),
     gradient: optStr,
     ctaLabel: optStr,
-    ctaHref: optStr,
+    ctaHref: opt(cmsLink()),
     extra: nullableJson,
     ...base,
   }),
@@ -220,10 +225,10 @@ crud(
   prisma.testimonial as unknown as Delegate,
   z.object({
     name: z.string().trim().min(1).max(160),
-    role: z.string().trim().max(160).default(''),
+    role: req(160),
     company: optStr,
     quote: z.string().trim().min(1).max(3000),
-    avatar: optStr,
+    avatar: opt(cmsMedia()),
     ...base,
   }),
   { ordered: true },
@@ -236,7 +241,7 @@ crud(
     name: z.string().trim().min(1).max(160),
     role: z.string().trim().max(160).default(''),
     bio: z.string().trim().max(3000).default(''),
-    photo: optStr,
+    photo: opt(cmsMedia()),
     ...base,
   }),
   { ordered: true },
@@ -260,11 +265,11 @@ crud(
       .max(160)
       .regex(/^[a-z0-9-]+$/, 'Use lowercase letters, numbers and dashes'),
     title: z.string().trim().min(1).max(240),
-    category: z.string().trim().max(120).default(''),
-    excerpt: z.string().trim().max(2000).default(''),
+    category: req(120),
+    excerpt: req(2000),
     body: optStr,
-    image: optStr,
-    author: z.string().trim().max(160).default('MAOUAJ Technology Team'),
+    image: opt(cmsMedia()),
+    author: req(160).default('MAOUAJ Technology Team'),
     publishedAt: z.coerce.date().optional(),
     dateLabel: optStr,
     visible: z.boolean().optional(),
@@ -323,27 +328,27 @@ adminRouter.delete(
 );
 
 /* ---------- Settings ---------- */
-const linkSchema = z.object({ label: z.string().trim().min(1).max(120), href: z.string().trim().min(1).max(500) });
+const linkSchema = z.object({ label: z.string().trim().min(1).max(120), href: cmsLink('Link URL', { required: true }) });
 const seoMeta = z.object({
   title: z.string().max(200).optional(),
   description: z.string().max(500).optional(),
-  ogImage: z.string().max(500).optional(),
+  ogImage: cmsMedia('Share image').optional(),
 });
 const settingsBody = z.object({
   siteName: z.string().trim().min(1).max(120),
   tagline: z.string().trim().max(300).default(''),
-  logoUrl: optStr,
-  email: z.string().trim().max(200).default(''),
-  phone: z.string().trim().max(60).default(''),
+  logoUrl: opt(cmsMedia()),
+  email: cmsEmail().default(''),
+  phone: cmsPhone().default(''),
   address: z.string().trim().max(400).default(''),
-  socials: z.record(z.string().max(500)).default({}),
+  socials: z.record(cmsWebUrl('Social link')).default({}),
   nav: z.array(linkSchema).default([]),
   footer: z.object({
     tagline: z.string().max(400).default(''),
     columns: z.array(z.object({ title: z.string().max(120), links: z.array(linkSchema) })).default([]),
     copyright: z.string().max(300).default(''),
     offices: z
-      .array(z.object({ name: z.string().trim().max(120), address: z.string().trim().max(400), phone: z.string().trim().max(60) }))
+      .array(z.object({ name: z.string().trim().max(120), address: z.string().trim().max(400), phone: cmsPhone('Office phone') }))
       .max(10)
       .default([]),
   }),

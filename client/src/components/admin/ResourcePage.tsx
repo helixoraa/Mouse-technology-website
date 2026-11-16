@@ -1,14 +1,14 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api, mediaUrl } from '@/lib/api';
-import { errMsg } from '@/lib/admin-api';
+import { errMsg, fieldErrorsOf } from '@/lib/admin-api';
 import { useAdminMutation } from '@/hooks/useAdminMutation';
 import { useConfirm } from '@/hooks/useConfirm';
 import { useToast } from '@/hooks/useToast';
 import { ImageField } from './ImageField';
 import { Modal } from './Modal';
 import { SortableItem, SortableList } from './Sortable';
-import { Btn, Card, EmptyState, ErrorState, Field, PageHeader, Select, Spinner, TextArea, TextInput, Toggle } from './ui';
+import { Btn, Card, EmptyState, ErrorState, Field, FieldError, PageHeader, Select, Spinner, TextArea, TextInput, Toggle } from './ui';
 
 export type Row = Record<string, unknown> & { id: string };
 export type FieldType = 'text' | 'textarea' | 'image' | 'select' | 'checkbox' | 'password' | 'email' | 'date' | 'json' | 'number';
@@ -57,12 +57,15 @@ function RowForm({
   onClose,
   onSave,
   busy,
+  errors,
 }: {
   cfg: ResourceConfig;
   row: Row | null;
   onClose: () => void;
   onSave: (body: Record<string, unknown>) => void;
   busy: boolean;
+  /** Server validation messages per field name (from a 400 response). */
+  errors: Record<string, string>;
 }) {
   const toast = useToast();
   const fields = cfg.fields.filter((f) => !f.createOnly || !row);
@@ -112,10 +115,11 @@ function RowForm({
               <div key={f.name} className={span}>
                 <span className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-700">{f.label}</span>
                 <ImageField label={f.label} value={String(v ?? '')} onChange={(x) => set(f.name, x)} />
+                {errors[f.name] && <FieldError message={errors[f.name]} />}
               </div>
             );
           return (
-            <Field key={f.name} label={f.label + (f.required ? ' *' : '')} hint={f.hint} className={span}>
+            <Field key={f.name} label={f.label + (f.required ? ' *' : '')} hint={f.hint} error={errors[f.name]} className={span}>
               {f.type === 'textarea' || f.type === 'json' ? (
                 <TextArea
                   rows={f.rows ?? (f.type === 'json' ? 6 : 4)}
@@ -178,7 +182,10 @@ export function ResourcePage({ cfg, currentUserId }: { cfg: ResourceConfig; curr
     if (q.data) setRows(cfg.reorder ? [...q.data].sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0)) : q.data);
   }, [q.data, cfg.reorder]);
 
-  const close = () => setEditing(null);
+  const close = () => {
+    setEditing(null);
+    save.reset(); // drop field errors from a failed save
+  };
   const save = useAdminMutation(
     ({ id, body }: { id?: string; body: Record<string, unknown> }) =>
       api(id ? `/admin/${cfg.path}/${id}` : `/admin/${cfg.path}`, { method: id ? 'PUT' : 'POST', body: JSON.stringify(body) }),
@@ -306,6 +313,7 @@ export function ResourcePage({ cfg, currentUserId }: { cfg: ResourceConfig; curr
           row={editing === 'new' ? null : editing}
           onClose={close}
           busy={save.isPending}
+          errors={fieldErrorsOf(save.error)}
           onSave={(b) => save.mutate({ id: editing === 'new' ? undefined : editing.id, body: b })}
         />
       )}

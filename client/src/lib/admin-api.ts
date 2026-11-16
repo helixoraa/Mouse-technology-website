@@ -50,7 +50,26 @@ export const PAGES: { key: string; label: string; path: string }[] = [
   { key: 'privacy', label: 'Privacy Policy', path: '/privacy-policy' },
 ];
 
+type ZodDetails = { formErrors?: string[]; fieldErrors?: Record<string, string[] | undefined> };
+const zodDetails = (e: unknown): ZodDetails | undefined => {
+  const d = e instanceof ApiError && e.status === 400 ? (e.details as ZodDetails | undefined) : undefined;
+  return d && typeof d === 'object' && d.fieldErrors && typeof d.fieldErrors === 'object' ? d : undefined;
+};
+
+/** First server validation message per field of a 400 response (zod `fieldErrors`), for showing under the field. */
+export function fieldErrorsOf(e: unknown): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(zodDetails(e)?.fieldErrors ?? {})) if (v?.[0]) out[k] = v[0];
+  return out;
+}
+
 export function errMsg(e: unknown): string {
+  const zd = zodDetails(e);
+  if (zd) {
+    const fields = Object.entries(fieldErrorsOf(e)).map(([k, m]) => (m.includes(':') ? m : `${k}: ${m}`));
+    const all = [...(zd.formErrors ?? []), ...fields];
+    return all.length ? `Please check: ${all.join('; ')}` : (e as ApiError).message;
+  }
   if (e instanceof ApiError) {
     const d = e.details;
     // password-policy style details: { problems: string[] } -> readable sentence

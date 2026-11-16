@@ -9,6 +9,7 @@ import { errMsg, fmtDate, type AdminUser } from '@/lib/admin-api';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { z } from 'zod';
+import { emailField } from '@shared/validation';
 
 type Role = AdminUser['role'];
 interface Issued {
@@ -59,7 +60,7 @@ function TempPasswordModal({ issued, onClose }: { issued: Issued; onClose: () =>
 
 const createSchema = z.object({
   name: z.string().trim().min(1, 'Enter a name'),
-  email: z.string().trim().email('Enter a valid email address'),
+  email: emailField('Enter an email address'), // same rule as the API (server/src/routes/users.ts)
   role: z.enum(['ADMIN', 'EDITOR']),
 });
 

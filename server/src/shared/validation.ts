@@ -168,3 +168,63 @@ export const LEAD_FIELDS: readonly LeadField[] = [
 
 /** First + last name as stored in Lead.name. */
 export const fullName = (v: Pick<LeadInput, 'firstName' | 'lastName'>) => `${v.firstName} ${v.lastName}`;
+
+/* ---------- Admin (CMS) fields ---------- */
+/* Server-side rules for typed admin fields. Admin text is not HTML-stripped (it is CMS content, rendered as text by React). */
+
+/** "[Business email]"-style CMS placeholders, shown as plain text until the real value is known. */
+export const isCmsPlaceholder = (v: string) => /^\[[^\]]*\]$/.test(v.trim());
+const say = (label: string | undefined, m: string) => (label ? `${label}: ${m}` : m.charAt(0).toUpperCase() + m.slice(1));
+const isEmail = (v: string) => z.string().email().safeParse(v).success;
+const DISPLAY_PHONE = /^\+?[0-9 ().-]+$/;
+const SITE_LINK = /^(?:\/(?!\/)|#|https?:\/\/[^/?#]+|mailto:[^@]+@[^@]+\.[a-z]{2,}|tel:\+?[0-9().-]{7,})/i;
+const MEDIA_REF = /^(?:\/(?!\/)|https?:\/\/[^/?#]+)/i;
+const WEB_URL = /^https?:\/\/[^/?#]+/i;
+const noSpace = (v: string) => !/\s/.test(v);
+
+/** Optional email (settings): "", a "[placeholder]" or a valid address. */
+export const cmsEmail = (label?: string) =>
+  z
+    .string()
+    .trim()
+    .max(EMAIL_MAX, say(label, `at most ${EMAIL_MAX} characters`))
+    .refine((v) => !v || isCmsPlaceholder(v) || isEmail(v), say(label, 'enter a valid email address or leave it empty'));
+
+/** Optional phone as displayed on the site: digits, spaces, ( ) - . and one leading +, 7–15 digits; "" or a "[placeholder]" too. */
+export const cmsPhone = (label?: string) =>
+  z
+    .string()
+    .trim()
+    .max(40, say(label, 'at most 40 characters'))
+    .refine(
+      (v) => !v || isCmsPlaceholder(v) || (DISPLAY_PHONE.test(v) && digitCount(v) >= PHONE_MIN_DIGITS && digitCount(v) <= PHONE_MAX_DIGITS),
+      say(label, `use digits, spaces and + ( ) - . only, with ${PHONE_MIN_DIGITS} to ${PHONE_MAX_DIGITS} digits`),
+    );
+
+/** Link target: a site path ("/our-products"), an anchor ("#contact"), http(s)://…, mailto: or tel:. No javascript:, no "//host". */
+export const cmsLink = (label?: string, opts: { required?: boolean } = {}) =>
+  z
+    .string()
+    .trim()
+    .max(500, say(label, 'at most 500 characters'))
+    .refine((v) => !!v || !opts.required, say(label, 'required'))
+    .refine(
+      (v) => !v || (SITE_LINK.test(v) && noSpace(v)),
+      say(label, 'use a site path like /contact-us, a full https:// address, mailto: or tel:'),
+    );
+
+/** Image/media reference: an uploaded or bundled file path ("/uploads/…") or a full http(s):// URL; "" when empty. */
+export const cmsMedia = (label?: string) =>
+  z
+    .string()
+    .trim()
+    .max(2000, say(label, 'at most 2000 characters'))
+    .refine((v) => !v || (MEDIA_REF.test(v) && noSpace(v)), say(label, 'use an uploaded image or a full https:// address'));
+
+/** Web address (social profiles): a full http(s):// URL or "". */
+export const cmsWebUrl = (label?: string) =>
+  z
+    .string()
+    .trim()
+    .max(500, say(label, 'at most 500 characters'))
+    .refine((v) => !v || (WEB_URL.test(v) && noSpace(v)), say(label, 'use a full address starting with https://'));

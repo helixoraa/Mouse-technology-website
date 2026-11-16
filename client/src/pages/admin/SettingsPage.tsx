@@ -2,9 +2,9 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ImageField } from '@/components/admin/ImageField';
 import { JsonNode } from '@/components/admin/JsonEditor';
-import { Btn, Card, ErrorState, Field, PageHeader, Spinner, TextArea, TextInput } from '@/components/admin/ui';
+import { Btn, Card, ErrorState, Field, FieldError, PageHeader, Spinner, TextArea, TextInput } from '@/components/admin/ui';
 import { useAdminMutation } from '@/hooks/useAdminMutation';
-import { errMsg } from '@/lib/admin-api';
+import { errMsg, fieldErrorsOf } from '@/lib/admin-api';
 import { api } from '@/lib/api';
 import type { SiteSettings } from '@/lib/types';
 
@@ -35,6 +35,9 @@ export default function SettingsPage() {
     () => setDirty(false),
   );
 
+  // Server validation messages (400 fieldErrors) shown under the matching field; nested ones (footer, nav, socials) go to the toast.
+  const fieldErr = fieldErrorsOf(save.error);
+
   if (q.isLoading) return <Spinner />;
   if (q.isError || !s) return <ErrorState message={errMsg(q.error)} onRetry={() => void q.refetch()} />;
 
@@ -60,7 +63,7 @@ export default function SettingsPage() {
       />
       <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
         <Block title="Brand">
-          <Field label="Site name">
+          <Field label="Site name" error={fieldErr.siteName}>
             <TextInput value={s.siteName} onChange={(e) => set('siteName', e.target.value)} required />
           </Field>
           <Field label="Tagline">
@@ -69,6 +72,7 @@ export default function SettingsPage() {
           <div>
             <span className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-700">Logo</span>
             <ImageField label="Logo" value={s.logoUrl ?? ''} onChange={(v) => set('logoUrl', v || null)} />
+            {fieldErr.logoUrl && <FieldError message={fieldErr.logoUrl} />}
           </div>
         </Block>
 
@@ -77,14 +81,14 @@ export default function SettingsPage() {
           desc="Email: Contact Us, homepage and footer. Office blocks (name, address, phone) are edited under Footer → offices; Telephone and Address here are only shown when no offices are listed."
         >
           <div className="grid gap-4 md:grid-cols-2 [&>*]:min-w-0">
-            <Field label="Email">
+            <Field label="Email" error={fieldErr.email}>
               <TextInput type="text" value={s.email ?? ''} onChange={(e) => set('email', e.target.value)} />
             </Field>
-            <Field label="Telephone">
+            <Field label="Telephone" error={fieldErr.phone} hint="Digits, spaces and + ( ) - . (7–15 digits).">
               <TextInput value={s.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
             </Field>
           </div>
-          <Field label="Address">
+          <Field label="Address" error={fieldErr.address}>
             <TextArea rows={2} value={s.address ?? ''} onChange={(e) => set('address', e.target.value)} />
           </Field>
         </Block>

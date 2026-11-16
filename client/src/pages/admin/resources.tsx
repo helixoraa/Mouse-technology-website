@@ -41,7 +41,7 @@ const servicesCfg: ResourceConfig = {
     { name: 'image', label: 'Image', type: 'image' },
     { name: 'gradient', label: 'Fallback gradient (CSS, optional)', full: true },
     { name: 'ctaLabel', label: 'Link label' },
-    { name: 'ctaHref', label: 'Link URL' },
+    { name: 'ctaHref', label: 'Link URL', hint: 'A site path like /our-products or a full https:// address' },
     { name: 'extra', label: 'Extra data (JSON, optional)', type: 'json' },
     { name: 'visible', label: 'Visible on the website', type: 'checkbox' },
   ],

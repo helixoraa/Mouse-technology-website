@@ -4,13 +4,35 @@ import { cn } from '@/lib/cn';
 export const inputCls =
   'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink max-lg:min-h-11 placeholder:text-ink-500/60 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 disabled:bg-surface-soft';
 
-export function Field({ label, hint, children, className }: { label: string; hint?: string; children: ReactNode; className?: string }) {
+export function Field({
+  label,
+  hint,
+  error,
+  children,
+  className,
+}: {
+  label: string;
+  hint?: string;
+  /** Validation message shown under the control (e.g. a server field error). */
+  error?: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <label className={cn('block', className)}>
       <span className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-ink-700">{label}</span>
       {children}
       {hint && <span className="mt-1 block text-xs text-ink-500">{hint}</span>}
+      {error && <FieldError message={error} />}
     </label>
+  );
+}
+
+export function FieldError({ message }: { message: string }) {
+  return (
+    <span role="alert" className="mt-1 block text-xs font-medium text-danger">
+      {message}
+    </span>
   );
 }
 

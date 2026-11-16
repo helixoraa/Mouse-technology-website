@@ -6,6 +6,7 @@ import { HttpError, idParams, validate, wrap } from '../middleware/common.js';
 import { audit } from '../lib/audit.js';
 import { generateTempPassword, hashPassword } from '../lib/password.js';
 import { unlockAccount } from '../lib/ratelimit.js';
+import { emailField } from '../shared/validation.js';
 
 /** Mounted at /api/admin/users (ADMIN only). */
 export const usersRouter = Router();
@@ -24,7 +25,7 @@ const publicUser = {
 } as const;
 
 const createBody = z.object({
-  email: z.string().trim().toLowerCase().email().max(200),
+  email: emailField('Enter an email address').transform((v) => v.toLowerCase()),
   name: z.string().trim().min(1).max(120),
   role: z.enum(['ADMIN', 'EDITOR']),
 });
