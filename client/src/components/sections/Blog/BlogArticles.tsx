@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ImgHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
 import { mediaUrl, usePosts } from '@/lib/api';
 import { cn } from '@/lib/cn';
@@ -51,15 +51,22 @@ function ReadLink({ slug, label }: { slug: string; label: string }) {
   );
 }
 
+/** React 18 doesn't know the camelCase fetchPriority prop (it warns); the lowercase HTML attribute passes through. */
+const HIGH_PRIORITY = { fetchpriority: 'high' } as ImgHTMLAttributes<HTMLImageElement>;
+
 function Featured({ post, readLabel }: { post: Post; readLabel: string }) {
   return (
     <article
       id={post.slug}
       className="grid overflow-hidden rounded-xl3 border border-line bg-white shadow-card lg:grid-cols-[minmax(0,600fr)_minmax(0,696fr)]"
     >
+      {/* The page's largest image (LCP): load it first, never lazily. */}
       <img
         src={mediaUrl(post.image)}
         alt={post.title}
+        width={600}
+        height={420}
+        {...HIGH_PRIORITY}
         className="h-64 w-full object-cover object-center md:h-80 lg:h-full lg:min-h-[340px] xl:h-[420px]"
       />
       <div className="flex flex-col justify-center gap-5 p-6 md:p-10 xl:px-14 xl:py-12">
@@ -80,7 +87,15 @@ function Featured({ post, readLabel }: { post: Post; readLabel: string }) {
 function Card({ post, readLabel }: { post: Post; readLabel: string }) {
   return (
     <article id={post.slug} className="flex flex-col gap-5 rounded-xl2 border border-line bg-white px-5 pb-7 pt-5 shadow-card">
-      <img src={mediaUrl(post.image)} alt={post.title} className="h-[200px] w-full rounded-[18px] object-cover object-center" />
+      <img
+        src={mediaUrl(post.image)}
+        alt={post.title}
+        width={377}
+        height={200}
+        loading="lazy"
+        decoding="async"
+        className="h-[200px] w-full rounded-[18px] object-cover object-center"
+      />
       <div className="flex flex-col gap-3 px-3">
         <div className="flex items-center gap-3">
           <CategoryChip>{post.category}</CategoryChip>

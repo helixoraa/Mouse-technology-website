@@ -33,10 +33,13 @@ function MemberCard({ m }: { m: TeamMember }) {
           <img
             src={mediaUrl(m.photo)}
             alt={`Portrait placeholder for ${m.name}`}
+            width={288}
+            height={vector ? 336 : 296}
+            decoding="async"
             className={
               vector
                 ? 'absolute inset-0 size-full object-cover'
-                : 'absolute inset-x-0 top-[calc(100%*24/336)] aspect-[288/296] w-full object-cover'
+                : 'absolute inset-x-0 top-[calc(100%*24/336)] aspect-[288/296] h-auto w-full object-cover'
             }
             loading="lazy"
             draggable={false}

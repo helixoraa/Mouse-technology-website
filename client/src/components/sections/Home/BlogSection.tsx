@@ -21,7 +21,17 @@ function Featured({ post }: { post: Post }) {
   return (
     <article className="flex flex-1 flex-col overflow-hidden rounded-xl2 border border-line bg-white">
       <div className="relative h-[250px] w-full overflow-hidden bg-blog-art">
-        {post.image && <img src={mediaUrl(post.image)} alt="" className="absolute inset-0 size-full object-cover" />}
+        {post.image && (
+          <img
+            src={mediaUrl(post.image)}
+            alt=""
+            width={635}
+            height={250}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 size-full object-cover"
+          />
+        )}
         <div aria-hidden className="absolute left-[416px] top-[-80px] hidden size-[300px] lg:block">
           <div className="absolute inset-[-30%]">
             <img src={blogEllipseA} alt="" className="size-full max-w-none" />
@@ -47,7 +57,17 @@ function Compact({ post }: { post: Post }) {
   return (
     <article className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl2 border border-line bg-white sm:flex-row">
       <div className="relative h-40 w-full shrink-0 overflow-hidden bg-blog-thumb sm:h-auto sm:w-[190px]">
-        {post.image && <img src={mediaUrl(post.image)} alt="" className="absolute inset-0 size-full object-cover" />}
+        {post.image && (
+          <img
+            src={mediaUrl(post.image)}
+            alt=""
+            width={190}
+            height={223}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 size-full object-cover"
+          />
+        )}
       </div>
       <div className="flex flex-col items-start justify-center gap-2 p-6 xl:p-[26px]">
         <CategoryChip label={post.category} />
