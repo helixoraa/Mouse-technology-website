@@ -1,7 +1,9 @@
-/** Unfilled CMS placeholders look like "[Business telephone]"; they are shown as text, never linked. */
+import type { Office } from './types';
+
+/** Unfilled CMS placeholders look like "[Business email]"; they are shown as text, never linked. */
 export const isPlaceholder = (v?: string | null) => !v || /^\s*\[/.test(v);
 
-/** tel: link in E.164 ("+1 (555) 010-0000" -> "tel:+15550100000"); undefined for placeholders. */
+/** tel: link in E.164 ("+1 (716) 533-2271" -> "tel:+17165332271"); undefined for placeholders. */
 export const telHref = (phone?: string | null) => {
   if (isPlaceholder(phone)) return undefined;
   const digits = phone!.replace(/\D/g, '');
@@ -9,3 +11,5 @@ export const telHref = (phone?: string | null) => {
 };
 
 export const mailHref = (email?: string | null) => (isPlaceholder(email) ? undefined : `mailto:${email!.trim()}`);
+
+export const officesOf = (site?: { offices?: Office[] }) => site?.offices ?? [];

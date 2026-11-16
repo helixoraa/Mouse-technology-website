@@ -20,8 +20,9 @@
  *  - re-keys the seed's services and posts to their fixed ids (prisma/seed-ids.ts), so a later seed run matches them by
  *    id and can never duplicate a row whose slug was renamed. The seed does this itself too; this step just does it now.
  * --step=r3-contact (Round 3)
- *  - site settings email -> info@maouajtechnology.com. Telephone and address are deliberately left as they are
- *    (MAOUAJ office details are not confirmed yet); remaining placeholders are listed, not changed.
+ *  - site settings: email -> info@maouajtechnology.com; footer.offices -> the two MAOUAJ offices (Grupo Maouaj S.A.,
+ *    Guatemala; Maouaj Technology Corporation, USA: name, address, phone); phone/address (legacy single fields) ->
+ *    the Guatemala office. Other footer keys are kept. Remaining "[Business …]"/"[Address …]" text is listed only.
  * --step=r3-card (Round 3)
  *  - HossainandMoallema.com card (found by fixed id, current or pre-Round-1 slug): new description, image
  *    seed/project-hossain-moallema-warehouse.webp + extra.image2x (the -2x file), link https://hossainandmoallema.com/.
@@ -40,7 +41,7 @@ import { fileURLToPath } from 'node:url';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../src/db.js';
 import { adoptSeedIds } from '../prisma/seed-ids.js';
-import { BUSINESS_SUMMARY } from '../prisma/seed-data/collections.js';
+import { BUSINESS_SUMMARY, OFFICES } from '../prisma/seed-data/collections.js';
 
 const apply = process.argv.includes('--apply');
 const step = process.argv.find((a) => a.startsWith('--step='))?.slice('--step='.length) ?? 'names';
@@ -291,23 +292,30 @@ async function businessWording() {
 const CONTACT_EMAIL = 'info@maouajtechnology.com';
 const PLACEHOLDER = /\[(?:business|address)[^\]]*\]/i;
 
-async function contactEmail() {
+async function contactDetails() {
   const s = await prisma.siteSettings.findUnique({ where: { id: 1 } });
   if (!s) throw new Error('Site settings row (id 1) not found');
-  let rows = 0;
-  if (s.email !== CONTACT_EMAIL) {
-    const note = s.email && !PLACEHOLDER.test(s.email) ? '  (replaces a non-placeholder value)' : '';
-    console.log(`  SiteSettings.email: ${JSON.stringify(s.email)} -> ${JSON.stringify(CONTACT_EMAIL)}${note}`);
-    if (apply) await prisma.siteSettings.update({ where: { id: 1 }, data: { email: CONTACT_EMAIL } });
-    rows++;
+  const footer = (s.footer && typeof s.footer === 'object' && !Array.isArray(s.footer) ? s.footer : {}) as Record<string, unknown>;
+  const want = { email: CONTACT_EMAIL, phone: OFFICES[0].phone, address: OFFICES[0].address };
+  const data: Prisma.SiteSettingsUpdateInput = {};
+  for (const k of ['email', 'phone', 'address'] as const) {
+    if (s[k] === want[k]) continue;
+    const note = s[k] && !PLACEHOLDER.test(s[k]) ? '  (replaces a non-placeholder value)' : '';
+    console.log(`  SiteSettings.${k}: ${JSON.stringify(s[k])} -> ${JSON.stringify(want[k])}${note}`);
+    data[k] = want[k];
   }
-  console.log(`  unchanged: SiteSettings.phone ${JSON.stringify(s.phone)}, SiteSettings.address ${JSON.stringify(s.address)}`);
+  if (JSON.stringify(footer.offices ?? null) !== JSON.stringify(OFFICES)) {
+    console.log(`  SiteSettings.footer.offices: ${JSON.stringify(footer.offices ?? null)} -> ${JSON.stringify(OFFICES)}`);
+    data.footer = { ...footer, offices: OFFICES } as Prisma.InputJsonValue;
+  }
   for (const sec of await prisma.pageSection.findMany()) {
     const found: string[] = [];
     mapStrings(sec.content, (v) => (PLACEHOLDER.test(v) && found.push(v), v));
     for (const v of found) console.log(`  note: placeholder left in PageSection ${sec.page}/${sec.key}: ${JSON.stringify(v)}`);
   }
-  return rows;
+  if (!Object.keys(data).length) return 0;
+  if (apply) await prisma.siteSettings.update({ where: { id: 1 }, data });
+  return 1;
 }
 
 const report = (n: number, what: string) => console.log(n ? `${n} ${what} ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
@@ -332,8 +340,8 @@ const steps: Record<string, () => Promise<void>> = {
     report(await businessWording(), 'section(s)');
   },
   'r3-contact': async () => {
-    console.log('Contact email:');
-    report(await contactEmail(), 'row(s)');
+    console.log('Contact details (email, MAOUAJ offices):');
+    report(await contactDetails(), 'row(s)');
   },
   'seed-ids': async () => {
     console.log('Seed services/posts -> fixed ids:');

@@ -342,6 +342,10 @@ const settingsBody = z.object({
     tagline: z.string().max(400).default(''),
     columns: z.array(z.object({ title: z.string().max(120), links: z.array(linkSchema) })).default([]),
     copyright: z.string().max(300).default(''),
+    offices: z
+      .array(z.object({ name: z.string().trim().max(120), address: z.string().trim().max(400), phone: z.string().trim().max(60) }))
+      .max(10)
+      .default([]),
   }),
   seo: z.object({ default: seoMeta.default({}), pages: z.record(seoMeta).default({}) }),
 });

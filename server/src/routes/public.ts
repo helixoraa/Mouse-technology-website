@@ -9,6 +9,21 @@ export type PageKey = (typeof PAGE_KEYS)[number];
 
 export const publicRouter = Router();
 
+export type Office = { name: string; address: string; phone: string };
+
+/** Office blocks from footer.offices; older data without them falls back to the single phone/address fields. */
+export function siteOffices(s: { phone: string; address: string; footer: unknown }): Office[] {
+  const list = (s.footer as { offices?: unknown } | null)?.offices;
+  if (Array.isArray(list)) {
+    const offices = list
+      .filter((o): o is Record<string, unknown> => !!o && typeof o === 'object')
+      .map((o) => ({ name: String(o.name ?? ''), address: String(o.address ?? ''), phone: String(o.phone ?? '') }))
+      .filter((o) => o.name || o.address || o.phone);
+    if (offices.length) return offices;
+  }
+  return s.phone || s.address ? [{ name: '', address: s.address, phone: s.phone }] : [];
+}
+
 type SeoShape = {
   default?: { title?: string; description?: string; ogImage?: string };
   pages?: Record<string, { title?: string; description?: string; ogImage?: string }>;
@@ -27,6 +42,7 @@ publicRouter.get(
       email: s.email,
       phone: s.phone,
       address: s.address,
+      offices: siteOffices(s),
       socials: s.socials,
       nav: s.nav,
       footer: s.footer,

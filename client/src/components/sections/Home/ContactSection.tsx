@@ -1,18 +1,50 @@
 import { useSite } from '@/lib/api';
-import { mailHref, telHref } from '@/lib/contact';
+import { mailHref, officesOf, telHref } from '@/lib/contact';
+import type { SiteSettings } from '@/lib/types';
 import { Segments } from '@/components/ui/Heading';
 import { ContactForm } from '../Contact/ContactForm';
 import { homeIcons } from './homeIcons';
 import type { ContactContent } from './types';
 
-/** Email and telephone become mailto:/tel: links once they are real values (placeholders stay plain text). */
-function DetailValue({ field, value }: { field: 'email' | 'phone' | 'address'; value?: string }) {
-  const href = field === 'email' ? mailHref(value) : field === 'phone' ? telHref(value) : undefined;
-  if (!href) return <>{value}</>;
+const linkCls = 'hover:text-brand max-lg:inline-flex max-lg:min-h-11 max-lg:items-center';
+
+/** One contact row's value: the email, every office phone, or every office address (with the office name). */
+function DetailValue({ field, site }: { field: 'email' | 'phone' | 'address'; site?: SiteSettings }) {
+  if (field === 'email') {
+    const href = mailHref(site?.email);
+    return (
+      <p className="break-words text-base font-semibold">
+        {href ? (
+          <a href={href} className={linkCls}>
+            {site?.email}
+          </a>
+        ) : (
+          site?.email
+        )}
+      </p>
+    );
+  }
+  const offices = officesOf(site);
   return (
-    <a href={href} className="hover:text-brand max-lg:inline-flex max-lg:min-h-11 max-lg:items-center">
-      {value}
-    </a>
+    <ul className="flex flex-col gap-1 max-lg:gap-0">
+      {offices.map((o, i) => {
+        const value = field === 'phone' ? o.phone : o.address;
+        if (!value) return null;
+        const href = field === 'phone' ? telHref(value) : undefined;
+        return (
+          <li key={i} className="text-base [overflow-wrap:anywhere]">
+            {o.name && <span className="text-ink-500">{o.name}: </span>}
+            {href ? (
+              <a href={href} className={`font-semibold ${linkCls}`}>
+                {value}
+              </a>
+            ) : (
+              <span className={field === 'phone' || !o.name ? 'font-semibold' : 'font-medium'}>{value}</span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -28,15 +60,13 @@ export function ContactSection({ content }: { content: ContactContent }) {
           <p className="max-w-[440px] text-base leading-[25px] text-ink-700">{content.lead}</p>
           <ul className="flex flex-col gap-6">
             {content.details.map((d) => (
-              <li key={d.field} className="flex items-center gap-4 text-ink-700">
-                <div className="flex items-start rounded-[14px] bg-tile-project p-3">
+              <li key={d.field} className="flex min-w-0 items-center gap-4 text-ink-700">
+                <div className="flex shrink-0 items-start rounded-[14px] bg-tile-project p-3">
                   <img src={homeIcons[d.icon]} alt="" className="size-5" />
                 </div>
-                <div className="flex flex-col gap-0.5">
+                <div className="flex min-w-0 flex-col gap-0.5">
                   <p className="text-xs">{d.label}</p>
-                  <p className="break-words text-base font-semibold">
-                    <DetailValue field={d.field} value={site?.[d.field]} />
-                  </p>
+                  <DetailValue field={d.field} site={site} />
                 </div>
               </li>
             ))}

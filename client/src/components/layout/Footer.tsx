@@ -1,7 +1,36 @@
 import { Link } from 'react-router-dom';
 import { useSite } from '@/lib/api';
-import { mailHref } from '@/lib/contact';
+import { mailHref, officesOf, telHref } from '@/lib/contact';
 import { Logo } from './Logo';
+
+const contactLinkCls =
+  'text-sm font-medium text-white hover:text-brand-sky max-xl:flex max-xl:min-h-11 max-xl:flex-wrap max-xl:items-center';
+
+/** Email and each office phone under the tagline (addresses live on Contact Us and the homepage contact section). */
+function FooterContact({ email, offices }: { email: string; offices: ReturnType<typeof officesOf> }) {
+  const mail = mailHref(email);
+  const phones = offices.filter((o) => telHref(o.phone));
+  if (!mail && !phones.length) return null;
+  return (
+    <ul className="mt-2 flex flex-col gap-2 max-xl:gap-0" aria-label="Contact">
+      {mail && (
+        <li>
+          <a href={mail} className={contactLinkCls}>
+            {email}
+          </a>
+        </li>
+      )}
+      {phones.map((o, i) => (
+        <li key={o.phone + i}>
+          <a href={telHref(o.phone)} className={contactLinkCls}>
+            {o.name && <span className="mr-1.5 text-text-soft">{o.name}</span>}
+            <span className="whitespace-nowrap">{o.phone}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function Footer() {
   const { data: site } = useSite();
@@ -14,14 +43,7 @@ export function Footer() {
           <div className="flex flex-col gap-3.5">
             <Logo siteName={site.siteName} logoUrl={site.logoUrl} />
             <p className="w-[300px] max-w-full text-[14.5px] leading-[22px] text-white">{footer.tagline}</p>
-            {mailHref(site.email) && (
-              <a
-                href={mailHref(site.email)}
-                className="mt-2 w-fit text-sm font-medium text-white hover:text-brand-sky max-xl:flex max-xl:min-h-11 max-xl:items-center"
-              >
-                {site.email}
-              </a>
-            )}
+            <FooterContact email={site.email} offices={officesOf(site)} />
           </div>
           {/* Phones: link groups flow into two balanced columns (each group kept whole); from 640 the groups sit in a row. */}
           <div className="columns-2 gap-x-6 sm:flex sm:flex-wrap sm:gap-10 lg:gap-20">

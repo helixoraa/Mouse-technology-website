@@ -2,6 +2,11 @@ export interface NavLink {
   label: string;
   href: string;
 }
+export interface Office {
+  name: string;
+  address: string;
+  phone: string;
+}
 export interface SiteSettings {
   siteName: string;
   tagline: string;
@@ -9,9 +14,11 @@ export interface SiteSettings {
   email: string;
   phone: string;
   address: string;
+  /** Office blocks (from footer.offices, or the single phone/address for older data). Returned by GET /api/site. */
+  offices?: Office[];
   socials: Record<string, string>;
   nav: NavLink[];
-  footer: { tagline: string; columns: { title: string; links: NavLink[] }[]; copyright: string };
+  footer: { tagline: string; columns: { title: string; links: NavLink[] }[]; copyright: string; offices?: Office[] };
   seo: { default: { title: string; description: string; ogImage?: string } };
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

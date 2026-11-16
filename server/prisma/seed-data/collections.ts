@@ -187,13 +187,28 @@ export const posts = [...homePosts, ...blogPosts.map((p) => ({ ...p, publishedAt
 // Figma contains no testimonials.
 export const testimonials: { name: string; role: string; company?: string; quote: string; avatar?: string; order: number }[] = [];
 
+/** MAOUAJ offices (client-confirmed): Contact Us, the homepage contact section and (phones) the footer. */
+export const OFFICES = [
+  {
+    name: 'Grupo Maouaj S.A.',
+    address: '3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala',
+    phone: '+502-51850811',
+  },
+  {
+    name: 'Maouaj Technology Corporation',
+    address: 'The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA',
+    phone: '+1 (716) 533-2271',
+  },
+];
+
 export const settings = {
   siteName: 'MAOUAJ Technology',
   tagline: 'Technology for the way people move, pay and trade.',
   logoUrl: null as string | null,
   email: 'info@maouajtechnology.com',
-  phone: '[Business telephone]',
-  address: '[Address and public business details]',
+  // phone/address: the primary (Guatemala) office, kept for older clients; the site renders footer.offices.
+  phone: '+502-51850811',
+  address: '3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala',
   socials: {} as Record<string, string>,
   nav: [
     { label: 'Products', href: '/our-products' },
@@ -234,6 +249,7 @@ export const settings = {
       },
     ],
     copyright: '© 2026 MAOUAJ Technology. All rights reserved.',
+    offices: OFFICES,
   },
   seo: {
     default: {

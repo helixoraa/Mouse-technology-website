@@ -72,7 +72,10 @@ export default function SettingsPage() {
           </div>
         </Block>
 
-        <Block title="Contact details" desc="Shown on Contact Us and the homepage contact section; the email also appears in the footer.">
+        <Block
+          title="Contact details"
+          desc="Email: Contact Us, homepage and footer. Office blocks (name, address, phone) are edited under Footer → offices; Telephone and Address here are only shown when no offices are listed."
+        >
           <div className="grid gap-4 md:grid-cols-2 [&>*]:min-w-0">
             <Field label="Email">
               <TextInput type="text" value={s.email ?? ''} onChange={(e) => set('email', e.target.value)} />
