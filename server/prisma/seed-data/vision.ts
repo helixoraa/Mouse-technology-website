@@ -49,7 +49,7 @@ const vision: PageSeed = {
             text: 'Cashless fare payments that connect passengers, balances and operators.',
           },
           { icon: 'pay', word: 'Pay', title: 'Payments', text: 'A clearer way to send money, review details and follow progress.' },
-          { icon: 'trade', word: 'Trade', title: 'Commerce', text: 'Future e-commerce and an existing online retail business.' },
+          { icon: 'trade', word: 'Trade', title: 'Commerce', text: 'Future e-commerce and an existing wholesale spice export business.' },
         ],
       },
     },

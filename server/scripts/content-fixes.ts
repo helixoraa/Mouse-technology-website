@@ -27,6 +27,11 @@
  *    seed/project-hossain-moallema-warehouse.webp + extra.image2x (the -2x file), link https://hossainandmoallema.com/.
  *    Images are uploaded to Blob (STORAGE_DRIVER=blob) or copied into UPLOAD_DIR/seed, only with --apply.
  *    The status label ("Existing business") is kept. Old image files are left in place.
+ * --step=r3-wording (Round 3)
+ *  - page sections: HossainandMoallema.com is a wholesale spice and agricultural export business, not "online retail"
+ *    or an "e-commerce business" (exact phrase replacements below). The planned "E-commerce Platform" product and the
+ *    card summary (--step=r3-card) are not touched, nor is the Our Team page (out of scope for Round 3, reported only).
+ *    Any other remaining match is listed, not changed.
  */
 import 'dotenv/config';
 import fs from 'node:fs';
@@ -235,6 +240,54 @@ async function businessCard() {
   return 1;
 }
 
+const BUSINESS_NAME = String.raw`H(?:o|u)ssain\s*(?:and|&)?\s*M(?:oallema|uallima)\.com`;
+const WORDING: [RegExp, string][] = [
+  [
+    new RegExp(String.raw`textiles and online retail, including ${BUSINESS_NAME}`, 'gi'),
+    'textiles and HossainandMoallema.com, a wholesale spice and agricultural export business',
+  ],
+  [/alongside business interests in textiles and online retail/gi, 'alongside business interests in textiles and wholesale spice export'],
+  [
+    /An existing e-commerce business and part of our online retail interests\./g,
+    'An existing wholesale spice and agricultural export business.',
+  ],
+  [/Future e-commerce and an existing online retail business\./g, 'Future e-commerce and an existing wholesale spice export business.'],
+  [/Our existing online retail business and what it offers customers\./g, 'Our existing wholesale spice and agricultural export business.'],
+];
+/** The Our Team page belongs to another round of changes; its matches are reported only. */
+const OUT_OF_SCOPE_PAGES = ['team'];
+const RETAIL_WORDING = /online\s+retail|e-?commerce\s+business|existing\s+e-?commerce/i;
+
+async function businessWording() {
+  const fix = (v: string) => WORDING.reduce((acc, [re, to]) => acc.replace(re, to), v);
+  let rows = 0;
+  for (const sec of await prisma.pageSection.findMany({ orderBy: [{ page: 'asc' }, { order: 'asc' }] })) {
+    if (OUT_OF_SCOPE_PAGES.includes(sec.page)) {
+      mapStrings(sec.content, (v) => {
+        if (RETAIL_WORDING.test(v))
+          console.log(`  note: skipped (team page is out of scope for Round 3) ${sec.page}/${sec.key}: ${JSON.stringify(v)}`);
+        return v;
+      });
+      continue;
+    }
+    const changes: string[] = [];
+    const r = mapStrings(sec.content, (v) => {
+      const next = fix(v);
+      if (next !== v) changes.push(`    ${JSON.stringify(v)}\n      -> ${JSON.stringify(next)}`);
+      return next;
+    });
+    mapStrings(r.value, (v) => {
+      if (RETAIL_WORDING.test(v)) console.log(`  note: left unchanged in PageSection ${sec.page}/${sec.key}: ${JSON.stringify(v)}`);
+      return v;
+    });
+    if (!r.changed) continue;
+    rows++;
+    console.log(`  PageSection ${sec.page}/${sec.key}${sec.visible ? '' : ' (hidden)'}:\n${changes.join('\n')}`);
+    if (apply) await prisma.pageSection.update({ where: { id: sec.id }, data: { content: r.value as Prisma.InputJsonValue } });
+  }
+  return rows;
+}
+
 const CONTACT_EMAIL = 'info@maouajtechnology.com';
 const PLACEHOLDER = /\[(?:business|address)[^\]]*\]/i;
 
@@ -273,6 +326,10 @@ const steps: Record<string, () => Promise<void>> = {
   'r3-card': async () => {
     console.log('HossainandMoallema.com card (description, image):');
     report(await businessCard(), 'row(s)');
+  },
+  'r3-wording': async () => {
+    console.log('HossainandMoallema.com wording (wholesale export, not online retail):');
+    report(await businessWording(), 'section(s)');
   },
   'r3-contact': async () => {
     console.log('Contact email:');
