@@ -7,7 +7,7 @@ import { blogPosts } from './blog.js';
 
 const seedImg = (name: string) => `/uploads/seed/${name}`;
 
-/** HossainandMoallema.com card text (Round 3). */
+/** Hossain and Moallema card text (Round 3). The card title is the domain, always lower case. */
 export const BUSINESS_SUMMARY =
   'A wholesale supplier and exporter of spices and agricultural products, led by green cardamom from Guatemala, serving importers and distributors worldwide.';
 
@@ -86,7 +86,7 @@ export const services = [
   {
     id: 'seed-service-hossainandmoallema',
     slug: 'hossainandmoallema-com',
-    title: 'HossainandMoallema.com',
+    title: 'hossainandmoallema.com',
     category: 'business',
     status: 'Existing business',
     summary: BUSINESS_SUMMARY,
@@ -157,7 +157,7 @@ export const homePosts = [
     category: 'Product explainer',
     excerpt: postText,
     image: seedImg('home-blog-1.webp'),
-    author: 'MAOUAJ Team',
+    author: 'MAOUAJ Technology Team',
     publishedAt: new Date('2026-06-30T09:00:00Z'),
   },
   {
@@ -167,7 +167,7 @@ export const homePosts = [
     category: 'Product introduction',
     excerpt: postText,
     image: seedImg('home-blog-2.webp'),
-    author: 'MAOUAJ Team',
+    author: 'MAOUAJ Technology Team',
     publishedAt: new Date('2026-06-29T09:00:00Z'),
   },
   {
@@ -177,7 +177,7 @@ export const homePosts = [
     category: 'Product introduction',
     excerpt: postText,
     image: seedImg('home-blog-3.webp'),
-    author: 'MAOUAJ Team',
+    author: 'MAOUAJ Technology Team',
     publishedAt: new Date('2026-06-28T09:00:00Z'),
   },
 ];

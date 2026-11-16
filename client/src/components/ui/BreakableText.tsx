@@ -18,7 +18,7 @@ function breakPoints(word: string): string[] {
 
 /**
  * Renders text with line-break opportunities (<wbr>) inside long run-together words such as domain names
- * ("HossainandMoallema.com" -> "Hossainand|Moallema|.com"), so narrow cards wrap at a sensible point instead of
+ * ("hossainandmoallema.com" -> "hossainandmoallema|.com", "CamelCaseName" -> "Camel|Case|Name"), so narrow cards wrap at a sensible point instead of
  * overflowing or breaking mid-word. Only words of 16+ characters are touched; ordinary text renders unchanged.
  */
 export function BreakableText({ text }: { text: string }) {

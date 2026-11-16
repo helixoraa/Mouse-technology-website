@@ -60,7 +60,7 @@ function ProjectCard({ s, large }: { s: Service; large: boolean }) {
       <div>
         <StatusChip label={s.status} />
       </div>
-      <h3 className={cn('font-extrabold text-ink', large ? 'text-h-card-lg' : 'text-h-card')}>
+      <h3 className={cn('break-words font-extrabold text-ink', large ? 'text-h-card-lg' : 'text-h-card')}>
         <BreakableText text={s.title} />
       </h3>
       <p className="text-body-sm text-ink-500">{s.summary}</p>

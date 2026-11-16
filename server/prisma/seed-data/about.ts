@@ -23,7 +23,7 @@ const about: PageSeed = {
       content: {
         heading: [{ text: 'Practical products for the things people do ' }, { text: 'every day', accent: true }, { text: '.' }],
         lead: 'Our work focuses on activities that people and businesses rely on every day: travelling, paying for services, transferring money and buying or selling goods.',
-        body: 'Our two main development projects are a cashless bus fare platform and a payment and money-transfer platform. We are also planning initiatives in ride-hailing and e-commerce. Our wider business interests include textiles and HossainandMoallema.com, a wholesale spice and agricultural export business.',
+        body: 'Our two main development projects are a cashless bus fare platform and a payment and money-transfer platform. We are also planning initiatives in ride-hailing and e-commerce. Our wider business interests include textiles and Hossain and Moallema, a wholesale spice and agricultural export business.',
       },
     },
     {
@@ -64,7 +64,7 @@ const about: PageSeed = {
           {
             number: '06',
             status: 'Existing business',
-            title: 'HossainandMoallema.com',
+            title: 'hossainandmoallema.com',
             text: 'An existing wholesale spice and agricultural export business.',
           },
         ],

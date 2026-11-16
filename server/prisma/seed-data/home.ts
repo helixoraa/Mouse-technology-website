@@ -186,7 +186,7 @@ const home: PageSeed = {
           },
           {
             icon: 'retail',
-            title: 'HossainandMoallema.com',
+            title: 'hossainandmoallema.com',
             text: 'Our existing wholesale spice and agricultural export business.',
             textWidth: 439,
           },

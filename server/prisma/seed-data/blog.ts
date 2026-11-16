@@ -53,7 +53,7 @@ export const blogPosts = [
     excerpt:
       'Passengers add balance, tap a supported transit card on the bus and receive a clear payment result, while operators review fare records.',
     image: '/uploads/seed/blog-featured-bus.webp',
-    author: 'MAOUAJ Team',
+    author: 'MAOUAJ Technology Team',
     publishedAt: '2026-12-30',
   },
   {
@@ -63,7 +63,7 @@ export const blogPosts = [
     category: 'Product explainer',
     excerpt: 'A look at the intended steps for sending money, reviewing costs and following a transfer’s progress.',
     image: '/uploads/seed/blog-payment.webp',
-    author: 'MAOUAJ Team',
+    author: 'MAOUAJ Technology Team',
     publishedAt: '2026-12-29',
   },
   {
@@ -73,7 +73,7 @@ export const blogPosts = [
     category: 'Company News',
     excerpt: 'Our current priorities in bus fares and payments, and what comes next in ride-hailing and e-commerce.',
     image: '/uploads/seed/blog-laptop.webp',
-    author: 'MAOUAJ Team',
+    author: 'MAOUAJ Technology Team',
     publishedAt: '2026-12-28',
   },
 ];

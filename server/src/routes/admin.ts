@@ -264,7 +264,7 @@ crud(
     excerpt: z.string().trim().max(2000).default(''),
     body: optStr,
     image: optStr,
-    author: z.string().trim().max(160).default('MAOUAJ Team'),
+    author: z.string().trim().max(160).default('MAOUAJ Technology Team'),
     publishedAt: z.coerce.date().optional(),
     dateLabel: optStr,
     visible: z.boolean().optional(),

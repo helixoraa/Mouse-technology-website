@@ -5,7 +5,7 @@ const privacy: PageSeed = {
   page: 'privacy',
   seo: {
     title: 'Privacy Policy | MAOUAJ Technology',
-    description: 'Understand how information shared through the MAOUAJ website is collected, used and handled.',
+    description: 'Understand how information shared through the MAOUAJ Technology website is collected, used and handled.',
   },
   sections: [
     {
@@ -14,7 +14,7 @@ const privacy: PageSeed = {
       content: {
         eyebrow: 'MAOUAJ  /  PRIVACY POLICY',
         title: [{ text: 'Your ' }, { text: 'privacy,', accent: true }, { text: '\nour responsibility.' }],
-        lead: 'Understand how information shared through the MAOUAJ website is collected, used and handled.',
+        lead: 'Understand how information shared through the MAOUAJ Technology website is collected, used and handled.',
       },
     },
     {

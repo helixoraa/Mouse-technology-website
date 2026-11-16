@@ -1,4 +1,4 @@
-# Deploying MAOUAJ to Vercel
+# Deploying MAOUAJ Technology to Vercel
 
 One Vercel project serves everything on **one domain**: the React site as static files, and the Express API as a serverless function at `/api`.
 The database is **Neon** (Postgres) and uploaded images live in **Vercel Blob**. Nothing sends email: accounts are handed over with a one-time temporary password.

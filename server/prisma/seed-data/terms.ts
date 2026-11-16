@@ -5,7 +5,7 @@ const terms: PageSeed = {
   page: 'terms',
   seo: {
     title: 'Terms of Use | MAOUAJ Technology',
-    description: 'A straightforward guide to using the MAOUAJ website, its content and external links.',
+    description: 'A straightforward guide to using the MAOUAJ Technology website, its content and external links.',
   },
   sections: [
     {
@@ -14,7 +14,7 @@ const terms: PageSeed = {
       content: {
         eyebrow: 'MAOUAJ  /  TERMS OF USE',
         title: [{ text: 'A clearer way\nto understand our ' }, { text: 'terms', accent: true }, { text: '.' }],
-        lead: 'A straightforward guide to using the MAOUAJ website, its content and external links.',
+        lead: 'A straightforward guide to using the MAOUAJ Technology website, its content and external links.',
       },
     },
     {

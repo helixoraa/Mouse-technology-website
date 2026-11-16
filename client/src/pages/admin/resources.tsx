@@ -119,7 +119,7 @@ const postsCfg: ResourceConfig = {
   singular: 'Post',
   description: 'Updates shown on the Blog & Updates page and the homepage.',
   hasVisible: true,
-  defaults: { visible: true, category: 'Product explainer', author: 'MAOUAJ Team' },
+  defaults: { visible: true, category: 'Product explainer', author: 'MAOUAJ Technology Team' },
   columns: [
     { key: 'image', label: 'Image', render: (r) => <Thumb src={r.image} alt={String(r.title)} /> },
     { key: 'title', label: 'Title', render: (r) => <span className="font-bold text-ink">{String(r.title)}</span> },
