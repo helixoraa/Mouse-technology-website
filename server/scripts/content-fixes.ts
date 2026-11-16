@@ -33,6 +33,21 @@
  *    or an "e-commerce business" (exact phrase replacements below). The planned "E-commerce Platform" product and the
  *    card summary (--step=r3-card) are not touched, nor is the Our Team page (out of scope for Round 3, reported only).
  *    Any other remaining match is listed, not changed.
+ * --step=r5-wording (Round 5; run after the steps above)
+ *  - Our Team page: the r3-wording replacements (HossainandMoallema.com is a wholesale export business), "Meet  people"
+ *    -> "Meet the people".
+ *  - Home: E-commerce portfolio text ("A  service" -> "A future service"); the inquiry form no longer lists the Textile
+ *    business or HossainandMoallema.com as topics (other businesses appear only on their own cards).
+ *  - Home and Contact forms: phone placeholder "+92 …" -> "Your phone number"; Contact label spacing and the
+ *    organisation placeholder (was an email address).
+ *  - Products: payment animation alt text without cities or currencies (the animation itself was changed in code).
+ *  - E-commerce Platform card: "separate from our existing retail business" -> "separate from our existing businesses".
+ *  - Status labels set to the content brief wherever a product or business title has one (none differ today).
+ *    Only exact old values are replaced. FAQs, site settings, team members and blog posts are checked against the
+ *    brief and listed only; the legal pages are skipped.
+ * --step=r5-seo (Round 5)
+ *  - SEO titles over 60 characters (home page, site default) -> "MAOUAJ Technology | For the way people move, pay and
+ *    trade" (the seed's home title). Other pages' titles and descriptions are only checked.
  */
 import 'dotenv/config';
 import fs from 'node:fs';
@@ -42,6 +57,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../src/db.js';
 import { adoptSeedIds } from '../prisma/seed-ids.js';
 import { BUSINESS_SUMMARY, OFFICES } from '../prisma/seed-data/collections.js';
+import homeSeed from '../prisma/seed-data/home.js';
 
 const apply = process.argv.includes('--apply');
 const step = process.argv.find((a) => a.startsWith('--step='))?.slice('--step='.length) ?? 'names';
@@ -289,6 +305,243 @@ async function businessWording() {
   return rows;
 }
 
+/** Like mapStrings, but `fn` also gets the dotted path of each string ("form.fields.phone.placeholder"). */
+function mapStringsAt(value: unknown, fn: (s: string, path: string) => string, path = ''): { value: unknown; changed: number } {
+  if (typeof value === 'string') {
+    const next = fn(value, path);
+    return { value: next, changed: next === value ? 0 : 1 };
+  }
+  const at = (k: string | number) => (path ? `${path}.${k}` : String(k));
+  if (Array.isArray(value)) {
+    let changed = 0;
+    const out = value.map((v, i) => {
+      const r = mapStringsAt(v, fn, at(i));
+      changed += r.changed;
+      return r.value;
+    });
+    return { value: out, changed };
+  }
+  if (value && typeof value === 'object') {
+    let changed = 0;
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      const r = mapStringsAt(v, fn, at(k));
+      changed += r.changed;
+      out[k] = r.value;
+    }
+    return { value: out, changed };
+  }
+  return { value, changed: 0 };
+}
+
+const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+
+/** Round 5 text fixes: only an exact old value at the given page/path is replaced, so admin edits are never overwritten. */
+const R5_TEXT: { pages: string[]; path: RegExp; from: RegExp; to: string; why: string }[] = [
+  // Team page: the Round 3 wording (R3-3), which skipped this page.
+  ...WORDING.map(([from, to]) => ({ pages: ['team'], path: /./, from, to, why: 'wholesale export, not online retail' })),
+  { pages: ['team'], path: /^title\.0\.text$/, from: /^Meet\s{2,}$/, to: 'Meet the ', why: 'missing word' },
+  {
+    pages: ['home'],
+    path: /^items\.\d+\.text$/,
+    from: /^A\s{2,}service connecting customers with products and sellers\.$/,
+    to: 'A future service connecting customers with products and sellers.',
+    why: 'missing word; the E-commerce Platform is planned',
+  },
+  // Placeholder pointed at one country (+92); MAOUAJ's offices are in Guatemala and the USA.
+  {
+    pages: ['home', 'contact'],
+    path: /fields\.phone\.placeholder$/,
+    from: /^\+92\s*(?:…|\.\.\.)$/,
+    to: 'Your phone number',
+    why: 'country-specific placeholder',
+  },
+  { pages: ['contact'], path: /fields\.phone\.label$/, from: /^Phone\(Optional\)$/, to: 'Phone (optional)', why: 'spacing' },
+  {
+    pages: ['contact'],
+    path: /fields\.organisation\.label$/,
+    from: /^Organization\(Optional\)$/,
+    to: 'Organization (optional)',
+    why: 'spacing',
+  },
+  {
+    pages: ['contact'],
+    path: /fields\.organisation\.placeholder$/,
+    from: /^xyz@example\.com$/,
+    to: 'Company or organization',
+    why: 'an email address as the organisation placeholder',
+  },
+  {
+    pages: ['products'],
+    path: /animation\.alt$/,
+    from: /^Globe showing live transfers, including \$2,300\.00 to New York and R12,800 to Johannesburg, both delivered$/,
+    to: 'Animation: money transfers delivered on a dotted globe, each shown with its amount and a delivered status',
+    why: 'named cities and currencies for the payment platform (the animation no longer shows them)',
+  },
+];
+/** Home inquiry form: other businesses only appear on their own cards, not as MAOUAJ inquiry topics. */
+const NOT_A_MAOUAJ_TOPIC = new RegExp(String.raw`^(?:textile business|${BUSINESS_NAME})$`, 'i');
+const R5_SERVICE_TEXT: [RegExp, string][] = [
+  [/ This is separate from our existing retail business\./g, ' This is separate from our existing businesses.'],
+];
+
+/** Content brief (29 Oct 2026): the status label each product or business must show. */
+const BRIEF_STATUS: [RegExp, string][] = [
+  [/cashless bus fare/i, 'In development'],
+  [/payment\s*(?:\/|&|and)?\s*money[- ]transfer/i, 'In development'],
+  [/ride[- ]hailing/i, 'Planned'],
+  [/e-?commerce platform/i, 'Planned'],
+  [/^textile/i, 'Existing business'],
+  [new RegExp(BUSINESS_NAME, 'i'), 'Existing business'],
+];
+const briefStatus = (title: unknown) => (typeof title === 'string' ? BRIEF_STATUS.find(([re]) => re.test(title))?.[1] : undefined);
+
+/** Sets `status` on every {title, status} object whose title the brief covers. Returns the corrected labels. */
+function fixStatuses(value: unknown, log: string[]): unknown {
+  if (Array.isArray(value)) return value.map((v) => fixStatuses(v, log));
+  if (!isObject(value)) return value;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value)) out[k] = fixStatuses(v, log);
+  const want = briefStatus(out.title);
+  if (want && typeof out.status === 'string' && out.status !== want) {
+    log.push(`status of ${JSON.stringify(out.title)}: ${JSON.stringify(out.status)} -> ${JSON.stringify(want)}`);
+    out.status = want;
+  }
+  return out;
+}
+
+/** Report-only checks against the content brief. Blog posts and the legal pages are listed but never changed here. */
+const BRIEF_CHECKS: [string, RegExp][] = [
+  ['old business-name spelling', /hussain|muallima/i],
+  ['"online retail" wording', /online\s+retail|e-?commerce\s+business|existing\s+(?:online\s+)?retail/i],
+  [
+    'bank-card claim (bus platform uses supported transit cards only)',
+    /bank\s*cards?|debit|credit\s*cards?|\bvisa\b|mastercard|any\s+card|all\s+cards/i,
+  ],
+  [
+    'market, currency or payment method named (the brief rules these out for the payment platform)',
+    /\b(?:USD|EUR|GBP|PKR|GTQ|MXN|COP|AED|CLP|KSh|countries)\b|[$€£₦¥₱]\s?\d|\bR\$?\d|new york|johannesburg|lagos|são paulo|bogotá|toronto|mobile money|bank transfer|wallet/i,
+  ],
+  ['placeholder text', /\[(?:add|business|address)[^\]]*\]/i],
+];
+const LEGAL_PAGES = ['terms', 'privacy'];
+
+function briefNotes(where: string, value: unknown, skip: (path: string) => boolean = () => false) {
+  mapStringsAt(value, (v, p) => {
+    if (skip(p)) return v;
+    for (const [label, re] of BRIEF_CHECKS)
+      if (re.test(v)) console.log(`  note (${label}): ${where}${p ? ` ${p}` : ''}: ${JSON.stringify(v)}`);
+    return v;
+  });
+}
+
+async function r5Wording() {
+  let rows = 0;
+  for (const sec of await prisma.pageSection.findMany({ orderBy: [{ page: 'asc' }, { order: 'asc' }] })) {
+    if (LEGAL_PAGES.includes(sec.page)) continue;
+    const changes: string[] = [];
+    const r = mapStringsAt(sec.content, (v, p) => {
+      let next = v;
+      for (const rule of R5_TEXT)
+        if (rule.pages.includes(sec.page) && rule.path.test(p) && rule.from.test(next)) next = next.replace(rule.from, rule.to);
+      if (next !== v) changes.push(`    ${p}: ${JSON.stringify(v)}\n      -> ${JSON.stringify(next)}`);
+      return next;
+    });
+    let content = r.value;
+    // Home inquiry form topics.
+    if (sec.page === 'home' && isObject(content) && isObject(content.form) && isObject(content.form.fields)) {
+      const interest = content.form.fields.interest;
+      if (isObject(interest) && Array.isArray(interest.options)) {
+        const options = interest.options.filter((o) => !(typeof o === 'string' && NOT_A_MAOUAJ_TOPIC.test(o.trim())));
+        if (options.length !== interest.options.length) {
+          changes.push(`    form.fields.interest.options: ${JSON.stringify(interest.options)}\n      -> ${JSON.stringify(options)}`);
+          content = { ...content, form: { ...content.form, fields: { ...content.form.fields, interest: { ...interest, options } } } };
+        }
+      }
+    }
+    const statusLog: string[] = [];
+    content = fixStatuses(content, statusLog);
+    changes.push(...statusLog.map((s) => `    ${s}`));
+    briefNotes(`PageSection ${sec.page}/${sec.key}${sec.visible ? '' : ' (hidden)'}`, content);
+    if (!changes.length) continue;
+    rows++;
+    console.log(`  PageSection ${sec.page}/${sec.key}${sec.visible ? '' : ' (hidden)'}:\n${changes.join('\n')}`);
+    if (apply) await prisma.pageSection.update({ where: { id: sec.id }, data: { content: content as Prisma.InputJsonValue } });
+  }
+  for (const s of await prisma.service.findMany({ orderBy: { order: 'asc' } })) {
+    const data: Prisma.ServiceUpdateInput = {};
+    const summary = R5_SERVICE_TEXT.reduce((acc, [re, to]) => acc.replace(re, to), s.summary);
+    if (summary !== s.summary) data.summary = summary;
+    const want = briefStatus(s.title);
+    if (want && s.status !== want) data.status = want;
+    briefNotes(`Service ${s.slug}${s.visible ? '' : ' (hidden)'}`, {
+      title: s.title,
+      summary,
+      description: s.description,
+      ctaLabel: s.ctaLabel,
+    });
+    if (!Object.keys(data).length) continue;
+    rows++;
+    for (const [k, v] of Object.entries(data))
+      console.log(`  Service ${s.slug}.${k}: ${JSON.stringify(s[k as keyof typeof s])} -> ${JSON.stringify(v)}`);
+    if (apply) await prisma.service.update({ where: { id: s.id }, data });
+  }
+  // Report only: FAQs, site settings, team members and blog posts.
+  for (const f of await prisma.faq.findMany()) briefNotes(`Faq ${JSON.stringify(f.question)}`, { question: f.question, answer: f.answer });
+  const site = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  if (site)
+    briefNotes('SiteSettings', { tagline: site.tagline, nav: site.nav, footer: site.footer, seo: site.seo }, (p) =>
+      p.startsWith('footer.offices'),
+    );
+  for (const t of await prisma.teamMember.findMany()) briefNotes(`TeamMember ${t.id}`, { name: t.name, role: t.role, bio: t.bio });
+  for (const p of await prisma.post.findMany())
+    briefNotes(`Post ${p.slug} (blog posts are not changed here)`, { title: p.title, excerpt: p.excerpt, body: p.body });
+  return rows;
+}
+
+/** 58 characters; the same title as the seed (seed-data/home.ts) and the build default (client/src/lib/seo-defaults.ts). */
+const R5_HOME_TITLE = homeSeed.seo.title;
+const TITLE_MAX = 60;
+const DESCRIPTION_MAX = 160;
+
+async function r5Seo() {
+  if (R5_HOME_TITLE.length > TITLE_MAX) throw new Error(`Home title is ${R5_HOME_TITLE.length} characters`);
+  const s = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  if (!s) throw new Error('Site settings row (id 1) not found');
+  const seo = (isObject(s.seo) ? s.seo : {}) as { default?: Record<string, unknown>; pages?: Record<string, Record<string, unknown>> };
+  const next = { ...seo, default: { ...(seo.default ?? {}) }, pages: { ...(seo.pages ?? {}) } };
+  let changed = false;
+  const shorten = (where: string, obj: Record<string, unknown>) => {
+    const title = obj.title;
+    if (typeof title !== 'string' || title.length <= TITLE_MAX) return;
+    console.log(
+      `  SiteSettings.seo.${where}.title (${title.length} chars): ${JSON.stringify(title)}\n    -> ${JSON.stringify(R5_HOME_TITLE)} (${R5_HOME_TITLE.length} chars)`,
+    );
+    obj.title = R5_HOME_TITLE;
+    changed = true;
+  };
+  if (next.pages.home) {
+    next.pages.home = { ...next.pages.home };
+    shorten('pages.home', next.pages.home);
+  }
+  // The default applies to any page without its own title (the home page included).
+  shorten('default', next.default);
+  for (const [page, v] of Object.entries(next.pages)) {
+    const merged = { ...next.default, ...v };
+    if (typeof merged.title === 'string' && merged.title.length > TITLE_MAX)
+      console.log(`  note: ${page} title is ${merged.title.length} characters: ${JSON.stringify(merged.title)}`);
+    if (typeof merged.description === 'string' && merged.description.length > DESCRIPTION_MAX)
+      console.log(`  note: ${page} description is ${merged.description.length} characters`);
+  }
+  if (!changed) return 0;
+  if (apply) await prisma.siteSettings.update({ where: { id: 1 }, data: { seo: next as Prisma.InputJsonValue } });
+  return 1;
+}
+
+/** JSON equality that ignores object key order (Postgres jsonb stores keys in its own order). */
+const sortKeys = (_k: string, v: unknown) => (isObject(v) ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => (a < b ? -1 : 1))) : v);
+const sameJson = (a: unknown, b: unknown) => JSON.stringify(a, sortKeys) === JSON.stringify(b, sortKeys);
+
 const CONTACT_EMAIL = 'info@maouajtechnology.com';
 const PLACEHOLDER = /\[(?:business|address)[^\]]*\]/i;
 
@@ -304,7 +557,7 @@ async function contactDetails() {
     console.log(`  SiteSettings.${k}: ${JSON.stringify(s[k])} -> ${JSON.stringify(want[k])}${note}`);
     data[k] = want[k];
   }
-  if (JSON.stringify(footer.offices ?? null) !== JSON.stringify(OFFICES)) {
+  if (!sameJson(footer.offices ?? null, OFFICES)) {
     console.log(`  SiteSettings.footer.offices: ${JSON.stringify(footer.offices ?? null)} -> ${JSON.stringify(OFFICES)}`);
     data.footer = { ...footer, offices: OFFICES } as Prisma.InputJsonValue;
   }
@@ -342,6 +595,14 @@ const steps: Record<string, () => Promise<void>> = {
   'r3-contact': async () => {
     console.log('Contact details (email, MAOUAJ offices):');
     report(await contactDetails(), 'row(s)');
+  },
+  'r5-wording': async () => {
+    console.log('Round 5 wording and content-brief check (team page, home form, contact form, payment animation, status labels):');
+    report(await r5Wording(), 'row(s)');
+  },
+  'r5-seo': async () => {
+    console.log(`SEO titles (${TITLE_MAX} characters or less):`);
+    report(await r5Seo(), 'row(s)');
   },
   'seed-ids': async () => {
     console.log('Seed services/posts -> fixed ids:');
