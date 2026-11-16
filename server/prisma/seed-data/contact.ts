@@ -55,8 +55,8 @@ const contact: PageSeed = {
         fields: {
           name: { label: 'Name', placeholder: 'Your name' },
           email: { label: 'Email', placeholder: 'you@example.com' },
-          phone: { label: 'Phone(Optional)', placeholder: '+92...' },
-          organisation: { label: 'Organization(Optional)', placeholder: 'xyz@example.com' },
+          phone: { label: 'Phone (optional)', placeholder: 'Your phone number' },
+          organisation: { label: 'Organization (optional)', placeholder: 'Company or organization' },
           interest: {
             label: 'Area of interest',
             placeholder: 'Select an area',

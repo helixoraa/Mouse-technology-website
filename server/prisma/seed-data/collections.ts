@@ -63,7 +63,7 @@ export const services = [
     category: 'planned',
     status: 'Planned',
     summary:
-      'A future digital commerce service connecting customers with products and sellers. This is separate from our existing retail business.',
+      'A future digital commerce service connecting customers with products and sellers. This is separate from our existing businesses.',
     image: seedImg('project-ecommerce.webp'),
     gradient: 'linear-gradient(146.48deg, #6d28d9 13.139%, #2f4bff 86.131%)',
     ctaLabel: 'Learn more',
@@ -253,7 +253,7 @@ export const settings = {
   },
   seo: {
     default: {
-      title: 'MAOUAJ Technology — Technology for the way people move, pay and trade',
+      title: 'MAOUAJ Technology | For the way people move, pay and trade',
       description: 'Digital platforms for cashless bus fares and clearer money transfers, with ride-hailing and e-commerce planned next.',
       ogImage: '',
     },

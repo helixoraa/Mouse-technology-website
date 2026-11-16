@@ -175,7 +175,7 @@ const home: PageSeed = {
           {
             icon: 'ecommerce',
             title: 'E-commerce Platform',
-            text: 'A  service connecting customers with products and sellers.',
+            text: 'A future service connecting customers with products and sellers.',
             textWidth: 485,
           },
           {
@@ -246,7 +246,7 @@ const home: PageSeed = {
           fields: {
             name: { label: 'Full name', placeholder: 'Your full name' },
             email: { label: 'Email', placeholder: 'you@company.com' },
-            phone: { label: 'Phone (optional)', placeholder: '+92 …' },
+            phone: { label: 'Phone (optional)', placeholder: 'Your phone number' },
             organisation: { label: 'Organisation (optional)', placeholder: 'Company or agency' },
             interest: {
               label: 'Area of interest',
@@ -256,8 +256,6 @@ const home: PageSeed = {
                 'Payment / Money Transfer Platform',
                 'Ride-Hailing Platform',
                 'E-commerce Platform',
-                'Textile business',
-                'HossainandMoallema.com',
                 'Partnership',
                 'Other',
               ],
