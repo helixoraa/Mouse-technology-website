@@ -3,9 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Double-brace tokens are filled at build time by build/seo-plugin.ts (SITE_URL + src/lib/seo-defaults.ts). -->
+    <title>{{DEFAULT_TITLE}}</title>
+    <meta name="description" content="{{DEFAULT_DESCRIPTION}}" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preload" href="/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <title>MAOUAJ Technology</title>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="{{SITE_NAME}}" />
+    <meta property="og:title" content="{{DEFAULT_TITLE}}" />
+    <meta property="og:description" content="{{DEFAULT_DESCRIPTION}}" />
+    <meta property="og:url" content="{{PAGE_URL}}" />
+    <meta property="og:image" content="{{SHARE_IMAGE_URL}}" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="{{SHARE_IMAGE_WIDTH}}" />
+    <meta property="og:image:height" content="{{SHARE_IMAGE_HEIGHT}}" />
+    <meta property="og:image:alt" content="{{SHARE_IMAGE_ALT}}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{DEFAULT_TITLE}}" />
+    <meta name="twitter:description" content="{{DEFAULT_DESCRIPTION}}" />
+    <meta name="twitter:image" content="{{SHARE_IMAGE_URL}}" />
+    <meta name="twitter:image:alt" content="{{SHARE_IMAGE_ALT}}" />
   </head>
   <body>
     <div id="root"></div>

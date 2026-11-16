@@ -9,7 +9,7 @@ import type { PageSeed } from './types.js';
 const home: PageSeed = {
   page: 'home',
   seo: {
-    title: 'MAOUAJ Technology | Technology for the way people move, pay and trade',
+    title: 'MAOUAJ Technology | For the way people move, pay and trade',
     description: 'Digital platforms for cashless bus fares and clearer money transfers, with ride-hailing and e-commerce planned next.',
   },
   sections: [

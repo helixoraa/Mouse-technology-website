@@ -2,12 +2,13 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
 import { resolveSiteUrl } from './build/site-url';
+import { seoPlugin } from './build/seo-plugin';
 
 export default defineConfig(({ mode }) => {
   // SITE_URL: process env (Vercel / Docker) or client/.env*, falling back to the default in build/site-url.ts.
   const siteUrl = resolveSiteUrl(loadEnv(mode, __dirname, '').SITE_URL);
   return {
-    plugins: [react()],
+    plugins: [react(), seoPlugin(siteUrl)],
     define: { __SITE_URL__: JSON.stringify(siteUrl) },
     resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
     server: {

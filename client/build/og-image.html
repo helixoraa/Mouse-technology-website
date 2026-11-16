@@ -1,0 +1,146 @@
+<!-- Source of public/og-image.jpg. Open in Chrome at a 1200x630 viewport, screenshot, save as JPEG ~q86 (must stay < 300 KB). -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: Manrope;
+        src: url(../public/fonts/manrope-latin-wght-normal.woff2) format('woff2-variations');
+        font-weight: 200 800;
+      }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      body {
+        font-family: Manrope, sans-serif;
+        background: linear-gradient(to bottom, #050a18 0%, #0a1640 100%);
+        position: relative;
+        color: #eaf0ff;
+      }
+      .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+      }
+      .g1 {
+        width: 620px;
+        height: 620px;
+        right: -170px;
+        top: -230px;
+        background: radial-gradient(circle, rgba(47, 75, 255, 0.55), rgba(47, 75, 255, 0) 70%);
+      }
+      .g2 {
+        width: 560px;
+        height: 560px;
+        left: -220px;
+        bottom: -300px;
+        background: radial-gradient(circle, rgba(58, 140, 255, 0.4), rgba(58, 140, 255, 0) 70%);
+      }
+      .orb {
+        position: absolute;
+        width: 210px;
+        height: 210px;
+        right: 70px;
+        top: -60px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%, #cfe3ff 0%, #6fb1ff 18%, #2f4bff 55%, #0a1e86 100%);
+        opacity: 0.9;
+        box-shadow: 0 30px 80px rgba(47, 75, 255, 0.45);
+      }
+      .orb2 {
+        position: absolute;
+        width: 110px;
+        height: 110px;
+        left: 84px;
+        bottom: -34px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%, #9bd2ff 0%, #3a8cff 40%, #143c74 100%);
+        opacity: 0.75;
+      }
+      .wrap {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 90px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 46px;
+      }
+      .tile {
+        width: 68px;
+        height: 68px;
+        border-radius: 19px;
+        background: linear-gradient(135deg, #60a5fa 14.6%, #2f4bff 85.4%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 30px rgba(47, 75, 255, 0.45);
+      }
+      .name {
+        font-size: 40px;
+        letter-spacing: -0.01em;
+      }
+      .name b {
+        font-weight: 800;
+        color: #fff;
+      }
+      .name span {
+        font-weight: 400;
+        color: #9fb0d6;
+        margin-left: 10px;
+      }
+      h1 {
+        font-size: 74px;
+        line-height: 1.08;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: #fff;
+        max-width: 1000px;
+      }
+      h1 em {
+        font-style: normal;
+        color: #6fb1ff;
+      }
+      .rule {
+        width: 120px;
+        height: 4px;
+        border-radius: 4px;
+        margin-top: 44px;
+        background: linear-gradient(90deg, #3a8cff, #2f4bff);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+    <div class="orb"></div>
+    <div class="orb2"></div>
+    <div class="wrap">
+      <div class="brand">
+        <div class="tile">
+          <svg width="40" height="40" viewBox="0 0 16 16" fill="none">
+            <path d="M3.33 12V4.67L8 9.33l4.67-4.66V12" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="name"><b>MAOUAJ</b><span>Technology</span></div>
+      </div>
+      <h1>Technology for the way people <em>move, pay</em> and&nbsp;trade.</h1>
+      <div class="rule"></div>
+    </div>
+  </body>
+</html>
