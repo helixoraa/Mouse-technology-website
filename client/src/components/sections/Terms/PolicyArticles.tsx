@@ -16,6 +16,8 @@ const anchor = (n: string) => `policy-section-${n}`;
 /** Readable policy layout: sticky "On this page" sidebar with scroll-spy + numbered article cards. */
 export function PolicyArticles({ content }: { content: PolicyContent }) {
   const [active, setActive] = useState(content.articles[0]?.number);
+  /** The design's tall sidebar rows fit 6 sections; longer policies get compact rows so the list fits the screen. */
+  const compact = content.articles.length > 7;
 
   useEffect(() => {
     let raf = 0;
@@ -54,7 +56,7 @@ export function PolicyArticles({ content }: { content: PolicyContent }) {
             className="w-full shrink-0 self-start rounded-[18px] border border-policy-sidebarBorder bg-sidebar p-3.5 pb-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-theme(spacing.12))] lg:overflow-y-auto"
           >
             <p className="px-2.5 pb-[17px] pt-[13px] text-base font-bold uppercase leading-[1.2] text-white">{content.sidebarTitle}</p>
-            <ul className="grid gap-1 md:grid-cols-2 lg:flex lg:flex-col lg:gap-[15px]">
+            <ul className={cn('grid gap-1 md:grid-cols-2 lg:flex lg:flex-col', compact ? 'lg:gap-1' : 'lg:gap-[15px]')}>
               {content.articles.map((a) => {
                 const on = a.number === active;
                 return (
@@ -64,7 +66,8 @@ export function PolicyArticles({ content }: { content: PolicyContent }) {
                       aria-current={on ? 'true' : undefined}
                       onClick={() => setActive(a.number)}
                       className={cn(
-                        'flex min-h-11 items-center gap-[3px] rounded-xl px-[15px] py-2 transition-colors lg:min-h-[69px] lg:py-0',
+                        'flex min-h-11 items-center gap-[3px] rounded-xl px-[15px] py-2 transition-colors',
+                        !compact && 'lg:min-h-[69px] lg:py-0',
                         on ? 'bg-brand-press text-white' : 'text-brand-pale hover:bg-white/5',
                       )}
                     >

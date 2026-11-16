@@ -15,6 +15,8 @@ export interface PolicyContentData {
 export function PolicyContent({ content }: { content?: PolicyContentData }) {
   const [active, setActive] = useState(0);
   if (!content) return null;
+  /** The design's tall sidebar rows fit 6 sections; longer policies get compact rows so the list fits the screen. */
+  const compact = content.articles.length > 7;
   return (
     <section className="bg-surface-soft px-5 py-16 md:px-10 xl:px-gutter xl:pb-[40px] xl:pt-[70px]" aria-labelledby="policy-heading">
       <div className="mx-auto max-w-page">
@@ -30,7 +32,7 @@ export function PolicyContent({ content }: { content?: PolicyContentData }) {
             className="h-fit rounded-[18px] border border-policy-sidebarBorder bg-sidebar px-3.5 pb-8 pt-[27px] lg:sticky lg:top-6 lg:mt-[3px] lg:max-h-[calc(100vh-theme(spacing.12))] lg:overflow-y-auto"
           >
             <p className="px-2.5 text-base font-bold leading-[1.2] text-white">{content.sidebarTitle}</p>
-            <ol className="mt-5 grid gap-1 md:grid-cols-2 lg:flex lg:flex-col lg:gap-[15px]">
+            <ol className={cn('mt-5 grid gap-1 md:grid-cols-2 lg:flex lg:flex-col', compact ? 'lg:gap-1' : 'lg:gap-[15px]')}>
               {content.articles.map((a, i) => (
                 <li key={a.number}>
                   <a
@@ -38,10 +40,11 @@ export function PolicyContent({ content }: { content?: PolicyContentData }) {
                     onClick={() => setActive(i)}
                     aria-current={active === i ? 'true' : undefined}
                     className={cn(
-                      'flex min-h-11 gap-[3px] rounded-xl px-[15px] py-2 transition-colors lg:min-h-[69px] lg:py-0',
+                      'flex min-h-11 gap-[3px] rounded-xl px-[15px] py-2 transition-colors',
+                      !compact && 'lg:min-h-[69px] lg:py-0',
                       active === i
                         ? 'items-center bg-brand-press font-bold text-white'
-                        : 'items-center font-medium text-brand-pale hover:bg-white/5 lg:items-start lg:pt-[12px]',
+                        : cn('items-center font-medium text-brand-pale hover:bg-white/5', !compact && 'lg:items-start lg:pt-[12px]'),
                     )}
                   >
                     <span className={cn('w-[46px] text-[13px] font-bold leading-[1.4]')}>{a.number}</span>
