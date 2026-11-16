@@ -43,7 +43,9 @@
     "UNPOOLED",
     "HSTS",
     "SMIL",
-    "wght"
+    "wght",
+    "TLDS",
+    "tlds"
   ],
   "ignoreWords": ["technologys"],
   "flagWords": ["hussain", "muallima", "muallema", "moallima", "hosain", "hussainandmuallima"]
