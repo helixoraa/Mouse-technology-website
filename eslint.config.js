@@ -11,6 +11,8 @@ export default tseslint.config(
       'server/uploads/**',
       '.figma-raw/**',
       'qa-screenshots/**',
+      // Claude Code agent worktrees (separate checkouts of this repo).
+      '.claude/**',
       'client/src/assets/**',
       '**/*.config.js',
     ],

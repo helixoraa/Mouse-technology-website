@@ -12,6 +12,8 @@
     "build": "npm run build -w server && npm run build -w client",
     "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
     "lint": "eslint . --max-warnings=0",
+    "spell": "cspell --no-progress",
+    "test": "npm test -w server",
     "format": "prettier --write .",
     "db:seed": "npm run db:seed -w server",
     "db:deploy": "npm run db:deploy -w server",

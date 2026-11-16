@@ -102,6 +102,8 @@ export const services = [
 
 /** Earlier slugs of seed records (by id), so rows created under an old slug are still recognised. */
 export const formerSlugs: Record<string, string[]> = {
+  // The pre-Round-1 slug (old spelling), kept only so an existing row is recognised and corrected; never shown.
+  // cspell:disable-next-line
   'seed-service-hossainandmoallema': ['hussainandmuallima-com'],
 };
 
