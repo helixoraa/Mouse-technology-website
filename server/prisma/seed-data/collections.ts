@@ -7,6 +7,10 @@ import { blogPosts } from './blog.js';
 
 const seedImg = (name: string) => `/uploads/seed/${name}`;
 
+/** HossainandMoallema.com card text (Round 3). */
+export const BUSINESS_SUMMARY =
+  'A wholesale supplier and exporter of spices and agricultural products, led by green cardamom from Guatemala, serving importers and distributors worldwide.';
+
 /**
  * Services and posts have fixed ids: the seed finds its rows by id, never by slug, so a renamed slug can't create a
  * duplicate (see prisma/seed-ids.ts). Never change an id; add the old slug to formerSlugs when a slug changes.
@@ -85,8 +89,10 @@ export const services = [
     title: 'HossainandMoallema.com',
     category: 'business',
     status: 'Existing business',
-    summary: 'An existing e-commerce business and part of our online retail interests. [Add what it offers customers.]',
-    image: seedImg('project-hossain-moallema.webp'),
+    summary: BUSINESS_SUMMARY,
+    image: seedImg('project-hossain-moallema-warehouse.webp'),
+    // 2x source for the card (srcset); the card only uses it while it matches `image`.
+    extra: { image2x: seedImg('project-hossain-moallema-warehouse-2x.webp') },
     gradient: 'linear-gradient(159.16deg, #60a5fa 14.789%, #2f4bff 85.211%)',
     ctaLabel: 'Learn more',
     ctaHref: 'https://hossainandmoallema.com/',

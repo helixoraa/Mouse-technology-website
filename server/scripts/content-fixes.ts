@@ -22,6 +22,11 @@
  * --step=r3-contact (Round 3)
  *  - site settings email -> info@maouajtechnology.com. Telephone and address are deliberately left as they are
  *    (MAOUAJ office details are not confirmed yet); remaining placeholders are listed, not changed.
+ * --step=r3-card (Round 3)
+ *  - HossainandMoallema.com card (found by fixed id, current or pre-Round-1 slug): new description, image
+ *    seed/project-hossain-moallema-warehouse.webp + extra.image2x (the -2x file), link https://hossainandmoallema.com/.
+ *    Images are uploaded to Blob (STORAGE_DRIVER=blob) or copied into UPLOAD_DIR/seed, only with --apply.
+ *    The status label ("Existing business") is kept. Old image files are left in place.
  */
 import 'dotenv/config';
 import fs from 'node:fs';
@@ -30,6 +35,7 @@ import { fileURLToPath } from 'node:url';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../src/db.js';
 import { adoptSeedIds } from '../prisma/seed-ids.js';
+import { BUSINESS_SUMMARY } from '../prisma/seed-data/collections.js';
 
 const apply = process.argv.includes('--apply');
 const step = process.argv.find((a) => a.startsWith('--step='))?.slice('--step='.length) ?? 'names';
@@ -97,16 +103,17 @@ async function businessName() {
 const NEW_IMAGE = 'project-hossain-moallema.webp';
 /** The old image as a local path (/uploads/seed/…) or as its Blob URL (https://<store>.public.blob.vercel-storage.com/seed/…). */
 const OLD_IMAGE_REF = /(?:https:\/\/[^\s"'()]+\/|\/uploads\/)seed\/project-hussain\.webp/g;
-const seedMediaFile = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../seed-media', NEW_IMAGE);
+const seedMediaDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../seed-media');
 
-/** URL the new image is served from, uploading (Blob) or copying (local) it when --apply is set and it is missing. */
-async function newImageUrl(): Promise<string> {
+/** URL a server/seed-media file is served from, uploading (Blob) or copying (local) it when --apply is set and it is missing. */
+async function newImageUrl(name = NEW_IMAGE): Promise<string> {
+  const seedMediaFile = path.join(seedMediaDir, name);
   if (!fs.existsSync(seedMediaFile)) throw new Error(`Missing ${seedMediaFile}`);
-  const key = `seed/${NEW_IMAGE}`;
+  const key = `seed/${name}`;
   if (process.env.STORAGE_DRIVER !== 'blob') {
     const dest = path.resolve(process.cwd(), process.env.UPLOAD_DIR ?? 'uploads', key);
     if (!fs.existsSync(dest)) {
-      console.log(`  ${apply ? 'copied' : 'would copy'} ${NEW_IMAGE} -> ${dest}`);
+      console.log(`  ${apply ? 'copied' : 'would copy'} ${name} -> ${dest}`);
       if (apply) {
         fs.mkdirSync(path.dirname(dest), { recursive: true });
         fs.copyFileSync(seedMediaFile, dest);
@@ -181,6 +188,53 @@ async function dateLabels() {
   return posts.length;
 }
 
+const CARD_IMAGE = 'project-hossain-moallema-warehouse.webp';
+const CARD_IMAGE_2X = 'project-hossain-moallema-warehouse-2x.webp';
+
+/** The HossainandMoallema.com business card, under its fixed seed id, current slug, or pre-Round-1 slug/title. */
+async function findBusinessCard() {
+  const all = await prisma.service.findMany();
+  return (
+    all.find((s) => s.id === 'seed-service-hossainandmoallema') ??
+    all.find((s) => s.slug === 'hossainandmoallema-com' || s.slug === 'hussainandmuallima-com') ??
+    all.find((s) => s.category === 'business' && (HAS_OLD_NAME.test(s.title) || /hossain\s*(?:and|&)?\s*moallema/i.test(s.title)))
+  );
+}
+
+async function businessCard() {
+  const card = await findBusinessCard();
+  if (!card) {
+    console.log('  HossainandMoallema.com card not found.');
+    return 0;
+  }
+  const data: Prisma.ServiceUpdateInput = {};
+  if (card.summary !== BUSINESS_SUMMARY) {
+    console.log(`  Service ${card.slug}.summary: ${JSON.stringify(card.summary)} -> ${JSON.stringify(BUSINESS_SUMMARY)}`);
+    data.summary = BUSINESS_SUMMARY;
+  }
+  const url = await newImageUrl(CARD_IMAGE);
+  const url2x = await newImageUrl(CARD_IMAGE_2X);
+  if (card.image !== url) {
+    console.log(`  Service ${card.slug}.image: ${JSON.stringify(card.image)} -> ${JSON.stringify(url)}`);
+    data.image = url;
+  }
+  const extra = (card.extra && typeof card.extra === 'object' && !Array.isArray(card.extra) ? card.extra : {}) as Record<string, unknown>;
+  if (extra.image2x !== url2x) {
+    console.log(`  Service ${card.slug}.extra.image2x: ${JSON.stringify(extra.image2x ?? null)} -> ${JSON.stringify(url2x)}`);
+    data.extra = { ...extra, image2x: url2x } as Prisma.InputJsonValue;
+  }
+  if (card.status !== 'Existing business') console.log(`  note: status label is ${JSON.stringify(card.status)} (left unchanged)`);
+  if (card.ctaHref !== BUSINESS_URL) {
+    console.log(`  Service ${card.slug}.ctaHref: ${JSON.stringify(card.ctaHref)} -> ${JSON.stringify(BUSINESS_URL)}`);
+    data.ctaHref = BUSINESS_URL;
+  }
+  if (HAS_OLD_NAME.test(`${card.slug} ${card.title}`))
+    console.log(`  note: title/slug still use the old spelling (${card.title}); --step=names fixes them`);
+  if (!Object.keys(data).length) return 0;
+  if (apply) await prisma.service.update({ where: { id: card.id }, data });
+  return 1;
+}
+
 const CONTACT_EMAIL = 'info@maouajtechnology.com';
 const PLACEHOLDER = /\[(?:business|address)[^\]]*\]/i;
 
@@ -215,6 +269,10 @@ const steps: Record<string, () => Promise<void>> = {
   image: async () => {
     console.log(`Business image -> ${NEW_IMAGE}:`);
     report(await renameImage(), 'row(s)');
+  },
+  'r3-card': async () => {
+    console.log('HossainandMoallema.com card (description, image):');
+    report(await businessCard(), 'row(s)');
   },
   'r3-contact': async () => {
     console.log('Contact email:');

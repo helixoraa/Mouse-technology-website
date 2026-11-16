@@ -12,6 +12,13 @@ export interface ProjectGroupContent {
   header: { title: Segment[]; subtitle: string; description: string };
 }
 
+/** extra.image2x is a 2x copy of `image` named "<image name>-2x.<ext>"; ignored once `image` is replaced in the admin. */
+function image2x(s: Service): string | undefined {
+  const x2 = s.extra?.image2x;
+  if (!s.image || typeof x2 !== 'string') return undefined;
+  return x2.replace(/-2x(\.\w+)$/, '$1') === s.image ? x2 : undefined;
+}
+
 function ProjectCard({ s, large }: { s: Service; large: boolean }) {
   const href = s.ctaHref || '/our-products';
   const external = isExternalUrl(href);
@@ -40,7 +47,15 @@ function ProjectCard({ s, large }: { s: Service; large: boolean }) {
         className="h-[220px] w-full shrink-0 overflow-hidden rounded-[20px]"
         style={s.gradient ? { backgroundImage: s.gradient } : undefined}
       >
-        {s.image && <img src={mediaUrl(s.image)} alt={`${s.title} illustration`} className="size-full object-cover" loading="lazy" />}
+        {s.image && (
+          <img
+            src={mediaUrl(s.image)}
+            srcSet={image2x(s) ? `${mediaUrl(s.image)} 1x, ${mediaUrl(image2x(s)!)} 2x` : undefined}
+            alt={`${s.title} illustration`}
+            className="size-full object-cover"
+            loading="lazy"
+          />
+        )}
       </div>
       <div>
         <StatusChip label={s.status} />
