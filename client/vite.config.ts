@@ -10,7 +10,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), seoPlugin(siteUrl, __dirname)],
     define: { __SITE_URL__: JSON.stringify(siteUrl) },
-    resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
+    // @shared = validation rules shared with the API (server/src/shared; the client Dockerfile copies that folder too).
+    resolve: { alias: { '@': path.resolve(__dirname, 'src'), '@shared': path.resolve(__dirname, '../server/src/shared') } },
     server: {
       port: 5173,
       proxy: {

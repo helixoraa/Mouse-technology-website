@@ -6,6 +6,8 @@ COPY client/package.json client/
 COPY server/package.json server/
 RUN npm ci -w client --include-workspace-root
 COPY client ./client
+# Validation rules shared with the API (imported as @shared/* by the contact form).
+COPY server/src/shared ./server/src/shared
 # Leave empty so the browser calls /api on the same origin (nginx proxies it to the server).
 ARG VITE_API_URL=
 ENV VITE_API_URL=$VITE_API_URL

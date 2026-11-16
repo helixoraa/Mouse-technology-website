@@ -11,7 +11,7 @@ Page keys / routes: `home` `/`, `vision` `/our-vision`, `about` `/about-us`, `te
 - `GET /pages/:page` -> `{page, seo:{title,description,ogImage?}, sections:{id,key,order,content}[]}` (visible only, ordered)
 - `GET /services` `?category=product|planned|business` -> Service[]
 - `GET /team`, `GET /faqs`, `GET /testimonials`, `GET /posts`, `GET /posts/:slug`
-- `POST /leads` `{name,email,phone?,organisation?,interest?,message,consent}` -> `201 {ok:true}`
+- `POST /leads` `{firstName,lastName,email,phone?,organisation?,interest?,message,consent,elapsedMs,website?}` -> `201 {ok:true}`. Rules live in `server/src/shared/validation.ts` (shared with the client form); stored as `Lead.name = "First Last"`. `website` is a honeypot (filled -> `201` but nothing stored); `elapsedMs` < 3000 -> `400`; >2 links in `message` -> `400`; HTML stripped from every text field; 5 requests per IP per hour -> `429`. Invalid fields -> `400 {error, details:{fieldErrors}}`.
   Images are URL strings. Local uploads are served from `/uploads/...`; seed images live at `/uploads/seed/<file>`.
 
 ## Section content

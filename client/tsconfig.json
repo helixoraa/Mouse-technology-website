@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "types": ["vite/client"],
-    "paths": { "@/*": ["./src/*"] },
+    "paths": { "@/*": ["./src/*"], "@shared/*": ["../server/src/shared/*"] },
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },

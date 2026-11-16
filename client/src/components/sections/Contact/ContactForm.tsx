@@ -1,5 +1,15 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
-import { z } from 'zod';
+import { useState, type FormEvent, type InputHTMLAttributes, type ReactNode } from 'react';
+import {
+  EMAIL_MAX,
+  HONEYPOT_FIELD,
+  LEAD_FIELDS,
+  NAME_MAX,
+  ORGANISATION_MAX,
+  TOO_FAST_MESSAGE,
+  leadSchema,
+  submittedTooFast,
+  type LeadField,
+} from '@shared/validation';
 import { api, ApiError } from '@/lib/api';
 import { cn } from '@/lib/cn';
 import { Select } from '@/components/ui/Select';
@@ -12,7 +22,9 @@ interface FieldContent {
 export interface ContactFormContent {
   title?: string;
   fields?: {
-    name?: FieldContent;
+    /** First/last name labels default to "First name"/"Last name" when the CMS has none. */
+    firstName?: FieldContent;
+    lastName?: FieldContent;
     email?: FieldContent;
     phone?: FieldContent;
     organisation?: FieldContent;
@@ -25,28 +37,28 @@ export interface ContactFormContent {
   successText?: string;
 }
 
-const schema = z.object({
-  name: z.string().trim().min(2, 'Please enter your full name'),
-  email: z.string().trim().email('Please enter a valid email address'),
-  phone: z.string().trim().max(40).optional(),
-  organisation: z.string().trim().max(120).optional(),
-  interest: z.string().trim().max(120).optional(),
-  message: z.string().trim().min(10, 'Please tell us a little more (at least 10 characters)').max(4000),
-  consent: z.literal(true, { errorMap: () => ({ message: 'Please agree to continue' }) }),
-});
+type Errors = Partial<Record<LeadField, string>>;
 
-type Errors = Partial<Record<keyof z.infer<typeof schema>, string>>;
+/** Element id per field, so a failed submit can move focus to the first field (in visual order) that needs fixing. */
+const FIELD_IDS: Record<LeadField, string> = {
+  firstName: 'cf-first-name',
+  lastName: 'cf-last-name',
+  email: 'cf-email',
+  phone: 'cf-phone',
+  organisation: 'cf-org',
+  interest: 'cf-interest',
+  message: 'cf-message',
+  consent: 'cf-consent',
+};
 
-/** Field ids in visual order, so a failed submit can move focus to the first field that needs fixing. */
-const FIELD_IDS: [keyof Errors, string][] = [
-  ['name', 'cf-name'],
-  ['email', 'cf-email'],
-  ['phone', 'cf-phone'],
-  ['organisation', 'cf-org'],
-  ['interest', 'cf-interest'],
-  ['message', 'cf-message'],
-  ['consent', 'cf-consent'],
-];
+/** Field errors from a 400 response ({ details: { fieldErrors } }), first message per field. */
+function serverFieldErrors(err: unknown): Errors {
+  const fe =
+    err instanceof ApiError ? (err.details as { fieldErrors?: Record<string, string[] | undefined> } | undefined)?.fieldErrors : undefined;
+  const out: Errors = {};
+  for (const key of LEAD_FIELDS) if (fe?.[key]?.[0]) out[key] = fe[key]![0];
+  return out;
+}
 
 interface Props {
   content?: ContactFormContent;
@@ -57,7 +69,10 @@ interface Props {
   showConsent?: boolean;
 }
 
-/** Inquiry form: zod-validated, POSTs to /api/leads, shows loading / error / success states. Reusable (Home + Contact). */
+/**
+ * Inquiry form: validated with the same zod schema as the API (@shared/validation), POSTs to /api/leads, shows loading /
+ * error / success states. Reusable (Home + Contact). Bot protection: a hidden honeypot input and the time since the form appeared.
+ */
 export function ContactForm({ content, className, variant = 'light', showConsent = true }: Props) {
   const f = content?.fields ?? {};
   const dark = variant === 'dark';
@@ -65,6 +80,8 @@ export function ContactForm({ content, className, variant = 'light', showConsent
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [serverError, setServerError] = useState('');
   const [consent, setConsent] = useState(false);
+  const [loadedAt] = useState(() => Date.now());
+  const interestOptions = f.interest?.options ?? [];
 
   // "compact" = the Home frame's inquiry form (Figma 1:… "Inquiry form", 600px card, 44px fields).
   const compact = variant === 'compact';
@@ -99,30 +116,45 @@ export function ContactForm({ content, className, variant = 'light', showConsent
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
-    const raw = {
-      name: String(fd.get('name') ?? ''),
-      email: String(fd.get('email') ?? ''),
-      phone: String(fd.get('phone') ?? '') || undefined,
-      organisation: String(fd.get('organisation') ?? '') || undefined,
-      interest: String(fd.get('interest') ?? '') || undefined,
-      message: String(fd.get('message') ?? ''),
-      consent: showConsent ? consent : true,
+    const value = (k: string) => String(fd.get(k) ?? '');
+    const showErrors = (next: Errors) => {
+      setErrors(next);
+      const first = LEAD_FIELDS.find((key) => next[key]);
+      if (first) form.querySelector<HTMLElement>(`#${FIELD_IDS[first]}`)?.focus();
     };
-    const parsed = schema.safeParse(raw);
+    const parsed = leadSchema(interestOptions).safeParse({
+      firstName: value('firstName'),
+      lastName: value('lastName'),
+      email: value('email'),
+      phone: value('phone'),
+      organisation: value('organisation'),
+      interest: value('interest'),
+      message: value('message'),
+      consent: showConsent ? consent : true,
+    });
     if (!parsed.success) {
       const next: Errors = {};
-      for (const issue of parsed.error.issues) next[issue.path[0] as keyof Errors] ??= issue.message;
-      setErrors(next);
-      const firstInvalid = FIELD_IDS.find(([key]) => next[key]);
-      if (firstInvalid) form.querySelector<HTMLElement>(`#${firstInvalid[1]}`)?.focus();
-      return;
+      for (const issue of parsed.error.issues) next[issue.path[0] as LeadField] ??= issue.message;
+      return showErrors(next);
     }
     setErrors({});
+    const elapsedMs = Date.now() - loadedAt;
+    if (submittedTooFast(elapsedMs)) {
+      setServerError(TOO_FAST_MESSAGE);
+      setStatus('error');
+      return;
+    }
     setStatus('loading');
     try {
-      await api('/leads', { method: 'POST', body: JSON.stringify(parsed.data) });
+      const body = { ...parsed.data, elapsedMs, [HONEYPOT_FIELD]: value(HONEYPOT_FIELD) };
+      await api('/leads', { method: 'POST', body: JSON.stringify(body) });
       setStatus('success');
     } catch (err) {
+      const fieldErrors = serverFieldErrors(err);
+      if (Object.keys(fieldErrors).length) {
+        setStatus('idle');
+        return showErrors(fieldErrors);
+      }
       setServerError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.');
       setStatus('error');
     }
@@ -153,6 +185,20 @@ export function ContactForm({ content, className, variant = 'light', showConsent
     </div>
   );
   const aria = (id: string, err?: string) => ({ 'aria-invalid': !!err, 'aria-describedby': err ? `${id}-error` : undefined });
+  const textField = (key: LeadField, label: string, placeholder: string | undefined, attrs: InputHTMLAttributes<HTMLInputElement>) =>
+    field(
+      FIELD_IDS[key],
+      label,
+      errors[key],
+      <input
+        id={FIELD_IDS[key]}
+        name={key}
+        className={cn(input, dark && 'h-[54px]')}
+        placeholder={placeholder}
+        {...attrs}
+        {...aria(FIELD_IDS[key], errors[key])}
+      />,
+    );
 
   return (
     <form noValidate onSubmit={onSubmit} className={cn(card, 'flex flex-col', compact ? 'gap-[18px]' : dark ? 'gap-6' : 'gap-5')}>
@@ -171,74 +217,50 @@ export function ContactForm({ content, className, variant = 'light', showConsent
         </h3>
       )}
       <div className={cn('grid md:grid-cols-2', compact ? 'gap-x-4 gap-y-[18px]' : dark ? 'gap-x-4 gap-y-6' : 'gap-5')}>
+        {textField('firstName', f.firstName?.label ?? 'First name', f.firstName?.placeholder, {
+          autoComplete: 'given-name',
+          maxLength: NAME_MAX,
+        })}
+        {textField('lastName', f.lastName?.label ?? 'Last name', f.lastName?.placeholder, {
+          autoComplete: 'family-name',
+          maxLength: NAME_MAX,
+        })}
+        {textField('email', f.email?.label ?? 'Email', f.email?.placeholder, {
+          type: 'email',
+          autoComplete: 'email',
+          maxLength: EMAIL_MAX,
+        })}
+        {textField('phone', f.phone?.label ?? 'Phone (optional)', f.phone?.placeholder, {
+          type: 'tel',
+          autoComplete: 'tel',
+          inputMode: 'tel',
+        })}
+        {textField('organisation', f.organisation?.label ?? 'Organisation (optional)', f.organisation?.placeholder, {
+          autoComplete: 'organization',
+          maxLength: ORGANISATION_MAX,
+        })}
         {field(
-          'cf-name',
-          f.name?.label ?? 'Full name',
-          errors.name,
-          <input
-            id="cf-name"
-            name="name"
-            autoComplete="name"
-            className={cn(input, dark && 'h-[54px]')}
-            placeholder={f.name?.placeholder}
-            {...aria('cf-name', errors.name)}
-          />,
-        )}
-        {field(
-          'cf-email',
-          f.email?.label ?? 'Email',
-          errors.email,
-          <input
-            id="cf-email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            className={cn(input, dark && 'h-[54px]')}
-            placeholder={f.email?.placeholder}
-            {...aria('cf-email', errors.email)}
-          />,
-        )}
-        {field(
-          'cf-phone',
-          f.phone?.label ?? 'Phone (optional)',
-          undefined,
-          <input
-            id="cf-phone"
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            className={cn(input, dark && 'h-[54px]')}
-            placeholder={f.phone?.placeholder}
-          />,
-        )}
-        {field(
-          'cf-org',
-          f.organisation?.label ?? 'Organisation (optional)',
-          undefined,
-          <input
-            id="cf-org"
-            name="organisation"
-            autoComplete="organization"
-            className={cn(input, dark && 'h-[54px]')}
-            placeholder={f.organisation?.placeholder}
+          FIELD_IDS.interest,
+          f.interest?.label ?? 'Area of interest',
+          errors.interest,
+          <Select
+            id={FIELD_IDS.interest}
+            name="interest"
+            options={interestOptions}
+            placeholder={f.interest?.placeholder ?? 'Select an area'}
+            triggerClassName={cn(input, 'focus-visible:outline-brand-sky', dark ? 'h-[54px]' : '')}
+            placeholderClassName={dark ? 'text-mock-muted' : 'text-ink-500'}
+            listClassName={dark ? 'border-white/20 bg-navy-form text-white' : 'border-line bg-white text-ink'}
+            chevron={dark ? <span className="text-base text-mock-muted">⌄</span> : undefined}
+            {...aria(FIELD_IDS.interest, errors.interest)}
           />,
         )}
       </div>
-      {field(
-        'cf-interest',
-        f.interest?.label ?? 'Area of interest',
-        undefined,
-        <Select
-          id="cf-interest"
-          name="interest"
-          options={f.interest?.options ?? []}
-          placeholder={f.interest?.placeholder ?? 'Select an area'}
-          triggerClassName={cn(input, 'focus-visible:outline-brand-sky', dark ? 'h-[54px]' : '')}
-          placeholderClassName={dark ? 'text-mock-muted' : 'text-ink-500'}
-          listClassName={dark ? 'border-white/20 bg-navy-form text-white' : 'border-line bg-white text-ink'}
-          chevron={dark ? <span className="text-base text-mock-muted">⌄</span> : undefined}
-        />,
-      )}
+      {/* Honeypot: hidden from people and assistive tech; a value here means a bot filled the form. */}
+      <div aria-hidden="true" className="sr-only">
+        <label htmlFor="cf-website">Leave this field empty</label>
+        <input id="cf-website" name={HONEYPOT_FIELD} type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
+      </div>
       {field(
         'cf-message',
         f.message?.label ?? 'Message',

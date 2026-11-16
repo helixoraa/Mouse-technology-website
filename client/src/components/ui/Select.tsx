@@ -14,6 +14,8 @@ interface SelectProps {
   optionClassName?: string;
   placeholderClassName?: string;
   chevron?: React.ReactNode;
+  'aria-invalid'?: boolean;
+  'aria-describedby'?: string;
 }
 
 /** Fully custom, keyboard-accessible listbox select (no native <select>). Submits its value via a hidden input. */
@@ -27,6 +29,8 @@ export function Select({
   optionClassName,
   placeholderClassName = 'opacity-70',
   chevron,
+  'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedBy,
 }: SelectProps) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
@@ -106,6 +110,8 @@ export function Select({
         aria-expanded={open}
         aria-controls={listId}
         aria-activedescendant={open ? `${listId}-${active}` : undefined}
+        aria-invalid={ariaInvalid}
+        aria-describedby={ariaDescribedBy}
         onClick={() => {
           setOpen((o) => !o);
           setActive(Math.max(0, options.indexOf(value)));

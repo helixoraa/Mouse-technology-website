@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../db.js';
 import { HttpError, validate, wrap } from '../middleware/common.js';
 import { rateLimit } from '../lib/ratelimit.js';
+import { HONEYPOT_FIELD, TOO_FAST_MESSAGE, fullName, honeypotFilled, leadSchema, submittedTooFast } from '../shared/validation.js';
 
 export const PAGE_KEYS = ['home', 'vision', 'about', 'team', 'contact', 'products', 'projects', 'blog', 'terms', 'privacy'] as const;
 export type PageKey = (typeof PAGE_KEYS)[number];
@@ -105,32 +106,47 @@ publicRouter.get(
   }),
 );
 
+/** 5 inquiries per client IP per hour (DB-backed, so it holds across serverless instances). Every POST counts. */
+export const LEAD_LIMIT = 5;
 const leadLimiter = rateLimit({
   name: 'leads',
-  limit: 10,
-  windowMs: 15 * 60 * 1000,
-  message: 'Too many submissions, please try again later.',
+  limit: LEAD_LIMIT,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many submissions from this network. Please try again in an hour or email us directly.',
 });
 
-export const leadSchema = z.object({
-  name: z.string().trim().min(2, 'Please enter your full name').max(120),
-  email: z.string().trim().email('Please enter a valid email').max(200),
-  phone: z.string().trim().max(40).optional().or(z.literal('')),
-  organisation: z.string().trim().max(160).optional().or(z.literal('')),
-  interest: z.string().trim().max(120).optional().or(z.literal('')),
-  message: z.string().trim().min(5, 'Please tell us how we can help').max(4000),
-  consent: z.literal(true, { errorMap: () => ({ message: 'Consent is required' }) }),
-});
+/** Pages whose sections render the inquiry form (Home "contact" section, Contact Us "form" section). */
+const FORM_PAGES: PageKey[] = ['home', 'contact'];
 
+/** Every "Area of interest" option configured in the CMS for the forms on FORM_PAGES (content.fields or content.form.fields). */
+export async function interestOptions(): Promise<string[]> {
+  const sections = await prisma.pageSection.findMany({ where: { page: { in: FORM_PAGES } }, select: { content: true } });
+  const out = new Set<string>();
+  for (const { content } of sections) {
+    const c = (content ?? {}) as { fields?: unknown; form?: { fields?: unknown } };
+    for (const fields of [c.fields, c.form?.fields]) {
+      const options = (fields as { interest?: { options?: unknown } } | undefined)?.interest?.options;
+      if (Array.isArray(options)) for (const o of options) if (typeof o === 'string' && o.trim()) out.add(o.trim());
+    }
+  }
+  return [...out];
+}
+
+/**
+ * Inquiry form. Order: rate limit -> honeypot (silently "accepted", never stored) -> timing (400, not stored)
+ * -> shared schema (400 with field errors; HTML stripped, links capped) -> store "First Last" in Lead.name.
+ */
 publicRouter.post(
   '/leads',
   leadLimiter,
-  validate({ body: leadSchema }),
   wrap(async (req, res) => {
-    const b = req.body as z.infer<typeof leadSchema>;
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    if (honeypotFilled(body[HONEYPOT_FIELD])) return res.status(201).json({ ok: true });
+    if (submittedTooFast(body.elapsedMs)) throw new HttpError(400, TOO_FAST_MESSAGE);
+    const b = leadSchema(await interestOptions()).parse(body);
     await prisma.lead.create({
       data: {
-        name: b.name,
+        name: fullName(b),
         email: b.email,
         phone: b.phone || null,
         organisation: b.organisation || null,
