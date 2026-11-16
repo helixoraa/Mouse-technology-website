@@ -4,6 +4,7 @@ import type { Plugin } from 'vite';
 import type { OutputAsset } from 'rollup';
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SHARE_IMAGE, SITE_NAME } from '../src/lib/seo-defaults';
 import { PRIVATE_PATH_PREFIXES, PUBLIC_ROUTES } from '../src/lib/routes';
+import { applyPageMeta, loadPageMeta, type PageMetaResult } from './page-seo';
 
 const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const escapeXml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -80,6 +81,8 @@ export function buildNoindexHtml(indexHtml: string): string {
  *   crawlers and link-preview bots receive (they don't run JavaScript) already has title, description, og:* and twitter:*;
  * - emits robots.txt and sitemap.xml (SITE_URL + src/lib/routes.ts) as real files next to index.html;
  * - emits <page>/index.html for every public page with its own canonical URL and og:url (see buildPageHtml);
+ * - writes each page's CMS title and description into its HTML (index.html for the home page), read once per build
+ *   with a read-only query (see build/page-seo.ts); without the database it uses per-page fallbacks and warns;
  * - emits 404.html and admin/index.html (noindex shells) and checks that vercel.json / nginx.conf route exactly the public pages (see checkHostingRoutes).
  */
 export function seoPlugin(siteUrl: string, clientDir: string): Plugin {
@@ -94,11 +97,21 @@ export function seoPlugin(siteUrl: string, clientDir: string): Plugin {
     SHARE_IMAGE_HEIGHT: String(SHARE_IMAGE.height),
     SHARE_IMAGE_ALT: SHARE_IMAGE.alt,
   };
+  let isBuild = false;
+  let pageMeta: PageMetaResult | undefined;
   return {
     name: 'maouaj-seo',
     enforce: 'post',
-    buildStart() {
+    configResolved(config) {
+      isBuild = config.command === 'build';
+    },
+    async buildStart() {
       checkHostingRoutes(clientDir);
+      if (!isBuild) return; // dev server: <Seo> sets the titles in the browser
+      pageMeta = await loadPageMeta(process.env.DATABASE_URL);
+      if (pageMeta.warning) console.warn(`\n[maouaj-seo] WARNING: ${pageMeta.warning}.`);
+      const rows = PUBLIC_ROUTES.map(({ path: p, page }) => `  ${p.padEnd(16)} ${pageMeta!.pages[page].title}`);
+      console.log(`[maouaj-seo] Page titles in the HTML (${pageMeta.source === 'cms' ? 'from the CMS' : 'fallback'}):\n${rows.join('\n')}`);
     },
     transformIndexHtml: {
       order: 'pre',
@@ -114,10 +127,17 @@ export function seoPlugin(siteUrl: string, clientDir: string): Plugin {
       const index = bundle['index.html'] as OutputAsset | undefined;
       if (!index) throw new Error('maouaj-seo: index.html missing from the bundle');
       const html = String(index.source);
-      for (const { path: pagePath } of PUBLIC_ROUTES) {
-        if (pagePath === '/') continue; // index.html itself already carries the home canonical
-        this.emitFile({ type: 'asset', fileName: `${pagePath.slice(1)}/index.html`, source: buildPageHtml(html, siteUrl, pagePath) });
+      const meta = pageMeta?.pages;
+      if (!meta) throw new Error('maouaj-seo: page titles were not loaded');
+      for (const { path: pagePath, page } of PUBLIC_ROUTES) {
+        if (pagePath === '/') {
+          index.source = applyPageMeta(html, meta[page]); // index.html itself already carries the home canonical
+          continue;
+        }
+        const pageHtml = applyPageMeta(buildPageHtml(html, siteUrl, pagePath), meta[page]);
+        this.emitFile({ type: 'asset', fileName: `${pagePath.slice(1)}/index.html`, source: pageHtml });
       }
+      // 404 and admin keep the site-wide default title and description.
       const noindex = buildNoindexHtml(html);
       this.emitFile({ type: 'asset', fileName: '404.html', source: noindex });
       this.emitFile({ type: 'asset', fileName: 'admin/index.html', source: noindex });

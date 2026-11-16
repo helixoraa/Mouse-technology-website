@@ -108,6 +108,7 @@ It prints a **temporary password** and signs that account out. They then log in 
 - **Security headers.** `vercel.json` sets a strict Content-Security-Policy (own scripts only; images from the site, `data:` and your Blob store), HSTS, `X-Frame-Options: DENY` and more. If you embed a third-party script or iframe later, extend the policy there.
 - **Backups.** Neon keeps point-in-time history (length depends on your plan; restore from the Neon console). For your own copy: `pg_dump "<DIRECT_URL>" > backup.sql`. Blob files are not versioned: keep originals of important images.
 - **Updating the site.** Push to `main` and Vercel redeploys. After a change that adds a migration run `npm run prod:deploy` once.
+- **Page titles for Google and link previews.** The build reads each page's SEO title and description from the database (read-only) and writes them into the page HTML. After editing them in Admin -> Settings -> SEO, **Redeploy** (or call a deploy hook) so the HTML picks them up. See README, "Page titles and descriptions in the HTML".
 
 ## Troubleshooting
 

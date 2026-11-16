@@ -59,6 +59,32 @@ When the real domain is ready:
 
 The build fails with a clear message if `SITE_URL` is not an absolute http(s) URL. Because the value is baked in at build time, changing it always needs a rebuild/redeploy.
 
+## Page titles and descriptions in the HTML
+
+Google, WhatsApp, LinkedIn and other link previews read the HTML without running JavaScript. So the client build writes each
+public page's **title and description from the CMS** (Admin -> Settings -> SEO) into that page's HTML file
+(`dist/index.html` for the home page, `dist/<page>/index.html` for the others): `<title>`, `meta description`, `og:title`,
+`og:description`, `twitter:title` and `twitter:description`. In the browser, `<Seo>` keeps them up to date after client-side navigation.
+
+- **How:** `client/build/page-seo.ts`, run by `client/build/seo-plugin.ts` during `vite build`. It needs `DATABASE_URL` at build time
+  (Vercel provides it) and makes one read-only query (`SELECT seo FROM "SiteSettings"` inside a `READ ONLY` transaction). It never writes.
+- **Database not available** (no `DATABASE_URL`, database down, timeout after 20 s): the build does **not** fail. It prints
+  `[maouaj-seo] WARNING: ...` and uses the fallbacks in `client/src/lib/seo-defaults.ts`: one title per page (e.g. "Our Products | MAOUAJ Technology")
+  and the site-wide description. Every build log lists the title used for each page and whether it came from the CMS or the fallback.
+- Local builds (`npm run build`) don't set `DATABASE_URL`, so they use the fallbacks and never touch the production database.
+
+**After editing a page title or description in the admin, rebuild the site**, because the HTML is fixed at build time:
+
+- **Vercel, by hand:** Deployments -> the latest Production deployment -> `...` -> **Redeploy**.
+- **Vercel, deploy hook (one click / one request):** Settings -> Git -> Deploy Hooks -> create a hook named e.g. "Refresh SEO" for branch `main`.
+  Keep the URL private (anyone with it can start a deploy). Then refresh with `curl -X POST "<deploy hook URL>"`, or bookmark it in a tool that sends POST.
+- **Own server (nginx):** rebuild the client where the database is reachable and replace the files nginx serves:
+  `npm ci && npm run db:generate -w server && DATABASE_URL="<database URL>" SITE_URL="https://<domain>" npm run build -w client`, then copy
+  `client/dist` to the nginx root. `nginx.conf` already serves `/<page>` from `<page>/index.html`, so no config change is needed.
+  The Docker image build (`client/Dockerfile`) has no database access, so it uses the fallbacks.
+
+Check the result without JavaScript: `curl -s -A "WhatsApp/2.23" https://<domain>/our-products | grep -E "<title>|description"`.
+
 ## Seeding
 
 `npm run db:seed` is idempotent and **never overwrites admin edits**: it creates the admin user, converts everything in `server/seed-media/`
