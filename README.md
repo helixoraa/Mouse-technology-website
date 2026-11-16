@@ -40,6 +40,24 @@ Admin: <http://localhost:5173/admin> — sign in with `ADMIN_EMAIL` / `ADMIN_PAS
 | server | `STORAGE_DRIVER`, `UPLOAD_DIR`  | Upload storage (`local` -> `server/uploads`, served at `/uploads`)                                                                                  |
 | server | `COOKIE_SECURE`                 | `true`/`false`; defaults to `true` when `NODE_ENV=production`. Use `false` only for plain-http setups                                               |
 | client | `VITE_API_URL`                  | API origin. Leave empty in dev (Vite proxies `/api` + `/uploads`) and when nginx proxies the API                                                    |
+| client | `SITE_URL`                      | Public site address (build time). Default `https://maouaj-technology-website.vercel.app`. See [Site URL](#site-url)                                 |
+
+## Site URL
+
+`SITE_URL` is the **one** setting for the site's public address. It is read when the client is built and used for every
+`<link rel="canonical">`, `og:url`, the share-image URL, `sitemap.xml` and the `Sitemap:` line in `robots.txt`.
+Nothing else in the code holds the address. Without it the build uses `https://maouaj-technology-website.vercel.app` (in `client/build/site-url.ts`).
+
+When the real domain is ready:
+
+1. Set `SITE_URL` to the new origin, e.g. `https://www.example.com` (no trailing slash needed; a path such as `https://example.com/site` also works).
+   - **Vercel:** Settings -> Environment Variables -> add `SITE_URL` for **Production** (and Preview if you want), then redeploy.
+   - **Docker:** set `SITE_URL=` in `.env` (compose passes it as a build arg), then `docker compose up --build`.
+   - **Other hosts:** export `SITE_URL` (or put it in `client/.env`) before `npm run build -w client`.
+2. Update the server's `CLIENT_URL` to the same origin (CORS for the admin).
+3. After deploying, check `https://<domain>/robots.txt` and `/sitemap.xml`, then submit the sitemap in Google Search Console.
+
+The build fails with a clear message if `SITE_URL` is not an absolute http(s) URL. Because the value is baked in at build time, changing it always needs a rebuild/redeploy.
 
 ## Seeding
 

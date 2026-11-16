@@ -9,6 +9,9 @@ COPY client ./client
 # Leave empty so the browser calls /api on the same origin (nginx proxies it to the server).
 ARG VITE_API_URL=
 ENV VITE_API_URL=$VITE_API_URL
+# Public site address for canonical URLs, og:url, sitemap.xml and robots.txt (README "Site URL"). Empty = built-in default.
+ARG SITE_URL=
+ENV SITE_URL=$SITE_URL
 RUN npm run build -w client
 
 FROM nginx:1.27-alpine
