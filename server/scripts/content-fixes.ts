@@ -7,9 +7,14 @@
  *   npm run prod:content-fix [-- --step=<step>] [--apply]       same, against production (.env.production.local)
  * Each step is separate; without --step the "names" step runs.
  *
+ * Spelling (Round 6): the business is "Hossain and Moallema"; its domain is always lower case, hossainandmoallema.com
+ * (also as the card title). Every step below writes those forms. Steps only replace old or placeholder values, so
+ * they never undo an edit made in the admin.
+ *
  * --step=names (Round 1)
- *  - business name "HussainandMuallima.com" (any spacing/case variant) -> "HossainandMoallema.com" in every page
- *    section and service, and the business card's link -> https://hossainandmoallema.com/
+ *  - old business-name spelling (any spacing/case variant) -> "hossainandmoallema.com" for the domain form,
+ *    "Hossain and Moallema" for the bare name, in every page section and service; the business card's link ->
+ *    https://hossainandmoallema.com/
  *  - blog posts: clear the old hard-coded "dateLabel" (e.g. "18/24/2026"). The site no longer reads it and always
  *    shows the real publishedAt as "18 Nov 2026", so this is housekeeping only.
  * --step=image
@@ -20,24 +25,27 @@
  *  - re-keys the seed's services and posts to their fixed ids (prisma/seed-ids.ts), so a later seed run matches them by
  *    id and can never duplicate a row whose slug was renamed. The seed does this itself too; this step just does it now.
  * --step=r3-contact (Round 3)
- *  - site settings: email -> info@maouajtechnology.com; footer.offices -> the two MAOUAJ offices (Grupo Maouaj S.A.,
- *    Guatemala; Maouaj Technology Corporation, USA: name, address, phone); phone/address (legacy single fields) ->
- *    the Guatemala office. Other footer keys are kept. Remaining "[Business …]"/"[Address …]" text is listed only.
+ *  - site settings: email -> info@maouajtechnology.com; footer.offices -> the two MAOUAJ Technology offices (Grupo
+ *    Maouaj S.A., Guatemala; Maouaj Technology Corporation, USA: name, address, phone); phone/address (legacy single
+ *    fields) -> the Guatemala office. Only empty or "[Business …]"/"[Address …]" placeholder values are replaced, so
+ *    details entered in the admin are kept (a difference is listed). Other footer keys are kept.
  * --step=r3-card (Round 3)
- *  - HossainandMoallema.com card (found by fixed id, current or pre-Round-1 slug): new description, image
+ *  - hossainandmoallema.com card (found by fixed id, current or pre-Round-1 slug): new description, image
  *    seed/project-hossain-moallema-warehouse.webp + extra.image2x (the -2x file), link https://hossainandmoallema.com/.
- *    Images are uploaded to Blob (STORAGE_DRIVER=blob) or copied into UPLOAD_DIR/seed, only with --apply.
- *    The status label ("Existing business") is kept. Old image files are left in place.
+ *    Each field is replaced only while it still holds an old value (old description or "[…]" placeholder, no image or
+ *    the pre-Round-3 image, a link not on hossainandmoallema.com), so a description, photo or link set in the admin
+ *    is kept. Images are uploaded to Blob (STORAGE_DRIVER=blob) or copied into UPLOAD_DIR/seed, only when needed and
+ *    only with --apply. The status label ("Existing business") is kept. Old image files are left in place.
  * --step=r3-wording (Round 3)
- *  - page sections: HossainandMoallema.com is a wholesale spice and agricultural export business, not "online retail"
+ *  - page sections: Hossain and Moallema is a wholesale spice and agricultural export business, not "online retail"
  *    or an "e-commerce business" (exact phrase replacements below). The planned "E-commerce Platform" product and the
  *    card summary (--step=r3-card) are not touched, nor is the Our Team page (out of scope for Round 3, reported only).
  *    Any other remaining match is listed, not changed.
  * --step=r5-wording (Round 5; run after the steps above)
- *  - Our Team page: the r3-wording replacements (HossainandMoallema.com is a wholesale export business), "Meet  people"
+ *  - Our Team page: the r3-wording replacements (Hossain and Moallema is a wholesale export business), "Meet  people"
  *    -> "Meet the people".
  *  - Home: E-commerce portfolio text ("A  service" -> "A future service"); the inquiry form no longer lists the Textile
- *    business or HossainandMoallema.com as topics (other businesses appear only on their own cards).
+ *    business or hossainandmoallema.com as topics (other businesses appear only on their own cards).
  *  - Home and Contact forms: phone placeholder "+92 …" -> "Your phone number"; Contact label spacing and the
  *    organisation placeholder (was an email address).
  *  - Products: payment animation alt text without cities or currencies (the animation itself was changed in code).
@@ -48,6 +56,14 @@
  * --step=r5-seo (Round 5)
  *  - SEO titles over 60 characters (home page, site default) -> "MAOUAJ Technology | For the way people move, pay and
  *    trade" (the seed's home title). Other pages' titles and descriptions are only checked.
+ * --step=r6 (Round 6; the same edits as the Round 6 admin change list, for use if they can't be made in the admin)
+ *  - capitalised domain "HossainandMoallema.com" -> "hossainandmoallema.com" (titles), or "Hossain and Moallema" in
+ *    prose ("textiles and …, a wholesale …"); "the MAOUAJ website" -> "the MAOUAJ Technology website".
+ *  - Privacy Policy and Terms of Use: the client-approved text (effective 16 November 2026, seed-data/privacy.ts and
+ *    terms.ts) replaces the policy section while it still holds draft "[…]" editor notes.
+ *  - "[…]" placeholder sentences removed from service summaries (the rest is kept).
+ *  - team members that are still placeholders ("Full name", "Role / title") are hidden (never deleted).
+ *  - blog post author "MAOUAJ Team" -> "MAOUAJ Technology Team".
  */
 import 'dotenv/config';
 import fs from 'node:fs';
@@ -58,13 +74,21 @@ import { prisma } from '../src/db.js';
 import { adoptSeedIds } from '../prisma/seed-ids.js';
 import { BUSINESS_SUMMARY, OFFICES } from '../prisma/seed-data/collections.js';
 import homeSeed from '../prisma/seed-data/home.js';
+import privacySeed from '../prisma/seed-data/privacy.js';
+import termsSeed from '../prisma/seed-data/terms.js';
 
 const apply = process.argv.includes('--apply');
 const step = process.argv.find((a) => a.startsWith('--step='))?.slice('--step='.length) ?? 'names';
 
+// Old spellings, matched so they can be corrected (the spelling test allows them in this file only).
 const OLD_NAME = /hussain\s*(?:and|&)?\s*muallima/gi;
+const OLD_DOMAIN = /hussain\s*(?:and|&)?\s*muallima\.com/gi;
 const HAS_OLD_NAME = /hussain\s*(?:and|&)?\s*muallima/i;
-const fixName = (s: string) => s.replace(OLD_NAME, (m) => (m[0] === m[0].toUpperCase() ? 'HossainandMoallema' : 'hossainandmoallema'));
+const DOMAIN = 'hossainandmoallema.com';
+const NAME = 'Hossain and Moallema';
+/** Domain form -> "hossainandmoallema.com"; a bare name -> "Hossain and Moallema" ("hossainandmoallema" in slugs). */
+const fixName = (s: string) =>
+  s.replace(OLD_DOMAIN, DOMAIN).replace(OLD_NAME, (m) => (m === m.toLowerCase() && !/\s/.test(m) ? 'hossainandmoallema' : NAME));
 const BUSINESS_URL = 'https://hossainandmoallema.com/';
 
 /** Applies `fn` to every string inside a JSON value; returns the new value and how many strings changed. */
@@ -212,8 +236,12 @@ async function dateLabels() {
 
 const CARD_IMAGE = 'project-hossain-moallema-warehouse.webp';
 const CARD_IMAGE_2X = 'project-hossain-moallema-warehouse-2x.webp';
+/** Card images from before Round 3 (the only ones r3-card replaces). */
+const OLD_CARD_IMAGE = /\/seed\/project-(?:hussain|hossain-moallema)\.(?:webp|png)$/;
+/** Card descriptions from before Round 3 (the only ones r3-card replaces). */
+const OLD_SUMMARY = /online\s+retail|e-?commerce\s+business|\[[^\]]*\]/i;
 
-/** The HossainandMoallema.com business card, under its fixed seed id, current slug, or pre-Round-1 slug/title. */
+/** The hossainandmoallema.com business card, under its fixed seed id, current slug, or pre-Round-1 slug/title. */
 async function findBusinessCard() {
   const all = await prisma.service.findMany();
   return (
@@ -226,27 +254,29 @@ async function findBusinessCard() {
 async function businessCard() {
   const card = await findBusinessCard();
   if (!card) {
-    console.log('  HossainandMoallema.com card not found.');
+    console.log('  hossainandmoallema.com card not found.');
     return 0;
   }
   const data: Prisma.ServiceUpdateInput = {};
   if (card.summary !== BUSINESS_SUMMARY) {
-    console.log(`  Service ${card.slug}.summary: ${JSON.stringify(card.summary)} -> ${JSON.stringify(BUSINESS_SUMMARY)}`);
-    data.summary = BUSINESS_SUMMARY;
-  }
-  const url = await newImageUrl(CARD_IMAGE);
-  const url2x = await newImageUrl(CARD_IMAGE_2X);
-  if (card.image !== url) {
-    console.log(`  Service ${card.slug}.image: ${JSON.stringify(card.image)} -> ${JSON.stringify(url)}`);
-    data.image = url;
+    if (OLD_SUMMARY.test(card.summary)) {
+      console.log(`  Service ${card.slug}.summary: ${JSON.stringify(card.summary)} -> ${JSON.stringify(BUSINESS_SUMMARY)}`);
+      data.summary = BUSINESS_SUMMARY;
+    } else console.log(`  note: summary was edited (kept): ${JSON.stringify(card.summary)}`);
   }
   const extra = (card.extra && typeof card.extra === 'object' && !Array.isArray(card.extra) ? card.extra : {}) as Record<string, unknown>;
-  if (extra.image2x !== url2x) {
-    console.log(`  Service ${card.slug}.extra.image2x: ${JSON.stringify(extra.image2x ?? null)} -> ${JSON.stringify(url2x)}`);
-    data.extra = { ...extra, image2x: url2x } as Prisma.InputJsonValue;
-  }
+  if (!card.image || OLD_CARD_IMAGE.test(card.image)) {
+    const url = await newImageUrl(CARD_IMAGE);
+    const url2x = await newImageUrl(CARD_IMAGE_2X);
+    console.log(`  Service ${card.slug}.image: ${JSON.stringify(card.image)} -> ${JSON.stringify(url)}`);
+    data.image = url;
+    if (extra.image2x !== url2x) {
+      console.log(`  Service ${card.slug}.extra.image2x: ${JSON.stringify(extra.image2x ?? null)} -> ${JSON.stringify(url2x)}`);
+      data.extra = { ...extra, image2x: url2x } as Prisma.InputJsonValue;
+    }
+  } else if (!card.image.includes(CARD_IMAGE)) console.log(`  note: image was set in the admin (kept): ${card.image}`);
   if (card.status !== 'Existing business') console.log(`  note: status label is ${JSON.stringify(card.status)} (left unchanged)`);
-  if (card.ctaHref !== BUSINESS_URL) {
+  if (!card.ctaHref?.startsWith(BUSINESS_URL)) {
     console.log(`  Service ${card.slug}.ctaHref: ${JSON.stringify(card.ctaHref)} -> ${JSON.stringify(BUSINESS_URL)}`);
     data.ctaHref = BUSINESS_URL;
   }
@@ -261,7 +291,7 @@ const BUSINESS_NAME = String.raw`H(?:o|u)ssain\s*(?:and|&)?\s*M(?:oallema|uallim
 const WORDING: [RegExp, string][] = [
   [
     new RegExp(String.raw`textiles and online retail, including ${BUSINESS_NAME}`, 'gi'),
-    'textiles and HossainandMoallema.com, a wholesale spice and agricultural export business',
+    `textiles and ${NAME}, a wholesale spice and agricultural export business`,
   ],
   [/alongside business interests in textiles and online retail/gi, 'alongside business interests in textiles and wholesale spice export'],
   [
@@ -553,11 +583,19 @@ async function contactDetails() {
   const data: Prisma.SiteSettingsUpdateInput = {};
   for (const k of ['email', 'phone', 'address'] as const) {
     if (s[k] === want[k]) continue;
-    const note = s[k] && !PLACEHOLDER.test(s[k]) ? '  (replaces a non-placeholder value)' : '';
-    console.log(`  SiteSettings.${k}: ${JSON.stringify(s[k])} -> ${JSON.stringify(want[k])}${note}`);
+    if (s[k] && !PLACEHOLDER.test(s[k])) {
+      console.log(`  note: SiteSettings.${k} was edited (kept): ${JSON.stringify(s[k])}`);
+      continue;
+    }
+    console.log(`  SiteSettings.${k}: ${JSON.stringify(s[k])} -> ${JSON.stringify(want[k])}`);
     data[k] = want[k];
   }
-  if (!sameJson(footer.offices ?? null, OFFICES)) {
+  const offices = Array.isArray(footer.offices) ? (footer.offices as Record<string, unknown>[]) : [];
+  const officesUnset =
+    !offices.length || offices.every((o) => !o.name || Object.values(o).some((v) => typeof v === 'string' && PLACEHOLDER.test(v)));
+  if (!sameJson(footer.offices ?? null, OFFICES) && !officesUnset)
+    console.log(`  note: SiteSettings.footer.offices was edited (kept): ${JSON.stringify(footer.offices)}`);
+  else if (!sameJson(footer.offices ?? null, OFFICES)) {
     console.log(`  SiteSettings.footer.offices: ${JSON.stringify(footer.offices ?? null)} -> ${JSON.stringify(OFFICES)}`);
     data.footer = { ...footer, offices: OFFICES } as Prisma.InputJsonValue;
   }
@@ -569,6 +607,93 @@ async function contactDetails() {
   if (!Object.keys(data).length) return 0;
   if (apply) await prisma.siteSettings.update({ where: { id: 1 }, data });
   return 1;
+}
+
+/* ---------- Round 6 ---------- */
+
+/** Capitalised domain (the Round 1-5 spelling) -> lower case; in prose the business name. Exact old forms only. */
+const R6_TEXT: [RegExp, string][] = [
+  [/textiles and HossainandMoallema\.com, a wholesale/g, `textiles and ${NAME}, a wholesale`],
+  [/\bHossainandMoallema\.com\b/g, DOMAIN],
+  [/\bthe MAOUAJ website\b/g, 'the MAOUAJ Technology website'],
+];
+const r6Fix = (v: string) => R6_TEXT.reduce((acc, [re, to]) => acc.replace(re, to), v);
+/** Draft editor notes on the legal pages ("[Confirm …]", "[Insert …]", "[List …]"). */
+const EDITOR_NOTE = /\[(?:confirm|insert|list|add)\b[^\]]*\]/i;
+/** A "[…]" placeholder sentence inside otherwise real text, e.g. "… portfolio. [Add product offering and introduction.]" */
+const PLACEHOLDER_SENTENCE = /\s*\[[^\]]*\]/g;
+const LEGAL_SEEDS = { privacy: privacySeed, terms: termsSeed } as const;
+
+async function r6() {
+  let rows = 0;
+  for (const sec of await prisma.pageSection.findMany({ orderBy: [{ page: 'asc' }, { order: 'asc' }] })) {
+    const where = `PageSection ${sec.page}/${sec.key}${sec.visible ? '' : ' (hidden)'}`;
+    const legal = LEGAL_SEEDS[sec.page as keyof typeof LEGAL_SEEDS];
+    if (legal && sec.key === 'policy') {
+      const notes: string[] = [];
+      mapStrings(sec.content, (v) => (EDITOR_NOTE.test(v) && notes.push(v), v));
+      const want = legal.sections.find((x) => x.key === 'policy')!.content;
+      if (sameJson(sec.content, want)) continue;
+      if (!notes.length) {
+        console.log(`  note: ${where} has no draft notes left (edited in the admin?); kept`);
+        continue;
+      }
+      rows++;
+      console.log(`  ${where}: draft policy (${notes.length} editor note(s)) -> client-approved text, effective 16 November 2026`);
+      if (apply) await prisma.pageSection.update({ where: { id: sec.id }, data: { content: want as Prisma.InputJsonValue } });
+      continue;
+    }
+    const changes: string[] = [];
+    const r = mapStringsAt(sec.content, (v, p) => {
+      const next = r6Fix(v);
+      if (next !== v) changes.push(`    ${p}: ${JSON.stringify(v)}\n      -> ${JSON.stringify(next)}`);
+      return next;
+    });
+    if (!r.changed) continue;
+    rows++;
+    console.log(`  ${where}:\n${changes.join('\n')}`);
+    if (apply) await prisma.pageSection.update({ where: { id: sec.id }, data: { content: r.value as Prisma.InputJsonValue } });
+  }
+  for (const s of await prisma.service.findMany({ orderBy: { order: 'asc' } })) {
+    const data: Prisma.ServiceUpdateInput = {};
+    if (r6Fix(s.title) !== s.title) data.title = r6Fix(s.title);
+    const summary = r6Fix(s.summary).replace(PLACEHOLDER_SENTENCE, '').trim();
+    if (summary !== s.summary) {
+      if (summary) data.summary = summary;
+      else console.log(`  note: Service ${s.slug}.summary is only a placeholder; write a real one in the admin`);
+    }
+    if (!Object.keys(data).length) continue;
+    rows++;
+    for (const [k, v] of Object.entries(data))
+      console.log(`  Service ${s.slug}.${k}: ${JSON.stringify(s[k as keyof typeof s])} -> ${JSON.stringify(v)}`);
+    if (apply) await prisma.service.update({ where: { id: s.id }, data });
+  }
+  const site = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  if (site && isObject(site.seo)) {
+    const r = mapStringsAt(site.seo, (v) => r6Fix(v));
+    if (r.changed) {
+      rows++;
+      console.log(`  SiteSettings.seo: ${r.changed} text value(s) ("the MAOUAJ website" / domain spelling)`);
+      if (apply) await prisma.siteSettings.update({ where: { id: 1 }, data: { seo: r.value as Prisma.InputJsonValue } });
+    }
+  }
+  const placeholders = (await prisma.teamMember.findMany({ where: { visible: true } })).filter(
+    (t) => /^full\s+name$/i.test(t.name.trim()) || /^role\s*\/\s*title$/i.test(t.role.trim()),
+  );
+  for (const t of placeholders)
+    console.log(`  TeamMember ${t.id} (${JSON.stringify(t.name)}, ${JSON.stringify(t.role)}): visible -> false`);
+  if (placeholders.length) {
+    rows += placeholders.length;
+    if (apply) await prisma.teamMember.updateMany({ where: { id: { in: placeholders.map((t) => t.id) } }, data: { visible: false } });
+  }
+  const authors = await prisma.post.findMany({ where: { author: 'MAOUAJ Team' }, select: { id: true, slug: true } });
+  for (const p of authors) console.log(`  Post ${p.slug}.author: "MAOUAJ Team" -> "MAOUAJ Technology Team"`);
+  if (authors.length) {
+    rows += authors.length;
+    if (apply)
+      await prisma.post.updateMany({ where: { id: { in: authors.map((p) => p.id) } }, data: { author: 'MAOUAJ Technology Team' } });
+  }
+  return rows;
 }
 
 const report = (n: number, what: string) => console.log(n ? `${n} ${what} ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
@@ -585,11 +710,11 @@ const steps: Record<string, () => Promise<void>> = {
     report(await renameImage(), 'row(s)');
   },
   'r3-card': async () => {
-    console.log('HossainandMoallema.com card (description, image):');
+    console.log('hossainandmoallema.com card (description, image, link):');
     report(await businessCard(), 'row(s)');
   },
   'r3-wording': async () => {
-    console.log('HossainandMoallema.com wording (wholesale export, not online retail):');
+    console.log('Hossain and Moallema wording (wholesale export, not online retail):');
     report(await businessWording(), 'section(s)');
   },
   'r3-contact': async () => {
@@ -603,6 +728,10 @@ const steps: Record<string, () => Promise<void>> = {
   'r5-seo': async () => {
     console.log(`SEO titles (${TITLE_MAX} characters or less):`);
     report(await r5Seo(), 'row(s)');
+  },
+  r6: async () => {
+    console.log('Round 6: domain spelling, legal pages, placeholder text, placeholder team cards, post author:');
+    report(await r6(), 'row(s)');
   },
   'seed-ids': async () => {
     console.log('Seed services/posts -> fixed ids:');
