@@ -4,7 +4,7 @@ import { Seo } from '@/components/ui/Seo';
 export default function NotFoundPage() {
   return (
     <>
-      <Seo title="Page not found | MAOUAJ Technology" />
+      <Seo title="Page not found | MAOUAJ Technology" noindex />
       <PageHero
         eyebrow="404"
         title={[{ text: 'This page ' }, { text: 'could not be found', accent: true }, { text: '.' }]}

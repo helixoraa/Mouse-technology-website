@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
   // SITE_URL: process env (Vercel / Docker) or client/.env*, falling back to the default in build/site-url.ts.
   const siteUrl = resolveSiteUrl(loadEnv(mode, __dirname, '').SITE_URL);
   return {
-    plugins: [react(), seoPlugin(siteUrl)],
+    plugins: [react(), seoPlugin(siteUrl, __dirname)],
     define: { __SITE_URL__: JSON.stringify(siteUrl) },
     resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
     server: {

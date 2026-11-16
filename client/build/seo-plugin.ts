@@ -1,4 +1,7 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import type { Plugin } from 'vite';
+import type { OutputAsset } from 'rollup';
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SHARE_IMAGE, SITE_NAME } from '../src/lib/seo-defaults';
 import { PRIVATE_PATH_PREFIXES, PUBLIC_ROUTES } from '../src/lib/routes';
 
@@ -17,13 +20,47 @@ export function buildRobots(siteUrl: string): string {
   return `User-agent: *\nAllow: /\n${disallow}\n\nSitemap: ${siteUrl}/sitemap.xml\n`;
 }
 
+/** The page paths (without "/") that the hosting config must route to the app; "/" is served by index.html itself. */
+const routedPages = () => PUBLIC_ROUTES.map((r) => r.path.slice(1)).filter(Boolean);
+
+/**
+ * Unknown URLs return a real 404 because the hosting config routes only the known pages to the app (vercel.json
+ * rewrites, nginx.conf location). Fail the build if either list differs from src/lib/routes.ts, so a new page can't
+ * silently 404 in production.
+ */
+export function checkHostingRoutes(clientDir: string) {
+  const expected = routedPages().sort().join('|');
+  const sources: [string, RegExp][] = [
+    [path.resolve(clientDir, '../vercel.json'), /"source":\s*"\/:page\(([^)]+)\)"/],
+    [path.resolve(clientDir, 'nginx.conf'), /location ~ \^\/\(([^)]+)\)/],
+  ];
+  for (const [file, pattern] of sources) {
+    if (!fs.existsSync(file)) continue;
+    const found = fs.readFileSync(file, 'utf8').match(pattern)?.[1];
+    const actual = found?.split('|').sort().join('|');
+    if (actual !== expected) {
+      throw new Error(
+        `${path.basename(file)}: the public page list (${found ?? 'not found'}) must match src/lib/routes.ts (${routedPages().join('|')})`,
+      );
+    }
+  }
+}
+
+/** 404.html: the app shell marked noindex, without og:url. Hosts serve it with status 404 for every unknown URL. */
+export function build404Html(indexHtml: string): string {
+  return indexHtml
+    .replace(/\s*<meta property="og:url"[^>]*>/, '')
+    .replace(/(<meta name="viewport"[^>]*>)/, '$1\n    <meta name="robots" content="noindex" />');
+}
+
 /**
  * Build-time SEO output:
  * - fills the {{TOKENS}} in index.html with SITE_URL and the defaults from src/lib/seo-defaults.ts, so the HTML that
  *   crawlers and link-preview bots receive (they don't run JavaScript) already has title, description, og:* and twitter:*;
- * - emits robots.txt and sitemap.xml (SITE_URL + src/lib/routes.ts) as real files next to index.html.
+ * - emits robots.txt and sitemap.xml (SITE_URL + src/lib/routes.ts) as real files next to index.html;
+ * - emits 404.html and checks that vercel.json / nginx.conf route exactly the public pages (see checkHostingRoutes).
  */
-export function seoPlugin(siteUrl: string): Plugin {
+export function seoPlugin(siteUrl: string, clientDir: string): Plugin {
   const tokens: Record<string, string> = {
     SITE_URL: siteUrl,
     PAGE_URL: `${siteUrl}/`,
@@ -37,6 +74,10 @@ export function seoPlugin(siteUrl: string): Plugin {
   };
   return {
     name: 'maouaj-seo',
+    enforce: 'post',
+    buildStart() {
+      checkHostingRoutes(clientDir);
+    },
     transformIndexHtml: {
       order: 'pre',
       handler: (html) =>
@@ -45,9 +86,12 @@ export function seoPlugin(siteUrl: string): Plugin {
           return escapeHtml(tokens[key]);
         }),
     },
-    generateBundle() {
+    generateBundle(_options, bundle) {
       this.emitFile({ type: 'asset', fileName: 'robots.txt', source: buildRobots(siteUrl) });
       this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: buildSitemap(siteUrl) });
+      const index = bundle['index.html'] as OutputAsset | undefined;
+      if (!index) throw new Error('maouaj-seo: index.html missing from the bundle');
+      this.emitFile({ type: 'asset', fileName: '404.html', source: build404Html(String(index.source)) });
     },
   };
 }

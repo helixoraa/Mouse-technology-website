@@ -8,6 +8,8 @@ interface SeoProps {
   title?: string;
   description?: string;
   ogImage?: string;
+  /** Ask search engines not to index this page (the 404 page). */
+  noindex?: boolean;
 }
 
 /** Find or create <meta name|property="key"> and set its content. */
@@ -32,7 +34,7 @@ const cleanPath = (pathname: string) => (pathname.length > 1 ? pathname.replace(
  * Per-page title, description and link-preview tags. Every tag is always written (falling back to the CMS
  * site defaults, then to src/lib/seo-defaults.ts), so nothing from the previous page survives a client-side navigation.
  */
-export function Seo({ title, description, ogImage }: SeoProps) {
+export function Seo({ title, description, ogImage, noindex = false }: SeoProps) {
   const { pathname } = useLocation();
   const { data: site } = useSite();
   const defaults = site?.seo?.default;
@@ -45,10 +47,14 @@ export function Seo({ title, description, ogImage }: SeoProps) {
     const url = absoluteUrl(cleanPath(pathname));
 
     document.title = t;
+    if (noindex) setMeta('name', 'robots', 'noindex');
+    else removeMeta('name', 'robots');
     setMeta('name', 'description', d);
     setMeta('property', 'og:title', t);
     setMeta('property', 'og:description', d);
-    setMeta('property', 'og:url', url);
+    // A page that must not be indexed (404) has no URL worth sharing.
+    if (noindex) removeMeta('property', 'og:url');
+    else setMeta('property', 'og:url', url);
     setMeta('property', 'og:image', image);
     setMeta('name', 'twitter:title', t);
     setMeta('name', 'twitter:description', d);
@@ -64,7 +70,7 @@ export function Seo({ title, description, ogImage }: SeoProps) {
       setMeta('property', 'og:image:alt', SHARE_IMAGE.alt);
       setMeta('name', 'twitter:image:alt', SHARE_IMAGE.alt);
     }
-  }, [title, description, ogImage, defaults?.title, defaults?.description, defaults?.ogImage, pathname]);
+  }, [title, description, ogImage, defaults?.title, defaults?.description, defaults?.ogImage, pathname, noindex]);
 
   return null;
 }

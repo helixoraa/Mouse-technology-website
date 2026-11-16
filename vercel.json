@@ -4,6 +4,7 @@
   "installCommand": "npm install",
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "client/dist",
+  "trailingSlash": false,
   "functions": {
     "api/index.ts": {
       "maxDuration": 30,
@@ -16,7 +17,15 @@
       "destination": "/api"
     },
     {
-      "source": "/((?!api/|assets/|fonts/|animations/).*)",
+      "source": "/:page(our-products|our-projects|our-vision|about-us|our-team|blog|contact-us|privacy-policy|terms-of-use)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/:path*",
       "destination": "/index.html"
     }
   ],
