@@ -27,11 +27,22 @@ function removeMeta(attr: 'name' | 'property', key: string) {
   document.head.querySelector(`meta[${attr}="${key}"]`)?.remove();
 }
 
+function setCanonical(href: string | null) {
+  let el = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!href) return el?.remove();
+  if (!el) {
+    el = document.createElement('link');
+    el.rel = 'canonical';
+    document.head.appendChild(el);
+  }
+  el.href = href;
+}
+
 /** Path without a trailing slash (except "/"), no query or hash: the URL we want shared and indexed. */
 const cleanPath = (pathname: string) => (pathname.length > 1 ? pathname.replace(/\/+$/, '') : '/');
 
 /**
- * Per-page title, description and link-preview tags. Every tag is always written (falling back to the CMS
+ * Per-page title, description, canonical URL and link-preview tags. Every tag is always written (falling back to the CMS
  * site defaults, then to src/lib/seo-defaults.ts), so nothing from the previous page survives a client-side navigation.
  */
 export function Seo({ title, description, ogImage, noindex = false }: SeoProps) {
@@ -52,7 +63,8 @@ export function Seo({ title, description, ogImage, noindex = false }: SeoProps) 
     setMeta('name', 'description', d);
     setMeta('property', 'og:title', t);
     setMeta('property', 'og:description', d);
-    // A page that must not be indexed (404) has no URL worth sharing.
+    // Canonical = SITE_URL + route (no query/hash/trailing slash). A page that must not be indexed (404) has neither.
+    setCanonical(noindex ? null : url);
     if (noindex) removeMeta('property', 'og:url');
     else setMeta('property', 'og:url', url);
     setMeta('property', 'og:image', image);

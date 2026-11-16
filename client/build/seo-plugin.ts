@@ -46,9 +46,30 @@ export function checkHostingRoutes(clientDir: string) {
   }
 }
 
-/** 404.html: the app shell marked noindex, without og:url. Hosts serve it with status 404 for every unknown URL. */
-export function build404Html(indexHtml: string): string {
+const CANONICAL_TAG = /<link rel="canonical" href="[^"]*" \/>/;
+const OG_URL_TAG = /<meta property="og:url" content="[^"]*" \/>/;
+
+/**
+ * The HTML for one public page: index.html with that page's canonical URL and og:url, so crawlers get the right
+ * canonical without running JavaScript. Written to <page>/index.html; the hosting config rewrites /<page> to it.
+ */
+export function buildPageHtml(indexHtml: string, siteUrl: string, pagePath: string): string {
+  if (!CANONICAL_TAG.test(indexHtml) || !OG_URL_TAG.test(indexHtml)) {
+    throw new Error('maouaj-seo: index.html must contain the canonical link and og:url meta tags');
+  }
+  const url = escapeHtml(siteUrl + pagePath);
   return indexHtml
+    .replace(CANONICAL_TAG, `<link rel="canonical" href="${url}" />`)
+    .replace(OG_URL_TAG, `<meta property="og:url" content="${url}" />`);
+}
+
+/**
+ * The app shell marked noindex, without canonical or og:url. Used for 404.html (hosts serve it with status 404 for
+ * every unknown URL) and admin/index.html (the admin portal must never be indexed or claim the home page's canonical).
+ */
+export function buildNoindexHtml(indexHtml: string): string {
+  return indexHtml
+    .replace(/\s*<link rel="canonical"[^>]*>/, '')
     .replace(/\s*<meta property="og:url"[^>]*>/, '')
     .replace(/(<meta name="viewport"[^>]*>)/, '$1\n    <meta name="robots" content="noindex" />');
 }
@@ -58,7 +79,8 @@ export function build404Html(indexHtml: string): string {
  * - fills the {{TOKENS}} in index.html with SITE_URL and the defaults from src/lib/seo-defaults.ts, so the HTML that
  *   crawlers and link-preview bots receive (they don't run JavaScript) already has title, description, og:* and twitter:*;
  * - emits robots.txt and sitemap.xml (SITE_URL + src/lib/routes.ts) as real files next to index.html;
- * - emits 404.html and checks that vercel.json / nginx.conf route exactly the public pages (see checkHostingRoutes).
+ * - emits <page>/index.html for every public page with its own canonical URL and og:url (see buildPageHtml);
+ * - emits 404.html and admin/index.html (noindex shells) and checks that vercel.json / nginx.conf route exactly the public pages (see checkHostingRoutes).
  */
 export function seoPlugin(siteUrl: string, clientDir: string): Plugin {
   const tokens: Record<string, string> = {
@@ -91,7 +113,14 @@ export function seoPlugin(siteUrl: string, clientDir: string): Plugin {
       this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: buildSitemap(siteUrl) });
       const index = bundle['index.html'] as OutputAsset | undefined;
       if (!index) throw new Error('maouaj-seo: index.html missing from the bundle');
-      this.emitFile({ type: 'asset', fileName: '404.html', source: build404Html(String(index.source)) });
+      const html = String(index.source);
+      for (const { path: pagePath } of PUBLIC_ROUTES) {
+        if (pagePath === '/') continue; // index.html itself already carries the home canonical
+        this.emitFile({ type: 'asset', fileName: `${pagePath.slice(1)}/index.html`, source: buildPageHtml(html, siteUrl, pagePath) });
+      }
+      const noindex = buildNoindexHtml(html);
+      this.emitFile({ type: 'asset', fileName: '404.html', source: noindex });
+      this.emitFile({ type: 'asset', fileName: 'admin/index.html', source: noindex });
     },
   };
 }

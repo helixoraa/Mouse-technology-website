@@ -18,15 +18,15 @@
     },
     {
       "source": "/:page(our-products|our-projects|our-vision|about-us|our-team|blog|contact-us|privacy-policy|terms-of-use)",
-      "destination": "/index.html"
+      "destination": "/:page/index.html"
     },
     {
       "source": "/admin",
-      "destination": "/index.html"
+      "destination": "/admin/index.html"
     },
     {
       "source": "/admin/:path*",
-      "destination": "/index.html"
+      "destination": "/admin/index.html"
     }
   ],
   "headers": [
