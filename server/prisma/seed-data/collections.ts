@@ -105,7 +105,8 @@ export const formerSlugs: Record<string, string[]> = {
   'seed-service-hossainandmoallema': ['hussainandmuallima-com'],
 };
 
-// Figma "Team carousel": 8 placeholder members (names/roles/biographies "to be supplied").
+// Figma "Team carousel": 8 placeholder members (names/roles/biographies "to be supplied"). Created hidden: the site
+// never shows placeholder cards; replace a card's name, role, biography and photo in the admin, then make it visible.
 export const team = [
   'team-photo-1.webp',
   'team-photo-2.webp',
@@ -121,6 +122,7 @@ export const team = [
   bio: 'Short professional biography to be supplied.',
   photo: seedImg(photo),
   order,
+  visible: false,
 }));
 
 export const faqs = [

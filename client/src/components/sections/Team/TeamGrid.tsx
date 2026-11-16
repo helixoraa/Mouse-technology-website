@@ -22,6 +22,10 @@ export function balancedColumns(count: number, options: number[]): number {
   return fits.reduce((best, c) => (empty(c) < empty(best) || (empty(c) === empty(best) && c > best) ? c : best));
 }
 
+/** Seed/design placeholder cards ("Full name", "Role / title") are not real people and are never shown. */
+export const isPlaceholderMember = (m: Pick<TeamMember, 'name' | 'role'>) =>
+  !m.name?.trim() || /^full\s+name$/i.test(m.name.trim()) || /^role\s*\/\s*title$/i.test(m.role?.trim() ?? '');
+
 function MemberCard({ m }: { m: TeamMember }) {
   const vector = m.photo?.endsWith('.svg');
   return (
@@ -32,7 +36,7 @@ function MemberCard({ m }: { m: TeamMember }) {
         {m.photo ? (
           <img
             src={mediaUrl(m.photo)}
-            alt={`Portrait placeholder for ${m.name}`}
+            alt={vector ? '' : `Portrait of ${m.name}`}
             width={288}
             height={vector ? 336 : 296}
             decoding="async"
@@ -60,9 +64,11 @@ function MemberCard({ m }: { m: TeamMember }) {
 /**
  * Every team member visible at once. Cards are at most a fifth of the content width (slightly smaller than the
  * design's 288px card) and the grid is centred. Columns: 1 (<640), 2 (640-767), 2-3 (768-1023), and from 1024 a
- * single row for up to five members, otherwise a balanced 3-5 column grid.
+ * single row for up to five members, otherwise a balanced 3-5 column grid. Placeholder cards are left out; with no
+ * real members only the section intro is shown.
  */
-export function TeamGrid({ content, members }: { content: TeamGridContent; members: TeamMember[] }) {
+export function TeamGrid({ content, members: all }: { content: TeamGridContent; members: TeamMember[] }) {
+  const members = all.filter((m) => !isPlaceholderMember(m));
   const n = members.length;
   const vars = {
     '--team-cols-sm': balancedColumns(n, [2, 1]),
@@ -73,15 +79,17 @@ export function TeamGrid({ content, members }: { content: TeamGridContent; membe
   return (
     <InnerBand tone="white" className="gap-10 xl:gap-16">
       <SectionHeader {...content.header} />
-      <ul
-        aria-label="Team members"
-        style={vars}
-        className="grid grid-cols-[minmax(0,var(--team-card))] justify-center gap-x-6 gap-y-12 [--team-card:calc((theme(maxWidth.page)-4*theme(spacing.6))/5)] sm:grid-cols-[repeat(var(--team-cols-sm),minmax(0,var(--team-card)))] md:grid-cols-[repeat(var(--team-cols-md),minmax(0,var(--team-card)))] lg:grid-cols-[repeat(var(--team-cols-lg),minmax(0,var(--team-card)))]"
-      >
-        {members.map((m) => (
-          <MemberCard key={m.id} m={m} />
-        ))}
-      </ul>
+      {n > 0 && (
+        <ul
+          aria-label="Team members"
+          style={vars}
+          className="grid grid-cols-[minmax(0,var(--team-card))] justify-center gap-x-6 gap-y-12 [--team-card:calc((theme(maxWidth.page)-4*theme(spacing.6))/5)] sm:grid-cols-[repeat(var(--team-cols-sm),minmax(0,var(--team-card)))] md:grid-cols-[repeat(var(--team-cols-md),minmax(0,var(--team-card)))] lg:grid-cols-[repeat(var(--team-cols-lg),minmax(0,var(--team-card)))]"
+        >
+          {members.map((m) => (
+            <MemberCard key={m.id} m={m} />
+          ))}
+        </ul>
+      )}
     </InnerBand>
   );
 }
