@@ -168,7 +168,13 @@ function ProductCard({ item, reverse }: { item: ProductItem; reverse?: boolean }
           to={item.cta.href}
           className="flex items-center gap-2 text-[15px] font-bold text-brand hover:text-brand-press max-xl:min-h-11"
         >
-          {item.cta.label}
+          <span>
+            {item.cta.label}
+            {/* Generic CMS labels ("Learn more") get the product name for screen readers and search engines. */}
+            {!(item.cta.label ?? '').toLowerCase().includes((item.title ?? '').toLowerCase()) && (
+              <span className="sr-only"> about the {item.title}</span>
+            )}
+          </span>
           <img src={arrowBlue} alt="" className="size-4" />
         </Link>
       </div>
