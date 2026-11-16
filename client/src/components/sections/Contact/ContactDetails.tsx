@@ -1,4 +1,5 @@
 import { useSite } from '@/lib/api';
+import { mailHref, telHref } from '@/lib/contact';
 
 export interface ContactDetailsContent {
   eyebrow: string;
@@ -13,12 +14,8 @@ export function ContactDetails({ content }: { content?: ContactDetailsContent })
   const { data: site } = useSite();
   if (!content) return null;
   const rows = [
-    {
-      label: content.emailLabel,
-      value: site?.email,
-      href: site?.email && !site.email.startsWith('[') ? `mailto:${site.email}` : undefined,
-    },
-    { label: content.phoneLabel, value: site?.phone, href: site?.phone && !site.phone.startsWith('[') ? `tel:${site.phone}` : undefined },
+    { label: content.emailLabel, value: site?.email, href: mailHref(site?.email) },
+    { label: content.phoneLabel, value: site?.phone, href: telHref(site?.phone) },
     { label: content.addressLabel, value: site?.address },
   ];
   return (
@@ -31,7 +28,7 @@ export function ContactDetails({ content }: { content?: ContactDetailsContent })
             <dt className="text-xs font-semibold uppercase leading-4 tracking-[0.12em] text-text-soft">{r.label}</dt>
             <dd className="break-words text-lg font-semibold leading-[27px]">
               {r.href ? (
-                <a href={r.href} className="hover:underline">
+                <a href={r.href} className="inline-block max-w-full hover:underline max-lg:min-h-11 max-lg:py-2">
                   {r.value}
                 </a>
               ) : (

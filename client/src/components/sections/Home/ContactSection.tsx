@@ -1,8 +1,20 @@
 import { useSite } from '@/lib/api';
+import { mailHref, telHref } from '@/lib/contact';
 import { Segments } from '@/components/ui/Heading';
 import { ContactForm } from '../Contact/ContactForm';
 import { homeIcons } from './homeIcons';
 import type { ContactContent } from './types';
+
+/** Email and telephone become mailto:/tel: links once they are real values (placeholders stay plain text). */
+function DetailValue({ field, value }: { field: 'email' | 'phone' | 'address'; value?: string }) {
+  const href = field === 'email' ? mailHref(value) : field === 'phone' ? telHref(value) : undefined;
+  if (!href) return <>{value}</>;
+  return (
+    <a href={href} className="hover:text-brand max-lg:inline-flex max-lg:min-h-11 max-lg:items-center">
+      {value}
+    </a>
+  );
+}
 
 export function ContactSection({ content }: { content: ContactContent }) {
   const { data: site } = useSite();
@@ -22,7 +34,9 @@ export function ContactSection({ content }: { content: ContactContent }) {
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <p className="text-xs">{d.label}</p>
-                  <p className="text-base font-semibold">{site?.[d.field]}</p>
+                  <p className="break-words text-base font-semibold">
+                    <DetailValue field={d.field} value={site?.[d.field]} />
+                  </p>
                 </div>
               </li>
             ))}

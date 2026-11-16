@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useSite } from '@/lib/api';
+import { mailHref } from '@/lib/contact';
 import { Logo } from './Logo';
 
 export function Footer() {
@@ -13,6 +14,14 @@ export function Footer() {
           <div className="flex flex-col gap-3.5">
             <Logo siteName={site.siteName} logoUrl={site.logoUrl} />
             <p className="w-[300px] max-w-full text-[14.5px] leading-[22px] text-white">{footer.tagline}</p>
+            {mailHref(site.email) && (
+              <a
+                href={mailHref(site.email)}
+                className="mt-2 w-fit text-sm font-medium text-white hover:text-brand-sky max-xl:flex max-xl:min-h-11 max-xl:items-center"
+              >
+                {site.email}
+              </a>
+            )}
           </div>
           {/* Phones: link groups flow into two balanced columns (each group kept whole); from 640 the groups sit in a row. */}
           <div className="columns-2 gap-x-6 sm:flex sm:flex-wrap sm:gap-10 lg:gap-20">

@@ -19,6 +19,9 @@
  * --step=seed-ids
  *  - re-keys the seed's services and posts to their fixed ids (prisma/seed-ids.ts), so a later seed run matches them by
  *    id and can never duplicate a row whose slug was renamed. The seed does this itself too; this step just does it now.
+ * --step=r3-contact (Round 3)
+ *  - site settings email -> info@maouajtechnology.com. Telephone and address are deliberately left as they are
+ *    (MAOUAJ office details are not confirmed yet); remaining placeholders are listed, not changed.
  */
 import 'dotenv/config';
 import fs from 'node:fs';
@@ -178,6 +181,28 @@ async function dateLabels() {
   return posts.length;
 }
 
+const CONTACT_EMAIL = 'info@maouajtechnology.com';
+const PLACEHOLDER = /\[(?:business|address)[^\]]*\]/i;
+
+async function contactEmail() {
+  const s = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  if (!s) throw new Error('Site settings row (id 1) not found');
+  let rows = 0;
+  if (s.email !== CONTACT_EMAIL) {
+    const note = s.email && !PLACEHOLDER.test(s.email) ? '  (replaces a non-placeholder value)' : '';
+    console.log(`  SiteSettings.email: ${JSON.stringify(s.email)} -> ${JSON.stringify(CONTACT_EMAIL)}${note}`);
+    if (apply) await prisma.siteSettings.update({ where: { id: 1 }, data: { email: CONTACT_EMAIL } });
+    rows++;
+  }
+  console.log(`  unchanged: SiteSettings.phone ${JSON.stringify(s.phone)}, SiteSettings.address ${JSON.stringify(s.address)}`);
+  for (const sec of await prisma.pageSection.findMany()) {
+    const found: string[] = [];
+    mapStrings(sec.content, (v) => (PLACEHOLDER.test(v) && found.push(v), v));
+    for (const v of found) console.log(`  note: placeholder left in PageSection ${sec.page}/${sec.key}: ${JSON.stringify(v)}`);
+  }
+  return rows;
+}
+
 const report = (n: number, what: string) => console.log(n ? `${n} ${what} ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
 
 const steps: Record<string, () => Promise<void>> = {
@@ -190,6 +215,10 @@ const steps: Record<string, () => Promise<void>> = {
   image: async () => {
     console.log(`Business image -> ${NEW_IMAGE}:`);
     report(await renameImage(), 'row(s)');
+  },
+  'r3-contact': async () => {
+    console.log('Contact email:');
+    report(await contactEmail(), 'row(s)');
   },
   'seed-ids': async () => {
     console.log('Seed services/posts -> fixed ids:');

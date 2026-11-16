@@ -185,7 +185,7 @@ export const settings = {
   siteName: 'MAOUAJ Technology',
   tagline: 'Technology for the way people move, pay and trade.',
   logoUrl: null as string | null,
-  email: '[Business email]',
+  email: 'info@maouajtechnology.com',
   phone: '[Business telephone]',
   address: '[Address and public business details]',
   socials: {} as Record<string, string>,
