@@ -48,7 +48,7 @@ const products: PageSeed = {
         animation: {
           src: '/animations/bus-fare.svg',
           staticImage: '/animations/bus-fare-static.webp',
-          alt: 'Transit card tapped on a phone reader showing a $2.75 fare paid, alongside the card balance and recent trips',
+          alt: 'Transit card tapped on a phone reader showing a 2.75 fare paid, alongside the card balance and recent trips',
         },
         imageWidth: 752,
         imageHeight: 426,
