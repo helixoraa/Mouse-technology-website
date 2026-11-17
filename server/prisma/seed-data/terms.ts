@@ -34,7 +34,7 @@ const terms: PageSeed = {
             number: '01',
             title: 'About this website',
             paragraphs: [
-              'The website is operated by MAOUAJ Technology ("MAOUAJ Technology", "we", "us" or "our"). It provides general information about our company, our technology products and projects, and the business interests connected with us.',
+              'The website is operated by MAOUAJ Technology, meaning Grupo Maouaj S.A. (Guatemala) and Maouaj Technology Corporation (USA) ("MAOUAJ Technology", "we", "us" or "our"). It provides general information about our company, our technology products and projects, and the business interests connected with us.',
               'The website is for information only. Nothing on it is an offer to sell, a contract, or financial, legal or professional advice.',
             ],
           },
@@ -60,7 +60,7 @@ const terms: PageSeed = {
             title: 'Acceptable use',
             paragraphs: [
               'When using the website, you agree not to:',
-              '- use it in any way that breaks applicable law\n- send false, misleading, offensive or unlawful information through our contact form\n- send spam, advertising or unsolicited bulk messages\n- attempt to gain unauthorised access to the website, its servers or any connected system\n- introduce viruses, malware or other harmful code\n- disrupt or overload the website, or use automated tools to scrape or copy it at scale',
+              '- use it in any way that breaks applicable law\n- send false, misleading, offensive or unlawful information through our contact form\n- send spam, advertising or unsolicited bulk messages\n- attempt to gain unauthorized access to the website, its servers or any connected system\n- introduce viruses, malware or other harmful code\n- disrupt or overload the website, or use automated tools to scrape or copy it at scale',
               'We may restrict access to the website for anyone who breaks these rules.',
             ],
           },
@@ -104,7 +104,7 @@ const terms: PageSeed = {
             number: '10',
             title: 'Governing law',
             paragraphs: [
-              'These Terms are governed by the laws of the country in which MAOUAJ Technology is registered, without regard to conflict-of-law rules. Any dispute will be handled by the courts of that country, unless the law of your country of residence gives you the right to bring a claim locally.',
+              'These Terms are governed by the laws of the country of the MAOUAJ Technology company you deal with (Guatemala for Grupo Maouaj S.A., the State of New York, USA for Maouaj Technology Corporation), without regard to conflict-of-law rules. Any dispute will be handled by the courts of that country, unless the law of your country of residence gives you the right to bring a claim locally.',
             ],
           },
           {
@@ -112,7 +112,7 @@ const terms: PageSeed = {
             title: 'Contact us',
             paragraphs: [
               'For questions about these Terms, contact us:',
-              '- **Email:** info@maouajtechnology.com\n- **Offices:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala, +502-51850811; Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA, +1 (716) 533-2271',
+              '- **Email:** info@maouajtechnology.com\n- **Guatemala:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala. Phone: +502-51850811\n- **USA:** Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA. Phone: +1 (716) 533-2271',
             ],
           },
         ],

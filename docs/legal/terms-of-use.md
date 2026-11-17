@@ -6,7 +6,7 @@ These Terms of Use ("Terms") govern your use of the MAOUAJ Technology website (t
 
 ## 1. About this website
 
-The website is operated by MAOUAJ Technology ("MAOUAJ Technology", "we", "us" or "our"). It provides general information about our company, our technology products and projects, and the business interests connected with us.
+The website is operated by MAOUAJ Technology, meaning Grupo Maouaj S.A. (Guatemala) and Maouaj Technology Corporation (USA) ("MAOUAJ Technology", "we", "us" or "our"). It provides general information about our company, our technology products and projects, and the business interests connected with us.
 
 The website is for information only. Nothing on it is an offer to sell, a contract, or financial, legal or professional advice.
 
@@ -31,7 +31,7 @@ When using the website, you agree not to:
 - use it in any way that breaks applicable law
 - send false, misleading, offensive or unlawful information through our contact form
 - send spam, advertising or unsolicited bulk messages
-- attempt to gain unauthorised access to the website, its servers or any connected system
+- attempt to gain unauthorized access to the website, its servers or any connected system
 - introduce viruses, malware or other harmful code
 - disrupt or overload the website, or use automated tools to scrape or copy it at scale
 
@@ -61,11 +61,12 @@ We may update these Terms from time to time. The updated version will be posted 
 
 ## 10. Governing law
 
-These Terms are governed by the laws of the country in which MAOUAJ Technology is registered, without regard to conflict-of-law rules. Any dispute will be handled by the courts of that country, unless the law of your country of residence gives you the right to bring a claim locally.
+These Terms are governed by the laws of the country of the MAOUAJ Technology company you deal with (Guatemala for Grupo Maouaj S.A., the State of New York, USA for Maouaj Technology Corporation), without regard to conflict-of-law rules. Any dispute will be handled by the courts of that country, unless the law of your country of residence gives you the right to bring a claim locally.
 
 ## 11. Contact us
 
 For questions about these Terms, contact us:
 
 - **Email:** info@maouajtechnology.com
-- **Offices:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala, +502-51850811; Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA, +1 (716) 533-2271
+- **Guatemala:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala. Phone: +502-51850811
+- **USA:** Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA. Phone: +1 (716) 533-2271

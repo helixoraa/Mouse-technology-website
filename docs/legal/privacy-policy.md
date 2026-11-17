@@ -2,7 +2,7 @@
 
 **Effective date:** 16 November 2026
 
-This Privacy Policy explains how MAOUAJ Technology ("MAOUAJ Technology", "we", "us" or "our") collects, uses, shares and protects information when you visit our website or contact us through it.
+This Privacy Policy explains how MAOUAJ Technology, meaning Grupo Maouaj S.A. (Guatemala) and Maouaj Technology Corporation (USA) ("MAOUAJ Technology", "we", "us" or "our") collects, uses, shares and protects information when you visit our website or contact us through it.
 
 This website is a corporate information website. It does not offer user accounts, online purchases or payments.
 
@@ -13,6 +13,7 @@ This website is a corporate information website. It does not offer user accounts
 - your name
 - your email address
 - the area you are interested in (for example, a product, a business inquiry or a partnership)
+- your phone number and organization, if you choose to give them (optional)
 - the message you write
 
 If you email or call us directly, we receive the information you choose to share in that email or call.
@@ -57,7 +58,7 @@ We keep inquiry information for as long as needed to respond to you and follow u
 
 ## 7. How we protect information
 
-We use reasonable technical and organisational measures to protect personal information, including encrypted connections (HTTPS) and restricted access to inquiry data. No method of transmission or storage is completely secure, so we cannot guarantee absolute security.
+We use reasonable technical and organizational measures to protect personal information, including encrypted connections (HTTPS) and restricted access to inquiry data. No method of transmission or storage is completely secure, so we cannot guarantee absolute security.
 
 ## 8. Your rights and choices
 
@@ -69,12 +70,13 @@ Depending on where you live, you may have the right to:
 - object to or ask us to restrict certain processing
 - withdraw your consent at any time, where we rely on consent
 - complain to your local data protection authority
+- confirm that we do not sell or share your personal information for cross-context behavioral advertising, as described under US state privacy laws such as those of California and New York
 
 To make a request, contact us using the details below. We may need to verify your identity before acting on it. We will not treat you differently for exercising your rights.
 
 ## 9. Children
 
-This website is not directed at children under 16, and we do not knowingly collect personal information from them. If you believe a child has sent us information, please contact us and we will delete it.
+This website is not directed at children under 13 (or under 16 in certain jurisdictions, such as the European Economic Area), and we do not knowingly collect personal information from them. If you believe a child has sent us information, please contact us and we will delete it.
 
 ## 10. Links to other websites
 
@@ -89,4 +91,5 @@ We may update this policy from time to time. The updated version will be posted 
 For privacy questions or requests, contact us:
 
 - **Email:** info@maouajtechnology.com
-- **Offices:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala, +502-51850811; Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA, +1 (716) 533-2271
+- **Guatemala:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala. Phone: +502-51850811
+- **USA:** Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA. Phone: +1 (716) 533-2271

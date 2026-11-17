@@ -26,7 +26,7 @@ const privacy: PageSeed = {
         heading: 'Privacy Policy',
         intro: [
           '**Effective date:** 16 November 2026',
-          'This Privacy Policy explains how MAOUAJ Technology ("MAOUAJ Technology", "we", "us" or "our") collects, uses, shares and protects information when you visit our website or contact us through it.',
+          'This Privacy Policy explains how MAOUAJ Technology, meaning Grupo Maouaj S.A. (Guatemala) and Maouaj Technology Corporation (USA) ("MAOUAJ Technology", "we", "us" or "our") collects, uses, shares and protects information when you visit our website or contact us through it.',
           'This website is a corporate information website. It does not offer user accounts, online purchases or payments.',
         ],
         sidebarTitle: 'ON THIS PAGE',
@@ -36,7 +36,7 @@ const privacy: PageSeed = {
             title: 'Information we collect',
             paragraphs: [
               '**Information you give us.** When you send an inquiry through our contact form, we collect:',
-              '- your name\n- your email address\n- the area you are interested in (for example, a product, a business inquiry or a partnership)\n- the message you write',
+              '- your name\n- your email address\n- the area you are interested in (for example, a product, a business inquiry or a partnership)\n- your phone number and organization, if you choose to give them (optional)\n- the message you write',
               'If you email or call us directly, we receive the information you choose to share in that email or call.',
               '**Information collected automatically.** When you visit the website, our hosting and infrastructure providers automatically record standard technical information, such as your IP address, browser type, device type, the pages you visit, the date and time of your visit and the referring website. This information is used to deliver the website, keep it secure and fix problems.',
               '**Cookies.** The website uses only cookies and similar technologies that are necessary for it to work and stay secure. We do not use advertising or tracking cookies. If we introduce analytics or other non-essential cookies in the future, we will update this policy and, where required, ask for your consent first.',
@@ -85,7 +85,7 @@ const privacy: PageSeed = {
             number: '07',
             title: 'How we protect information',
             paragraphs: [
-              'We use reasonable technical and organisational measures to protect personal information, including encrypted connections (HTTPS) and restricted access to inquiry data. No method of transmission or storage is completely secure, so we cannot guarantee absolute security.',
+              'We use reasonable technical and organizational measures to protect personal information, including encrypted connections (HTTPS) and restricted access to inquiry data. No method of transmission or storage is completely secure, so we cannot guarantee absolute security.',
             ],
           },
           {
@@ -93,7 +93,7 @@ const privacy: PageSeed = {
             title: 'Your rights and choices',
             paragraphs: [
               'Depending on where you live, you may have the right to:',
-              '- ask what personal information we hold about you and request a copy\n- ask us to correct inaccurate information\n- ask us to delete your information\n- object to or ask us to restrict certain processing\n- withdraw your consent at any time, where we rely on consent\n- complain to your local data protection authority',
+              '- ask what personal information we hold about you and request a copy\n- ask us to correct inaccurate information\n- ask us to delete your information\n- object to or ask us to restrict certain processing\n- withdraw your consent at any time, where we rely on consent\n- complain to your local data protection authority\n- confirm that we do not sell or share your personal information for cross-context behavioral advertising, as described under US state privacy laws such as those of California and New York',
               'To make a request, contact us using the details below. We may need to verify your identity before acting on it. We will not treat you differently for exercising your rights.',
             ],
           },
@@ -101,7 +101,7 @@ const privacy: PageSeed = {
             number: '09',
             title: 'Children',
             paragraphs: [
-              'This website is not directed at children under 16, and we do not knowingly collect personal information from them. If you believe a child has sent us information, please contact us and we will delete it.',
+              'This website is not directed at children under 13 (or under 16 in certain jurisdictions, such as the European Economic Area), and we do not knowingly collect personal information from them. If you believe a child has sent us information, please contact us and we will delete it.',
             ],
           },
           {
@@ -123,7 +123,7 @@ const privacy: PageSeed = {
             title: 'Contact us',
             paragraphs: [
               'For privacy questions or requests, contact us:',
-              '- **Email:** info@maouajtechnology.com\n- **Offices:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala, +502-51850811; Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA, +1 (716) 533-2271',
+              '- **Email:** info@maouajtechnology.com\n- **Guatemala:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala. Phone: +502-51850811\n- **USA:** Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA. Phone: +1 (716) 533-2271',
             ],
           },
         ],
