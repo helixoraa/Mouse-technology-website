@@ -54,12 +54,6 @@ const ALLOWED: Record<string, RegExp> = {
   // Email normalisation test: a mixed-case address must be stored lower case.
   'server/tests/auth.test.ts': /^Example\.com$/,
 };
-/**
- * Old image files kept on purpose until the production database no longer points at them (the client will confirm;
- * they are then deleted). Nothing in the code or seed references them.
- */
-const KEPT_OLD_FILES = new Set(['server/seed-media/project-hussain.webp', 'server/seed-media/project-hussain.png']);
-
 const TEXT_FILE =
   /\.(?:ts|tsx|js|mjs|cjs|json|md|html|css|sql|ya?ml|toml|txt|xml|svg|conf|sh|example|prisma)$|(?:^|\/)(?:Dockerfile|\.[\w.-]*ignore)$/;
 
@@ -81,7 +75,7 @@ describe('spelling guard', () => {
   it('no tracked file (code, seed, docs) or file name has a wrong spelling or a capitalised domain', () => {
     const problems: string[] = [];
     for (const file of trackedFiles()) {
-      if (WRONG_SPELLING.test(file) && !KEPT_OLD_FILES.has(file)) problems.push(`${file}: file name`);
+      if (WRONG_SPELLING.test(file)) problems.push(`${file}: file name`);
       if (!TEXT_FILE.test(file) || file === 'package-lock.json') continue;
       const allowed = ALLOWED[file];
       fs.readFileSync(path.join(root, file), 'utf8')
