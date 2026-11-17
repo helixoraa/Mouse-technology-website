@@ -22,7 +22,7 @@ const about: PageSeed = {
       order: 2,
       content: {
         heading: [{ text: 'Practical products for the things people do ' }, { text: 'every day', accent: true }, { text: '.' }],
-        lead: 'Our work focuses on activities that people and businesses rely on every day: travelling, paying for services, transferring money and buying or selling goods.',
+        lead: 'Our work focuses on activities that people and businesses rely on every day: traveling, paying for services, transferring money and buying or selling goods.',
         body: 'Our two main development projects are a cashless bus fare platform and a payment and money-transfer platform. We are also planning initiatives in ride-hailing and e-commerce. Our wider business interests include textiles and Hossain and Moallema, a wholesale spice and agricultural export business.',
       },
     },
@@ -76,7 +76,7 @@ const about: PageSeed = {
       content: {
         eyebrow: 'The purpose behind our products',
         title: 'Useful technology for everyday needs, for people and businesses.',
-        tags: ['Travelling', 'Paying for services', 'Transferring money', 'Buying and selling goods'],
+        tags: ['Traveling', 'Paying for services', 'Transferring money', 'Buying and selling goods'],
       },
     },
   ],

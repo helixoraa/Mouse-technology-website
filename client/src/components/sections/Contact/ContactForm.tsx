@@ -235,7 +235,7 @@ export function ContactForm({ content, className, variant = 'light', showConsent
           autoComplete: 'tel',
           inputMode: 'tel',
         })}
-        {textField('organisation', f.organisation?.label ?? 'Organisation (optional)', f.organisation?.placeholder, {
+        {textField('organisation', f.organisation?.label ?? 'Organization (optional)', f.organisation?.placeholder, {
           autoComplete: 'organization',
           maxLength: ORGANISATION_MAX,
         })}

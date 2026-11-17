@@ -127,7 +127,7 @@ export default function LeadsPage() {
                 ['Name', open.name],
                 ['Email', open.email],
                 ['Phone', open.phone],
-                ['Organisation', open.organisation],
+                ['Organization', open.organisation],
                 ['Area of interest', open.interest],
                 ['Received', fmtDate(open.createdAt)],
               ] as const

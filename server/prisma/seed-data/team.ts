@@ -32,7 +32,7 @@ const team: PageSeed = {
         image: '/uploads/seed/team-vision-card.webp',
         imageAlt: 'Business leader in a navy suit with arms crossed against a concrete wall',
         paragraphs: [
-          'Our work focuses on activities that people and businesses rely on every day: travelling, paying for services, transferring money and buying or selling goods.',
+          'Our work focuses on activities that people and businesses rely on every day: traveling, paying for services, transferring money and buying or selling goods.',
           'Our two main development projects are a cashless bus fare platform and a payment and money-transfer platform. We are also planning initiatives in ride-hailing and e-commerce. Our wider business interests include textiles and Hossain and Moallema, a wholesale spice and agricultural export business.',
         ],
       },

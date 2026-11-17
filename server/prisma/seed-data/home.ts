@@ -151,7 +151,7 @@ const home: PageSeed = {
         title: [{ text: 'Our ' }, { text: 'Focus', accent: true }],
         subtitle: 'Practical technology for everyday movement, payments and trade.',
         description:
-          'We focus on the activities people and businesses rely on every day: travelling, paying for services, transferring money and buying or selling goods.',
+          'We focus on the activities people and businesses rely on every day: traveling, paying for services, transferring money and buying or selling goods.',
         pillars: [
           {
             icon: 'move',
@@ -247,7 +247,7 @@ const home: PageSeed = {
             name: { label: 'Full name', placeholder: 'Your full name' },
             email: { label: 'Email', placeholder: 'you@company.com' },
             phone: { label: 'Phone (optional)', placeholder: 'Your phone number' },
-            organisation: { label: 'Organisation (optional)', placeholder: 'Company or agency' },
+            organisation: { label: 'Organization (optional)', placeholder: 'Company or agency' },
             interest: {
               label: 'Area of interest',
               placeholder: 'Select an area',

@@ -169,7 +169,8 @@ export const homePosts = [
     slug: 'an-introduction-to-the-payment-platform',
     title: 'An introduction to the payment platform',
     category: 'Product introduction',
-    excerpt: postText,
+    excerpt:
+      'A first look at the payment platform in development: choose a recipient, enter the amount, review the details and charges, then confirm.',
     image: seedImg('home-blog-2.webp'),
     author: 'MAOUAJ Technology Team',
     publishedAt: new Date('2026-06-29T09:00:00Z'),
@@ -179,7 +180,8 @@ export const homePosts = [
     slug: 'an-introduction-to-the-payment-platform-2',
     title: 'An introduction to the payment platform',
     category: 'Product introduction',
-    excerpt: postText,
+    excerpt:
+      'How the payment platform will keep transfers clear: details and charges shown before you confirm, then status updates until it is complete.',
     image: seedImg('home-blog-3.webp'),
     author: 'MAOUAJ Technology Team',
     publishedAt: new Date('2026-06-28T09:00:00Z'),
