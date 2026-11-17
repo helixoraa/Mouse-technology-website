@@ -64,15 +64,22 @@
  *  - "[…]" placeholder sentences removed from service summaries (the rest is kept).
  *  - team members that are still placeholders ("Full name", "Role / title") are hidden (never deleted).
  *  - blog post author "MAOUAJ Team" -> "MAOUAJ Technology Team".
+ * --step=r6b (run after r6)
+ *  - Privacy Policy / Terms of Use still holding the Round 6 approved text -> the updated text (docs/legal: US
+ *    spelling, both companies named, optional phone/organization fields). Draft pages get it from r6 directly.
+ *  - US spelling: "travelling" -> "traveling" (Home, About, Our Team), Home form "Organisation" -> "Organization".
+ *  - Products bus animation alt text without "$"; the two payment posts that carry the bus-fare summary get a
+ *    payment summary (seed-data/collections.ts).
  */
 import 'dotenv/config';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../src/db.js';
 import { adoptSeedIds } from '../prisma/seed-ids.js';
-import { BUSINESS_SUMMARY, OFFICES } from '../prisma/seed-data/collections.js';
+import { BUSINESS_SUMMARY, OFFICES, posts } from '../prisma/seed-data/collections.js';
 import homeSeed from '../prisma/seed-data/home.js';
 import privacySeed from '../prisma/seed-data/privacy.js';
 import termsSeed from '../prisma/seed-data/terms.js';
@@ -696,6 +703,68 @@ async function r6() {
   return rows;
 }
 
+/* ---------- Round 6b: US English, updated legal text, bus amounts, payment post summaries ---------- */
+
+/** SHA-256 of the Round 6 approved policy content (key-sorted JSON), replaced by the updated text (US spelling,
+ * optional phone/organization fields, both companies named). Any other version, e.g. an admin edit, is kept. */
+const R6_APPROVED_POLICY_SHA: Record<string, string> = {
+  privacy: 'c082bed3c73347f880d61d8d12e0091fbe3970d288d4045ba4f87a8eccd56965',
+  terms: '5a04adcf3bc6629c73e89d2e4de0fb014834ae6827341939c639e2133275cec8',
+};
+const sha = (v: unknown) => crypto.createHash('sha256').update(JSON.stringify(v, sortKeys)).digest('hex');
+/** Exact old values only (page, dotted path, old text). */
+const R6B_TEXT: { pages: string[]; path: RegExp; from: RegExp; to: string }[] = [
+  { pages: ['home', 'about', 'team'], path: /./, from: /rely on every day: travelling,/g, to: 'rely on every day: traveling,' },
+  { pages: ['about'], path: /^tags\.\d+$/, from: /^Travelling$/, to: 'Traveling' },
+  { pages: ['home'], path: /fields\.organisation\.label$/, from: /^Organisation \(optional\)$/, to: 'Organization (optional)' },
+  { pages: ['products'], path: /animation\.alt$/, from: /showing a \$2\.75 fare paid/, to: 'showing a 2.75 fare paid' },
+];
+/** The two payment posts were seeded with the bus-fare summary. */
+const BUS_SUMMARY = 'Add balance, tap a supported transit card on the bus, receive the result and review your history.';
+const PAYMENT_POST_IDS = ['seed-post-home-payment', 'seed-post-home-payment-2'];
+
+async function r6b() {
+  let rows = 0;
+  for (const sec of await prisma.pageSection.findMany({ orderBy: [{ page: 'asc' }, { order: 'asc' }] })) {
+    const where = `PageSection ${sec.page}/${sec.key}${sec.visible ? '' : ' (hidden)'}`;
+    const legal = LEGAL_SEEDS[sec.page as keyof typeof LEGAL_SEEDS];
+    if (legal && sec.key === 'policy') {
+      const want = legal.sections.find((x) => x.key === 'policy')!.content;
+      if (sameJson(sec.content, want)) continue;
+      if (sha(sec.content) !== R6_APPROVED_POLICY_SHA[sec.page]) {
+        console.log(`  note: ${where} is not the Round 6 approved text (draft: run --step=r6; or edited in the admin); kept`);
+        continue;
+      }
+      rows++;
+      console.log(
+        `  ${where}: Round 6 approved text -> updated text (docs/legal/${sec.page === 'privacy' ? 'privacy-policy' : 'terms-of-use'}.md)`,
+      );
+      if (apply) await prisma.pageSection.update({ where: { id: sec.id }, data: { content: want as Prisma.InputJsonValue } });
+      continue;
+    }
+    const changes: string[] = [];
+    const r = mapStringsAt(sec.content, (v, p) => {
+      let next = v;
+      for (const rule of R6B_TEXT) if (rule.pages.includes(sec.page) && rule.path.test(p)) next = next.replace(rule.from, rule.to);
+      if (next !== v) changes.push(`    ${p}: ${JSON.stringify(v)}\n      -> ${JSON.stringify(next)}`);
+      return next;
+    });
+    if (!r.changed) continue;
+    rows++;
+    console.log(`  ${where}:\n${changes.join('\n')}`);
+    if (apply) await prisma.pageSection.update({ where: { id: sec.id }, data: { content: r.value as Prisma.InputJsonValue } });
+  }
+  const want = Object.fromEntries(posts.filter((p) => PAYMENT_POST_IDS.includes(p.id)).map((p) => [p.slug, p.excerpt]));
+  for (const p of await prisma.post.findMany({ where: { excerpt: BUS_SUMMARY } })) {
+    const excerpt = want[p.slug];
+    if (!excerpt) continue; // the bus-fare post keeps its (correct) summary
+    rows++;
+    console.log(`  Post ${p.slug}.excerpt: ${JSON.stringify(p.excerpt)}\n    -> ${JSON.stringify(excerpt)}`);
+    if (apply) await prisma.post.update({ where: { id: p.id }, data: { excerpt } });
+  }
+  return rows;
+}
+
 const report = (n: number, what: string) => console.log(n ? `${n} ${what} ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
 
 const steps: Record<string, () => Promise<void>> = {
@@ -732,6 +801,10 @@ const steps: Record<string, () => Promise<void>> = {
   r6: async () => {
     console.log('Round 6: domain spelling, legal pages, placeholder text, placeholder team cards, post author:');
     report(await r6(), 'row(s)');
+  },
+  r6b: async () => {
+    console.log('Round 6b: US spelling, updated legal text, bus fare amounts, payment post summaries:');
+    report(await r6b(), 'row(s)');
   },
   'seed-ids': async () => {
     console.log('Seed services/posts -> fixed ids:');
