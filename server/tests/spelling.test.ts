@@ -26,7 +26,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 /** Wrong spellings that must never appear (any case). */
 export const WRONG_SPELLING = /hussain|muallima|muallema|moallima|hosain/i;
 /** Our domains: any occurrence must be all lower case. */
-const OUR_DOMAINS = /hossainandmoallema\.com|maouajtechnology\.com|maouaj-technology-website\.vercel\.app/gi;
+const OUR_DOMAINS = /hossainandmoallema\.com|maouajtechnology\.com|maouaj-technology-website\.vercel\.app|\bmaouaj\.com/gi;
 /** Any other capitalised .com domain ("SomeName.com"). */
 const CAPITALISED_DOMAIN = /\b[A-Za-z0-9-]*[A-Z][A-Za-z0-9-]*\.com\b/g;
 
@@ -67,8 +67,9 @@ describe('spelling guard', () => {
     expect(spellingProblems('Visit HussainandMuallima.com')).not.toEqual([]);
     expect(spellingProblems('Visit HossainandMoallema.com')).toEqual(['capitalised domain "HossainandMoallema.com"']);
     expect(spellingProblems('Mail Info@MaouajTechnology.com')).not.toEqual([]);
+    expect(spellingProblems('Mail info@Maouaj.com')).not.toEqual([]);
     for (const w of ['Hussain', 'Muallima', 'Muallema', 'Moallima', 'Hosain']) expect(spellingProblems(`${w} and Co`)).not.toEqual([]);
-    expect(spellingProblems('Hossain and Moallema, hossainandmoallema.com, info@maouajtechnology.com')).toEqual([]);
+    expect(spellingProblems('Hossain and Moallema, hossainandmoallema.com, info@maouaj.com, www.maouaj.com')).toEqual([]);
     expect(spellingProblems('https://maouaj-technology-website.vercel.app/')).toEqual([]);
   });
 

@@ -25,7 +25,7 @@
  *  - re-keys the seed's services and posts to their fixed ids (prisma/seed-ids.ts), so a later seed run matches them by
  *    id and can never duplicate a row whose slug was renamed. The seed does this itself too; this step just does it now.
  * --step=r3-contact (Round 3)
- *  - site settings: email -> info@maouajtechnology.com; footer.offices -> the two MAOUAJ Technology offices (Grupo
+ *  - site settings: email -> info@maouaj.com; footer.offices -> the two MAOUAJ Technology offices (Grupo
  *    Maouaj S.A., Guatemala; Maouaj Technology Corporation, USA: name, address, phone); phone/address (legacy single
  *    fields) -> the Guatemala office. Only empty or "[Business …]"/"[Address …]" placeholder values are replaced, so
  *    details entered in the admin are kept (a difference is listed). Other footer keys are kept.
@@ -70,6 +70,9 @@
  *  - US spelling: "travelling" -> "traveling" (Home, About, Our Team), Home form "Organisation" -> "Organization".
  *  - Products bus animation alt text without "$"; the two payment posts that carry the bus-fare summary get a
  *    payment summary (seed-data/collections.ts).
+ * --step=r7-email (run last)
+ *  - MAOUAJ email info@maouajtechnology.com -> info@maouaj.com wherever it is stored (site settings, page sections
+ *    including the legal pages, services, posts, FAQs). Only that exact address is replaced (any capitalisation).
  */
 import 'dotenv/config';
 import crypto from 'node:crypto';
@@ -579,7 +582,7 @@ async function r5Seo() {
 const sortKeys = (_k: string, v: unknown) => (isObject(v) ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => (a < b ? -1 : 1))) : v);
 const sameJson = (a: unknown, b: unknown) => JSON.stringify(a, sortKeys) === JSON.stringify(b, sortKeys);
 
-const CONTACT_EMAIL = 'info@maouajtechnology.com';
+const CONTACT_EMAIL = 'info@maouaj.com';
 const PLACEHOLDER = /\[(?:business|address)[^\]]*\]/i;
 
 async function contactDetails() {
@@ -765,6 +768,64 @@ async function r6b() {
   return rows;
 }
 
+/* ---------- Round 7 ---------- */
+
+const OLD_EMAIL = /info@maouajtechnology\.com/gi;
+const fixEmail = (v: string) => v.replace(OLD_EMAIL, CONTACT_EMAIL);
+
+/** String and JSON fields of one row with the old email replaced; only changed fields are returned. */
+function emailChanges(row: Record<string, unknown>, where: string): Record<string, unknown> {
+  const data: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(row)) {
+    if (k === 'id') continue;
+    if (typeof v === 'string') {
+      if (fixEmail(v) !== v) data[k] = fixEmail(v);
+    } else if (v && typeof v === 'object' && !(v instanceof Date)) {
+      const r = mapStringsAt(v, (x) => fixEmail(x));
+      if (r.changed) data[k] = r.value;
+    }
+  }
+  for (const k of Object.keys(data)) console.log(`  ${where}.${k}: info@maouajtechnology.com -> ${CONTACT_EMAIL}`);
+  return data;
+}
+
+async function r7Email() {
+  let rows = 0;
+  const site = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  if (site) {
+    const data = emailChanges(site, 'SiteSettings');
+    if (Object.keys(data).length) {
+      rows++;
+      if (apply) await prisma.siteSettings.update({ where: { id: 1 }, data: data as Prisma.SiteSettingsUpdateInput });
+    }
+  }
+  for (const sec of await prisma.pageSection.findMany()) {
+    const data = emailChanges({ content: sec.content }, `PageSection ${sec.page}/${sec.key}`);
+    if (!Object.keys(data).length) continue;
+    rows++;
+    if (apply) await prisma.pageSection.update({ where: { id: sec.id }, data: data as Prisma.PageSectionUpdateInput });
+  }
+  for (const s of await prisma.service.findMany()) {
+    const data = emailChanges(s, `Service ${s.slug}`);
+    if (!Object.keys(data).length) continue;
+    rows++;
+    if (apply) await prisma.service.update({ where: { id: s.id }, data: data as Prisma.ServiceUpdateInput });
+  }
+  for (const p of await prisma.post.findMany()) {
+    const data = emailChanges(p, `Post ${p.slug}`);
+    if (!Object.keys(data).length) continue;
+    rows++;
+    if (apply) await prisma.post.update({ where: { id: p.id }, data: data as Prisma.PostUpdateInput });
+  }
+  for (const f of await prisma.faq.findMany()) {
+    const data = emailChanges(f, `Faq ${f.id}`);
+    if (!Object.keys(data).length) continue;
+    rows++;
+    if (apply) await prisma.faq.update({ where: { id: f.id }, data: data as Prisma.FaqUpdateInput });
+  }
+  return rows;
+}
+
 const report = (n: number, what: string) => console.log(n ? `${n} ${what} ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
 
 const steps: Record<string, () => Promise<void>> = {
@@ -805,6 +866,10 @@ const steps: Record<string, () => Promise<void>> = {
   r6b: async () => {
     console.log('Round 6b: US spelling, updated legal text, bus fare amounts, payment post summaries:');
     report(await r6b(), 'row(s)');
+  },
+  'r7-email': async () => {
+    console.log(`Round 7: MAOUAJ email -> ${CONTACT_EMAIL}:`);
+    report(await r7Email(), 'row(s)');
   },
   'seed-ids': async () => {
     console.log('Seed services/posts -> fixed ids:');

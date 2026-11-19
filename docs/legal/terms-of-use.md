@@ -67,6 +67,6 @@ These Terms are governed by the laws of the country of the MAOUAJ Technology com
 
 For questions about these Terms, contact us:
 
-- **Email:** info@maouajtechnology.com
+- **Email:** info@maouaj.com
 - **Guatemala:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala. Phone: +502-51850811
 - **USA:** Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA. Phone: +1 (716) 533-2271

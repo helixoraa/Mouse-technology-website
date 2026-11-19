@@ -211,7 +211,7 @@ export const settings = {
   siteName: 'MAOUAJ Technology',
   tagline: 'Technology for the way people move, pay and trade.',
   logoUrl: null as string | null,
-  email: 'info@maouajtechnology.com',
+  email: 'info@maouaj.com',
   // phone/address: the primary (Guatemala) office, kept for older clients; the site renders footer.offices.
   phone: '+502-51850811',
   address: '3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala',
