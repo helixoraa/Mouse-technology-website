@@ -26,32 +26,46 @@ export function balancedColumns(count: number, options: number[]): number {
 export const isPlaceholderMember = (m: Pick<TeamMember, 'name' | 'role'>) =>
   !m.name?.trim() || /^full\s+name$/i.test(m.name.trim()) || /^role\s*\/\s*title$/i.test(m.role?.trim() ?? '');
 
+/** A portrait saved as "<name>-1x.webp" has a "<name>-2x.webp" next to it (seed media and the static site). */
+const retinaSrcSet = (url: string) => (/-1x\.webp$/.test(url) ? `${url} 1x, ${url.replace(/-1x\.webp$/, '-2x.webp')} 2x` : undefined);
+
 function MemberCard({ m }: { m: TeamMember }) {
   const vector = m.photo?.endsWith('.svg');
+  const src = mediaUrl(m.photo);
   return (
     <li className="flex flex-col items-center gap-5">
-      {/* One frame ratio for every photo (288:336, the design card). Raster portraits are pre-cut arches drawn
-          288:296 from 24/336 down the frame; vector placeholders fill the whole frame. */}
-      <div className="relative aspect-[288/336] w-full overflow-hidden">
-        {m.photo ? (
+      {vector ? (
+        // Design placeholder art (never shown: placeholder members are filtered out) keeps the design's 288:336 frame.
+        <div className="relative aspect-[288/336] w-full overflow-hidden">
           <img
-            src={mediaUrl(m.photo)}
-            alt={vector ? '' : `Portrait of ${m.name}`}
+            src={src}
+            alt=""
             width={288}
-            height={vector ? 336 : 296}
+            height={336}
             decoding="async"
-            className={
-              vector
-                ? 'absolute inset-0 size-full object-cover'
-                : 'absolute inset-x-0 top-[calc(100%*24/336)] aspect-[288/296] h-auto w-full object-cover'
-            }
+            className="absolute inset-0 size-full object-cover"
             loading="lazy"
             draggable={false}
           />
-        ) : (
-          <div className="size-full bg-surface-tint" />
-        )}
-      </div>
+        </div>
+      ) : (
+        // Portraits: the design's 288:296 photo format with rounded corners, the face centred in the image itself.
+        <div className="relative aspect-[288/296] w-full overflow-hidden rounded-[28px] bg-surface-tint shadow-card">
+          {m.photo && (
+            <img
+              src={src}
+              srcSet={retinaSrcSet(src)}
+              alt={`Portrait of ${m.name}${m.role?.trim() ? `, ${m.role.trim()}` : ''}`}
+              width={288}
+              height={296}
+              decoding="async"
+              className="absolute inset-0 size-full object-cover"
+              loading="lazy"
+              draggable={false}
+            />
+          )}
+        </div>
+      )}
       <div className="flex w-full flex-col items-center gap-1.5 text-center">
         <h3 className="w-full text-[22px] font-bold text-ink">{m.name}</h3>
         <p className="w-full text-sm font-semibold text-brand">{m.role}</p>

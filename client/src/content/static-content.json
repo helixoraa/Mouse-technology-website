@@ -257,11 +257,7 @@
                   "value": "Shown before confirm"
                 }
               ],
-              "steps": [
-                "Paid",
-                "Processing",
-                "Delivered"
-              ],
+              "steps": ["Paid", "Processing", "Delivered"],
               "title": "Transfer review",
               "status": "Processing"
             },
@@ -300,12 +296,7 @@
                   "readerStatus": "Accepted",
                   "operatorTitle": "Operator view"
                 },
-                "journey": [
-                  "Add balance",
-                  "Tap on the bus",
-                  "See the result",
-                  "Review history"
-                ],
+                "journey": ["Add balance", "Tap on the bus", "See the result", "Review history"],
                 "features": [
                   "Transit cards linked to balances and history",
                   "Fare results shown clearly at the reader",
@@ -347,20 +338,10 @@
                   "confirm": "Confirm and pay",
                   "panelTitle": "Review your transfer",
                   "panelStatus": "Ready",
-                  "trackerSteps": [
-                    "Awaiting payment",
-                    "Processing",
-                    "Completed"
-                  ],
+                  "trackerSteps": ["Awaiting payment", "Processing", "Completed"],
                   "trackerTitle": "Transfer status"
                 },
-                "journey": [
-                  "Recipient",
-                  "Amount",
-                  "Review",
-                  "Confirm",
-                  "Track"
-                ],
+                "journey": ["Recipient", "Amount", "Review", "Confirm", "Track"],
                 "features": [
                   "Transfer details reviewed before you confirm",
                   "Status tracking and transaction history",
@@ -587,10 +568,7 @@
           "order": 9,
           "content": {
             "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
-            "lines": [
-              "Let’s talk about",
-              "what comes next."
-            ],
+            "lines": ["Let’s talk about", "what comes next."],
             "eyebrow": "LET’S TALK",
             "primary": {
               "href": "/contact-us",
@@ -818,10 +796,7 @@
           "order": 5,
           "content": {
             "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
-            "lines": [
-              "Let’s talk about",
-              "what comes next."
-            ],
+            "lines": ["Let’s talk about", "what comes next."],
             "eyebrow": "LET’S TALK",
             "primary": {
               "href": "/contact-us",
@@ -945,12 +920,7 @@
           "key": "purpose",
           "order": 4,
           "content": {
-            "tags": [
-              "Traveling",
-              "Paying for services",
-              "Transferring money",
-              "Buying and selling goods"
-            ],
+            "tags": ["Traveling", "Paying for services", "Transferring money", "Buying and selling goods"],
             "title": "Useful technology for everyday needs, for people and businesses.",
             "eyebrow": "The purpose behind our products"
           }
@@ -1123,11 +1093,7 @@
               },
               "interest": {
                 "label": "Area of interest",
-                "options": [
-                  "Product questions",
-                  "Business inquiries",
-                  "Partnerships"
-                ],
+                "options": ["Product questions", "Business inquiries", "Partnerships"],
                 "placeholder": "Select an area"
               },
               "organisation": {
@@ -1335,10 +1301,7 @@
           "order": 5,
           "content": {
             "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
-            "lines": [
-              "Let’s talk about",
-              "what comes next."
-            ],
+            "lines": ["Let’s talk about", "what comes next."],
             "eyebrow": "LET’S TALK",
             "primary": {
               "href": "/contact-us",
@@ -1447,10 +1410,7 @@
           "order": 5,
           "content": {
             "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
-            "lines": [
-              "Let’s talk about",
-              "what comes next."
-            ],
+            "lines": ["Let’s talk about", "what comes next."],
             "eyebrow": "LET’S TALK",
             "primary": {
               "href": "/contact-us",
@@ -1495,12 +1455,7 @@
           "key": "articles",
           "order": 2,
           "content": {
-            "filters": [
-              "All",
-              "Product explainers",
-              "Project updates",
-              "Company news"
-            ],
+            "filters": ["All", "Product explainers", "Project updates", "Company news"],
             "pageSize": 3,
             "emptyText": "New explainers and updates will appear here as our projects progress.",
             "nextLabel": "Next",
@@ -1515,10 +1470,7 @@
           "order": 3,
           "content": {
             "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
-            "lines": [
-              "Let’s talk about",
-              "what comes next."
-            ],
+            "lines": ["Let’s talk about", "what comes next."],
             "eyebrow": "LET’S TALK",
             "primary": {
               "href": "/contact-us",
@@ -1918,7 +1870,30 @@
       "updatedAt": "2026-11-19T19:10:09.243Z"
     }
   ],
-  "team": [],
+  "team": [
+    {
+      "id": "seed-team-uzair-bin-abdul-hameed",
+      "name": "Uzair Bin Abdul Hameed",
+      "role": "Head of Technology",
+      "bio": "Leads technology at MAOUAJ Technology, including product engineering, artificial intelligence and security. He oversees how our platforms are designed, built and kept secure.",
+      "photo": "/content-images/team-uzair-bin-abdul-hameed-1x.webp",
+      "order": 0,
+      "visible": true,
+      "createdAt": "2026-11-19T19:47:35.000Z",
+      "updatedAt": "2026-11-19T19:47:35.000Z"
+    },
+    {
+      "id": "seed-team-ahmed",
+      "name": "Ahmed",
+      "role": "Head of Product and Operations",
+      "bio": "Leads product development, operations and business at MAOUAJ Technology. He turns plans into products and keeps our projects on track.",
+      "photo": "/content-images/team-ahmed-1x.webp",
+      "order": 1,
+      "visible": true,
+      "createdAt": "2026-11-19T19:47:35.000Z",
+      "updatedAt": "2026-11-19T19:47:35.000Z"
+    }
+  ],
   "faqs": [
     {
       "id": "cmw18tmpw001wqoxsnpmp2png",

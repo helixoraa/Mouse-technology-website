@@ -45,7 +45,9 @@
     "SMIL",
     "wght",
     "TLDS",
-    "tlds"
+    "tlds",
+    "Uzair",
+    "Hameed"
   ],
   "ignoreWords": ["technologys"],
   "flagWords": ["hussain", "muallima", "muallema", "moallima", "hosain", "hussainandmuallima"]

@@ -107,9 +107,35 @@ export const formerSlugs: Record<string, string[]> = {
   'seed-service-hossainandmoallema': ['hussainandmuallima-com'],
 };
 
+/**
+ * The real team members, in this order. Fixed ids, so --step=r8-team (scripts/content-fixes.ts) can add them to an
+ * existing database exactly once. Photos: server/seed-media/<name>-1x.webp with a -2x.webp next to it (the team cards
+ * use the pair as srcset).
+ */
+export const teamMembers = [
+  {
+    id: 'seed-team-uzair-bin-abdul-hameed',
+    name: 'Uzair Bin Abdul Hameed',
+    role: 'Head of Technology',
+    bio: 'Leads technology at MAOUAJ Technology, including product engineering, artificial intelligence and security. He oversees how our platforms are designed, built and kept secure.',
+    photo: seedImg('team-uzair-bin-abdul-hameed-1x.webp'),
+    order: 0,
+    visible: true,
+  },
+  {
+    id: 'seed-team-ahmed',
+    name: 'Ahmed',
+    role: 'Head of Product and Operations',
+    bio: 'Leads product development, operations and business at MAOUAJ Technology. He turns plans into products and keeps our projects on track.',
+    photo: seedImg('team-ahmed-1x.webp'),
+    order: 1,
+    visible: true,
+  },
+];
+
 // Figma "Team carousel": 8 placeholder members (names/roles/biographies "to be supplied"). Created hidden: the site
 // never shows placeholder cards; replace a card's name, role, biography and photo in the admin, then make it visible.
-export const team = [
+const placeholderTeam = [
   'team-photo-1.webp',
   'team-photo-2.webp',
   'team-photo-3.webp',
@@ -118,14 +144,16 @@ export const team = [
   'team-photo-6.svg',
   'team-photo-7.svg',
   'team-photo-8.svg',
-].map((photo, order) => ({
+].map((photo, i) => ({
   name: 'Full name',
   role: 'Role / title',
   bio: 'Short professional biography to be supplied.',
   photo: seedImg(photo),
-  order,
+  order: teamMembers.length + i,
   visible: false,
 }));
+
+export const team = [...teamMembers, ...placeholderTeam];
 
 export const faqs = [
   {

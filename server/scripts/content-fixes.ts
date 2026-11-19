@@ -73,6 +73,11 @@
  * --step=r7-email (run last)
  *  - MAOUAJ email info@maouajtechnology.com -> info@maouaj.com wherever it is stored (site settings, page sections
  *    including the legal pages, services, posts, FAQs). Only that exact address is replaced (any capitalisation).
+ * --step=r8-team
+ *  - adds the real team members (seed-data/collections.ts teamMembers: Uzair Bin Abdul Hameed, then Ahmed) with their
+ *    photos (1x + 2x WebP, uploaded to Blob or copied into UPLOAD_DIR/seed like --step=image), visible, in that order.
+ *    A member whose fixed id or exact name is already in the database is left as it is (a difference is listed).
+ *    The hidden placeholder members are not touched.
  */
 import 'dotenv/config';
 import crypto from 'node:crypto';
@@ -82,7 +87,7 @@ import { fileURLToPath } from 'node:url';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../src/db.js';
 import { adoptSeedIds } from '../prisma/seed-ids.js';
-import { BUSINESS_SUMMARY, OFFICES, posts } from '../prisma/seed-data/collections.js';
+import { BUSINESS_SUMMARY, OFFICES, posts, teamMembers } from '../prisma/seed-data/collections.js';
 import homeSeed from '../prisma/seed-data/home.js';
 import privacySeed from '../prisma/seed-data/privacy.js';
 import termsSeed from '../prisma/seed-data/terms.js';
@@ -826,6 +831,32 @@ async function r7Email() {
   return rows;
 }
 
+/* ---------- Round 8 ---------- */
+
+async function r8Team() {
+  let rows = 0;
+  for (const m of teamMembers) {
+    const existing =
+      (await prisma.teamMember.findUnique({ where: { id: m.id } })) ?? (await prisma.teamMember.findFirst({ where: { name: m.name } }));
+    if (existing) {
+      const differs = (['name', 'role', 'bio', 'order', 'visible'] as const).filter((k) => existing[k] !== m[k]);
+      console.log(
+        differs.length
+          ? `  note: TeamMember ${existing.id} (${JSON.stringify(m.name)}) is already there; kept (differs in: ${differs.join(', ')})`
+          : `  TeamMember ${JSON.stringify(m.name)} is already there`,
+      );
+      continue;
+    }
+    const file = path.basename(m.photo);
+    await newImageUrl(file.replace(/-1x\.webp$/, '-2x.webp')); // the 2x file must sit next to the 1x one
+    const photo = await newImageUrl(file);
+    rows++;
+    console.log(`  TeamMember ${JSON.stringify(m.name)} (${m.role}, order ${m.order}): add, photo ${photo}`);
+    if (apply) await prisma.teamMember.create({ data: { ...m, photo } });
+  }
+  return rows;
+}
+
 const report = (n: number, what: string) => console.log(n ? `${n} ${what} ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
 
 const steps: Record<string, () => Promise<void>> = {
@@ -870,6 +901,10 @@ const steps: Record<string, () => Promise<void>> = {
   'r7-email': async () => {
     console.log(`Round 7: MAOUAJ email -> ${CONTACT_EMAIL}:`);
     report(await r7Email(), 'row(s)');
+  },
+  'r8-team': async () => {
+    console.log('Round 8: real team members (Uzair Bin Abdul Hameed, Ahmed):');
+    report(await r8Team(), 'row(s)');
   },
   'seed-ids': async () => {
     console.log('Seed services/posts -> fixed ids:');
