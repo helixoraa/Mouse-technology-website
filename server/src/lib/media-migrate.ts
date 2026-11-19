@@ -24,7 +24,7 @@ const TYPES: Record<string, string> = {
   '.jpeg': 'image/jpeg',
 };
 /** A relative /uploads/ path that is not already part of a longer URL or path. */
-const PATH_RE = /(?<![\w/.:%-])\/uploads\/[\w.%/-]+/g;
+const PATH_RE = /(?<![\w/.:%-])\/uploads\/[\w.%@/-]+/g;
 
 export interface MigrateOptions {
   dryRun?: boolean;

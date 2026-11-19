@@ -69,7 +69,7 @@ function rewriteSeedUrls(node: unknown): void {
     }
   }
 }
-const replaceSeedUrls = (str: string) => str.replace(/\/uploads\/seed\/[\w.-]+/g, (m) => seedUrlMap.get(m) ?? m);
+const replaceSeedUrls = (str: string) => str.replace(/\/uploads\/seed\/[\w.@-]+/g, (m) => seedUrlMap.get(m) ?? m);
 
 /** Production/blob mode: upload server/seed-media to Vercel Blob once; Media rows (filename "seed/<file>") make re-runs idempotent. */
 async function seedMediaToBlob(src: string) {

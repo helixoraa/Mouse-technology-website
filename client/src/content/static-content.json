@@ -961,7 +961,10 @@
           "key": "leadership",
           "order": 2,
           "content": {
-            "image": "/content-images/team-founder-v2-1x.webp",
+            "image": "/content-images/founder-full.webp",
+            "image2x": "/content-images/founder-full@2x.webp",
+            "imageWidth": 552,
+            "imageHeight": 690,
             "header": {
               "title": [
                 {
@@ -972,10 +975,11 @@
                   "accent": true
                 }
               ],
-              "subtitle": "The people leading MAOUAJ Technology",
-              "description": "Names, roles and brief professional biographies will be added here."
+              "subtitle": "The people leading MAOUAJ Technology"
             },
-            "imageAlt": "Portrait of the founder of MAOUAJ Technology",
+            "imageAlt": "Portrait of Saleh Ahmed, Founder and CEO",
+            "name": "Saleh Ahmed",
+            "title": "Founder and CEO",
             "paragraphs": [
               "Our work focuses on activities that people and businesses rely on every day: traveling, paying for services, transferring money and buying or selling goods.",
               "Our two main development projects are a cashless bus fare platform and a payment and money-transfer platform. We are also planning initiatives in ride-hailing and e-commerce. Our wider business interests include textiles and Hossain and Moallema, a wholesale spice and agricultural export business."
@@ -997,8 +1001,7 @@
                   "accent": true
                 }
               ],
-              "subtitle": "The people behind our products",
-              "description": "Names, roles and brief professional biographies will be added here."
+              "subtitle": "The people behind our products"
             },
             "nextLabel": "Next",
             "prevLabel": "Prev"

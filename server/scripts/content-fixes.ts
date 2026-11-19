@@ -79,11 +79,15 @@
  *    A member whose fixed id or exact name is already in the database is left as it is (a difference is listed).
  *    The hidden placeholder members are not touched.
  * --step=r9-founder-photo
- *  - Our Team page, "Our leadership": the stock photo seed/team-vision-card.webp, or the first founder photo
- *    seed/team-founder-1x.webp (local /uploads path or its Blob URL) -> the current founder photo
- *    seed/team-founder-v2-1x.webp (1x + 2x uploaded to Blob or copied into UPLOAD_DIR/seed), and its alt text ->
- *    "Portrait of the founder of MAOUAJ Technology". Only while the section still shows one of those two; an image
- *    set in the admin is kept. Nothing else in the section changes; old files are left in place.
+ *  - superseded by --step=r10-leadership (its cropped founder photo was replaced by the whole photo); does nothing.
+ * --step=r10-leadership
+ *  - Our Team page, "Our leadership": the stock photo or an earlier founder crop (seed/team-vision-card.webp,
+ *    seed/team-founder-1x.webp, seed/team-founder-v2-1x.webp; local /uploads path or Blob URL) -> the whole founder
+ *    photo seed/founder-full.webp + founder-full@2x.webp (uploaded to Blob or copied into UPLOAD_DIR/seed), shown
+ *    uncropped (imageWidth/imageHeight), with the name "Saleh Ahmed" and title "Founder and CEO" below it and the alt
+ *    text "Portrait of Saleh Ahmed, Founder and CEO". An image set in the admin is kept (listed).
+ *  - removes "Names, roles and brief professional biographies will be added here." wherever it appears (a header
+ *    description that is only that sentence is removed). Nothing else changes; old files are left in place.
  */
 import 'dotenv/config';
 import crypto from 'node:crypto';
@@ -863,36 +867,73 @@ async function r8Team() {
   return rows;
 }
 
-/* ---------- Round 9 ---------- */
+/* ---------- Round 10 ---------- */
 
-/** The images this step replaces: the stock photo and the first founder photo (Round 9, replaced by the v2 photo). */
-const STOCK_LEADER_IMAGE = /^(?:https:\/\/[^\s"'()]+\/|\/uploads\/)seed\/(?:team-vision-card|team-founder-1x)\.webp$/;
-const FOUNDER_IMAGE = 'team-founder-v2-1x.webp';
-const FOUNDER_ALT = 'Portrait of the founder of MAOUAJ Technology';
+/** The images --step=r10-leadership replaces: the stock photo and the earlier founder crops. */
+const OLD_LEADER_IMAGE = /^(?:https:\/\/[^\s"'()]+\/|\/uploads\/)seed\/(?:team-vision-card|team-founder-1x|team-founder-v2-1x)\.webp$/;
+const FOUNDER = {
+  image: 'founder-full.webp',
+  image2x: 'founder-full@2x.webp',
+  imageWidth: 552,
+  imageHeight: 690,
+  imageAlt: 'Portrait of Saleh Ahmed, Founder and CEO',
+  name: 'Saleh Ahmed',
+  title: 'Founder and CEO',
+};
+const TEAM_PLACEHOLDER_TEXT = 'Names, roles and brief professional biographies will be added here.';
+const TEAM_PLACEHOLDER = /\s*Names, roles and brief professional biographies will be added here\./g;
 
-async function r9FounderPhoto() {
-  let rows = 0;
-  for (const sec of await prisma.pageSection.findMany({ where: { page: 'team', key: 'leadership' } })) {
-    const content = isObject(sec.content) ? sec.content : {};
-    const image = typeof content.image === 'string' ? content.image : '';
-    if (!STOCK_LEADER_IMAGE.test(image)) {
-      console.log(
-        image.endsWith(`seed/${FOUNDER_IMAGE}`)
-          ? '  PageSection team/leadership already shows the founder photo'
-          : `  note: PageSection team/leadership image is ${JSON.stringify(image)} (not the stock or first founder photo); kept`,
-      );
-      continue;
+/** The placeholder sentence removed from every string; an object key left empty by that is dropped. */
+function withoutTeamPlaceholder(value: unknown): { value: unknown; changed: boolean } {
+  if (typeof value === 'string') {
+    // Only strings holding the sentence are touched (others keep their exact spacing, e.g. "Meet the ").
+    if (!value.includes(TEAM_PLACEHOLDER_TEXT)) return { value, changed: false };
+    return { value: value.replace(TEAM_PLACEHOLDER, '').trim(), changed: true };
+  }
+  if (Array.isArray(value)) {
+    const items = value.map(withoutTeamPlaceholder);
+    return items.some((r) => r.changed) ? { value: items.map((r) => r.value), changed: true } : { value, changed: false };
+  }
+  if (isObject(value)) {
+    let changed = false;
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      const r = withoutTeamPlaceholder(v);
+      changed ||= r.changed;
+      if (r.changed && r.value === '') continue;
+      out[k] = r.value;
     }
-    await newImageUrl(FOUNDER_IMAGE.replace(/-1x\.webp$/, '-2x.webp')); // the 2x file must sit next to the 1x one
-    const url = await newImageUrl(FOUNDER_IMAGE);
+    return changed ? { value: out, changed } : { value, changed: false };
+  }
+  return { value, changed: false };
+}
+
+async function r10Leadership() {
+  let rows = 0;
+  for (const sec of await prisma.pageSection.findMany({ orderBy: [{ page: 'asc' }, { order: 'asc' }] })) {
+    const where = `PageSection ${sec.page}/${sec.key}${sec.visible ? '' : ' (hidden)'}`;
+    const cleaned = withoutTeamPlaceholder(sec.content);
+    let content = (isObject(cleaned.value) ? cleaned.value : {}) as Record<string, unknown>;
+    const changes: string[] = [];
+    if (cleaned.changed) changes.push('removed "Names, roles and brief professional biographies will be added here."');
+    if (sec.page === 'team' && sec.key === 'leadership') {
+      const image = typeof content.image === 'string' ? content.image : '';
+      if (image.endsWith(`seed/${FOUNDER.image}`)) {
+        // already the whole founder photo
+      } else if (!OLD_LEADER_IMAGE.test(image)) {
+        console.log(`  note: ${where} image is ${JSON.stringify(image)} (set in the admin?); kept`);
+      } else {
+        const image2x = await newImageUrl(FOUNDER.image2x);
+        const url = await newImageUrl(FOUNDER.image);
+        content = { ...content, ...FOUNDER, image: url, image2x };
+        changes.push(`image ${JSON.stringify(image)} -> ${JSON.stringify(url)} (whole photo, 2x ${JSON.stringify(image2x)})`);
+        changes.push(`name/title -> "${FOUNDER.name}", "${FOUNDER.title}"; alt -> "${FOUNDER.imageAlt}"`);
+      }
+    }
+    if (!changes.length) continue;
     rows++;
-    console.log(`  PageSection team/leadership: image ${JSON.stringify(image)}\n    -> ${JSON.stringify(url)}`);
-    console.log(`    imageAlt ${JSON.stringify(content.imageAlt)} -> ${JSON.stringify(FOUNDER_ALT)}`);
-    if (apply)
-      await prisma.pageSection.update({
-        where: { id: sec.id },
-        data: { content: { ...content, image: url, imageAlt: FOUNDER_ALT } as Prisma.InputJsonValue },
-      });
+    console.log(`  ${where}:\n    ${changes.join('\n    ')}`);
+    if (apply) await prisma.pageSection.update({ where: { id: sec.id }, data: { content: content as Prisma.InputJsonValue } });
   }
   return rows;
 }
@@ -947,8 +988,11 @@ const steps: Record<string, () => Promise<void>> = {
     report(await r8Team(), 'row(s)');
   },
   'r9-founder-photo': async () => {
-    console.log('Round 9: founder photo in "Our leadership" (Our Team page):');
-    report(await r9FounderPhoto(), 'row(s)');
+    console.log('Round 9 (founder photo crop) is superseded by --step=r10-leadership; nothing to do here.');
+  },
+  'r10-leadership': async () => {
+    console.log('Round 10: "Our leadership" (whole founder photo, name and title) and the team placeholder sentence:');
+    report(await r10Leadership(), 'row(s)');
   },
   'seed-ids': async () => {
     console.log('Seed services/posts -> fixed ids:');

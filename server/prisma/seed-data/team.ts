@@ -27,11 +27,15 @@ const team: PageSeed = {
         header: {
           title: [{ text: 'Our ' }, { text: 'leadership', accent: true }],
           subtitle: 'The people leading MAOUAJ Technology',
-          description: 'Names, roles and brief professional biographies will be added here.',
         },
-        // The founder's photo (server/seed-media/team-founder-v2-1x.webp, with a -2x.webp next to it for the srcset).
-        image: '/uploads/seed/team-founder-v2-1x.webp',
-        imageAlt: 'Portrait of the founder of MAOUAJ Technology',
+        // The founder's whole photo (no crop), shown in its own shape with the name and title below it.
+        image: '/uploads/seed/founder-full.webp',
+        image2x: '/uploads/seed/founder-full@2x.webp',
+        imageWidth: 552,
+        imageHeight: 690,
+        imageAlt: 'Portrait of Saleh Ahmed, Founder and CEO',
+        name: 'Saleh Ahmed',
+        title: 'Founder and CEO',
         paragraphs: [
           'Our work focuses on activities that people and businesses rely on every day: traveling, paying for services, transferring money and buying or selling goods.',
           'Our two main development projects are a cashless bus fare platform and a payment and money-transfer platform. We are also planning initiatives in ride-hailing and e-commerce. Our wider business interests include textiles and Hossain and Moallema, a wholesale spice and agricultural export business.',
@@ -45,7 +49,6 @@ const team: PageSeed = {
         header: {
           title: [{ text: 'Meet our ' }, { text: 'team', accent: true }],
           subtitle: 'The people behind our products',
-          description: 'Names, roles and brief professional biographies will be added here.',
         },
         prevLabel: 'Prev',
         nextLabel: 'Next',
