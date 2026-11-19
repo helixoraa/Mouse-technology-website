@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "concurrently -n server,client -c blue,green \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build -w server && npm run build -w client",
+    "build:static": "VITE_STATIC_CONTENT=true npm run build -w client",
     "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
     "lint": "eslint . --max-warnings=0",
     "spell": "cspell --no-progress",

@@ -10,7 +10,9 @@ import {
   submittedTooFast,
   type LeadField,
 } from '@shared/validation';
-import { api, ApiError } from '@/lib/api';
+import { api, ApiError, useSite } from '@/lib/api';
+import { mailHref, officesOf, telHref } from '@/lib/contact';
+import { STATIC_CONTENT } from '@/lib/static-content';
 import { cn } from '@/lib/cn';
 import { Select } from '@/components/ui/Select';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -69,11 +71,75 @@ interface Props {
   showConsent?: boolean;
 }
 
+/** The form's card: white (Home), navy (Contact) or the Home frame's compact card. */
+const cardClass = (variant: Props['variant'], className?: string) =>
+  cn(
+    variant === 'compact' ? 'rounded-[30px] p-6 sm:p-[38px]' : 'rounded-xl4 p-6 md:p-12',
+    variant === 'dark'
+      ? 'border border-line-form bg-navy-form text-white shadow-card'
+      : variant === 'compact'
+        ? 'border border-mock-fieldLine bg-white shadow-policy'
+        : 'border border-line bg-white shadow-card',
+    className,
+  );
+
+/** The MAOUAJ email when the snapshot has none. */
+const FALLBACK_EMAIL = 'info@maouaj.com';
+
+/**
+ * Static version (VITE_STATIC_CONTENT=true): there is no API to send the form to, so the card shows how to reach us
+ * instead: the MAOUAJ email and each office's phone number, as mailto: / tel: links.
+ */
+function StaticContactBox({ content, className, variant = 'light' }: Props) {
+  const { data: site } = useSite();
+  const dark = variant === 'dark';
+  const email = site?.email?.trim() || FALLBACK_EMAIL;
+  const muted = dark ? 'text-text-muted' : 'text-ink-500';
+  const link = cn('font-semibold underline-offset-4 hover:underline', dark ? 'text-brand-sky' : 'text-brand');
+  return (
+    <div className={cn(cardClass(variant, className), 'flex flex-col gap-5')}>
+      <h3 className={cn('text-h-card font-extrabold', dark ? 'text-white' : 'text-ink')}>{content?.title || 'Contact us'}</h3>
+      <p className={cn('text-body-sm', muted)}>
+        Our online form is temporarily unavailable. Please email or call us and we will get back to you.
+      </p>
+      <dl className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <dt className={cn('text-xs font-semibold uppercase tracking-[0.08em]', muted)}>Email</dt>
+          <dd>
+            <a href={mailHref(email)} className={cn(link, 'text-[17px]')}>
+              {email}
+            </a>
+          </dd>
+        </div>
+        {officesOf(site).map((o) => (
+          <div key={o.name} className="flex flex-col gap-1">
+            <dt className={cn('text-xs font-semibold uppercase tracking-[0.08em]', muted)}>{o.name}</dt>
+            <dd>
+              {telHref(o.phone) ? (
+                <a href={telHref(o.phone)} className={cn(link, 'text-[17px]')}>
+                  {o.phone}
+                </a>
+              ) : (
+                <span className={dark ? 'text-white' : 'text-ink'}>{o.phone}</span>
+              )}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+/** Inquiry form, or in the static version the email/phone box (StaticContactBox). */
+export function ContactForm(props: Props) {
+  return STATIC_CONTENT ? <StaticContactBox {...props} /> : <LiveContactForm {...props} />;
+}
+
 /**
  * Inquiry form: validated with the same zod schema as the API (@shared/validation), POSTs to /api/leads, shows loading /
  * error / success states. Reusable (Home + Contact). Bot protection: a hidden honeypot input and the time since the form appeared.
  */
-export function ContactForm({ content, className, variant = 'light', showConsent = true }: Props) {
+function LiveContactForm({ content, className, variant = 'light', showConsent = true }: Props) {
   const f = content?.fields ?? {};
   const dark = variant === 'dark';
   const [errors, setErrors] = useState<Errors>({});
@@ -102,15 +168,7 @@ export function ContactForm({ content, className, variant = 'light', showConsent
     compact ? 'text-[12.5px] font-medium' : dark ? 'text-[13px] font-semibold leading-4' : 'text-xs font-semibold',
     dark ? 'text-mock-label' : compact ? 'text-mock-label2' : 'text-ink',
   );
-  const card = cn(
-    compact ? 'rounded-[30px] p-6 sm:p-[38px]' : dark ? 'rounded-xl4 p-6 md:p-12' : 'rounded-xl4 p-6 md:p-12',
-    dark
-      ? 'border border-line-form bg-navy-form text-white shadow-card'
-      : compact
-        ? 'border border-mock-fieldLine bg-white shadow-policy'
-        : 'border border-line bg-white shadow-card',
-    className,
-  );
+  const card = cardClass(variant, className);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();

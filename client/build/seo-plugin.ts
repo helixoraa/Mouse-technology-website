@@ -4,7 +4,7 @@ import type { Plugin } from 'vite';
 import type { OutputAsset } from 'rollup';
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SHARE_IMAGE, SITE_NAME } from '../src/lib/seo-defaults';
 import { PRIVATE_PATH_PREFIXES, PUBLIC_ROUTES } from '../src/lib/routes';
-import { applyPageMeta, loadPageMeta, type PageMetaResult } from './page-seo';
+import { applyPageMeta, loadPageMeta, loadSnapshotPageMeta, type PageMetaResult } from './page-seo';
 
 const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const escapeXml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -83,9 +83,10 @@ export function buildNoindexHtml(indexHtml: string): string {
  * - emits <page>/index.html for every public page with its own canonical URL and og:url (see buildPageHtml);
  * - writes each page's CMS title and description into its HTML (index.html for the home page), read once per build
  *   with a read-only query (see build/page-seo.ts); without the database it uses per-page fallbacks and warns;
+ *   (static version: from src/content/static-content.json instead);
  * - emits 404.html and admin/index.html (noindex shells) and checks that vercel.json / nginx.conf route exactly the public pages (see checkHostingRoutes).
  */
-export function seoPlugin(siteUrl: string, clientDir: string): Plugin {
+export function seoPlugin(siteUrl: string, clientDir: string, options: { staticContent?: boolean } = {}): Plugin {
   const tokens: Record<string, string> = {
     SITE_URL: siteUrl,
     PAGE_URL: `${siteUrl}/`,
@@ -108,10 +109,12 @@ export function seoPlugin(siteUrl: string, clientDir: string): Plugin {
     async buildStart() {
       checkHostingRoutes(clientDir);
       if (!isBuild) return; // dev server: <Seo> sets the titles in the browser
-      pageMeta = await loadPageMeta(process.env.DATABASE_URL);
+      pageMeta = options.staticContent
+        ? loadSnapshotPageMeta(path.resolve(clientDir, 'src/content/static-content.json'))
+        : await loadPageMeta(process.env.DATABASE_URL);
       if (pageMeta.warning) console.warn(`\n[maouaj-seo] WARNING: ${pageMeta.warning}.`);
       const rows = PUBLIC_ROUTES.map(({ path: p, page }) => `  ${p.padEnd(16)} ${pageMeta!.pages[page].title}`);
-      console.log(`[maouaj-seo] Page titles in the HTML (${pageMeta.source === 'cms' ? 'from the CMS' : 'fallback'}):\n${rows.join('\n')}`);
+      console.log(`[maouaj-seo] Page titles in the HTML (${{ cms: 'from the CMS', snapshot: 'from the static snapshot', fallback: 'fallback' }[pageMeta.source]}):\n${rows.join('\n')}`);
     },
     transformIndexHtml: {
       order: 'pre',

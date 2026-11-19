@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, FALLBACK_PAGE_TITLES } from '../src/lib/seo-defaults';
 import { PUBLIC_ROUTES, type PublicPage } from '../src/lib/routes';
 
@@ -11,7 +12,7 @@ import { PUBLIC_ROUTES, type PublicPage } from '../src/lib/routes';
  */
 
 export type PageMeta = { title: string; description: string };
-export type PageMetaResult = { source: 'cms' | 'fallback'; pages: Record<PublicPage, PageMeta>; warning?: string };
+export type PageMetaResult = { source: 'cms' | 'snapshot' | 'fallback'; pages: Record<PublicPage, PageMeta>; warning?: string };
 
 type SeoEntry = { title?: unknown; description?: unknown };
 type SeoJson = { default?: SeoEntry; pages?: Record<string, SeoEntry | undefined> };
@@ -96,6 +97,13 @@ export async function loadPageMeta(databaseUrl: string | undefined): Promise<Pag
       warning: `could not read page titles from the database (${reason.slice(0, 300)}), so they come from src/lib/seo-defaults.ts`,
     };
   }
+}
+
+/** Static version: the titles come from the snapshot's SiteSettings.seo (src/content/static-content.json), no database. */
+export function loadSnapshotPageMeta(snapshotFile: string): PageMetaResult {
+  const { seo } = JSON.parse(fs.readFileSync(snapshotFile, 'utf8')) as { seo?: unknown };
+  if (!seo) throw new Error(`${snapshotFile} has no "seo" entry`);
+  return { source: 'snapshot', pages: resolvePageMeta(seo) };
 }
 
 const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

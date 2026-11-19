@@ -149,6 +149,22 @@ docker compose up --build
   and never caches `index.html`.
 - Low on disk? `docker system prune -f` removes stopped containers, dangling images and unused networks (not volumes).
 
+## Static version (temporary, no database)
+
+Build with `VITE_STATIC_CONTENT=true` (or `npm run build:static`) to get a site that needs no API or database:
+
+- All content comes from `client/src/content/static-content.json`, a frozen copy of the public API responses
+  (site settings, page sections including the legal pages, services, team, FAQs, testimonials, blog posts and the
+  SEO titles). Its images are in `client/public/content-images/`.
+- The build-time page titles come from that file's `seo` entry instead of the database.
+- The contact forms are replaced by a box with the MAOUAJ email and the office phone numbers (mailto/tel links).
+- `/admin` shows "Admin is temporarily unavailable".
+
+Without the variable the site works exactly as before (the snapshot is not even bundled). The snapshot was made on a
+throwaway local Postgres: migrations, seed, the verified live backup imported, every `content-fixes.ts` step applied,
+then the public API responses saved and the images they use downloaded. To go back to the full version, deploy the
+normal build (variable unset) with its API and database.
+
 ## Deployment
 
 **Vercel (recommended): see [DEPLOY.md](DEPLOY.md).** One Vercel project serves the static client and the Express API as a serverless function at `/api` on the same domain,

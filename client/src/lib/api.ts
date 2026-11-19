@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import type { Faq, Json, PageData, Post, Service, SiteSettings, TeamMember, Testimonial } from './types';
+import { STATIC_CONTENT, staticResponse } from './static-content';
 
 const BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? '';
 
@@ -14,6 +15,7 @@ export class ApiError extends Error {
 }
 
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if (STATIC_CONTENT) return staticApi<T>(path, init);
   const isForm = init.body instanceof FormData;
   const res = await fetch(`${BASE}/api${path}`, {
     credentials: 'include',
@@ -27,10 +29,18 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   return data as T;
 }
 
+/** Static version: public GETs are answered from the snapshot; anything else (forms, admin) is unavailable. */
+async function staticApi<T>(path: string, init: RequestInit): Promise<T> {
+  if ((init.method ?? 'GET').toUpperCase() !== 'GET') throw new ApiError(503, 'This is temporarily unavailable.');
+  const data = await staticResponse(path);
+  if (data === undefined) throw new ApiError(404, 'Not found');
+  return data as T;
+}
+
 /** Resolve an uploaded/seeded media URL against the API origin. */
 export function mediaUrl(src?: string | null): string {
   if (!src) return '';
-  if (/^(https?:|data:|blob:)/.test(src) || src.startsWith('/animations/')) return src; // /animations/* ships with the client
+  if (/^(https?:|data:|blob:)/.test(src) || src.startsWith('/animations/') || src.startsWith('/content-images/')) return src; // ships with the client
   return `${BASE}${src}`;
 }
 
