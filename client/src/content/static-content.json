@@ -1,0 +1,2053 @@
+{
+  "generatedAt": "2026-11-19T19:11:11Z",
+  "source": "content-intake/backups/live-content-2026-11-16.json + server/scripts/content-fixes.ts (all steps) on a local database",
+  "site": {
+    "siteName": "MAOUAJ Technology",
+    "tagline": "Technology for the way people move, pay and trade.",
+    "logoUrl": null,
+    "email": "info@maouaj.com",
+    "phone": "+502-51850811",
+    "address": "3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala",
+    "offices": [
+      {
+        "name": "Grupo Maouaj S.A.",
+        "address": "3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala",
+        "phone": "+502-51850811"
+      },
+      {
+        "name": "Maouaj Technology Corporation",
+        "address": "The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA",
+        "phone": "+1 (716) 533-2271"
+      }
+    ],
+    "socials": {},
+    "nav": [
+      {
+        "href": "/our-products",
+        "label": "Products"
+      },
+      {
+        "href": "/our-projects",
+        "label": "Projects"
+      },
+      {
+        "href": "/our-vision",
+        "label": "Our Vision"
+      },
+      {
+        "href": "/about-us",
+        "label": "About Us"
+      },
+      {
+        "href": "/our-team",
+        "label": "Our Team"
+      },
+      {
+        "href": "/blog",
+        "label": "Blog & Updates"
+      },
+      {
+        "href": "/contact-us",
+        "label": "Contact Us"
+      }
+    ],
+    "footer": {
+      "columns": [
+        {
+          "links": [
+            {
+              "href": "/our-vision",
+              "label": "Our Vision"
+            },
+            {
+              "href": "/about-us",
+              "label": "About Us"
+            },
+            {
+              "href": "/our-team",
+              "label": "Our Team"
+            },
+            {
+              "href": "/our-projects",
+              "label": "Our Projects"
+            },
+            {
+              "href": "/blog",
+              "label": "Blog & Updates"
+            },
+            {
+              "href": "/contact-us",
+              "label": "Contact Us"
+            }
+          ],
+          "title": "COMPANY"
+        },
+        {
+          "links": [
+            {
+              "href": "/our-products",
+              "label": "Cashless Bus Fare Platform"
+            },
+            {
+              "href": "/our-products",
+              "label": "Payment / Money Transfer"
+            }
+          ],
+          "title": "PRODUCTS"
+        },
+        {
+          "links": [
+            {
+              "href": "/privacy-policy",
+              "label": "Privacy Policy"
+            },
+            {
+              "href": "/terms-of-use",
+              "label": "Terms of Use"
+            }
+          ],
+          "title": "LEGAL"
+        }
+      ],
+      "offices": [
+        {
+          "name": "Grupo Maouaj S.A.",
+          "phone": "+502-51850811",
+          "address": "3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala"
+        },
+        {
+          "name": "Maouaj Technology Corporation",
+          "phone": "+1 (716) 533-2271",
+          "address": "The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA"
+        }
+      ],
+      "tagline": "Technology for the way people move, pay and trade.",
+      "copyright": "© 2026 MAOUAJ Technology. All rights reserved."
+    },
+    "seo": {
+      "default": {
+        "title": "MAOUAJ Technology | For the way people move, pay and trade",
+        "ogImage": "",
+        "description": "Digital platforms for cashless bus fares and clearer money transfers, with ride-hailing and e-commerce planned next."
+      }
+    }
+  },
+  "seo": {
+    "pages": {
+      "blog": {
+        "title": "Blog & Updates | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Explore product explanations, project progress and company news from MAOUAJ Technology."
+      },
+      "home": {
+        "title": "MAOUAJ Technology | For the way people move, pay and trade",
+        "ogImage": "",
+        "description": "Digital platforms for cashless bus fares and clearer money transfers, with ride-hailing and e-commerce planned next."
+      },
+      "team": {
+        "title": "Our Team | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Meet the leadership and team shaping MAOUAJ Technology’s products and business portfolio."
+      },
+      "about": {
+        "title": "About Us | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "MAOUAJ Technology is building a portfolio of products across transportation, payments and commerce."
+      },
+      "terms": {
+        "title": "Terms of Use | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "A straightforward guide to using the MAOUAJ Technology website, its content and external links."
+      },
+      "vision": {
+        "title": "Our Vision | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Our ambition is to make transport, payments and commerce easier through practical technology."
+      },
+      "contact": {
+        "title": "Contact Us | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership."
+      },
+      "privacy": {
+        "title": "Privacy Policy | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Understand how information shared through the MAOUAJ Technology website is collected, used and handled."
+      },
+      "products": {
+        "title": "Our Products | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Two products in development for everyday transport and payments: the Cashless Bus Fare Platform and the Payment / Money Transfer Platform."
+      },
+      "projects": {
+        "title": "Our Projects | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Our current development priorities are cashless bus fares and digital payments, with ride-hailing and broader digital commerce planned."
+      }
+    },
+    "default": {
+      "title": "MAOUAJ Technology | For the way people move, pay and trade",
+      "ogImage": "",
+      "description": "Digital platforms for cashless bus fares and clearer money transfers, with ride-hailing and e-commerce planned next."
+    }
+  },
+  "pages": {
+    "home": {
+      "page": "home",
+      "seo": {
+        "title": "MAOUAJ Technology | For the way people move, pay and trade",
+        "ogImage": "",
+        "description": "Digital platforms for cashless bus fares and clearer money transfers, with ride-hailing and e-commerce planned next."
+      },
+      "sections": [
+        {
+          "id": "cmwnxcipr000cnhemrpt6n5he",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "card": {
+              "tap": "Tap to pay",
+              "brand": "MAOUAJ",
+              "label": "TRANSIT CARD"
+            },
+            "lead": "Digital platforms for cashless bus fares and clearer money transfers, with ride-hailing and e-commerce planned next.",
+            "phone": {
+              "rows": [
+                {
+                  "label": "Route tap",
+                  "status": "Accepted"
+                },
+                {
+                  "label": "Top-up",
+                  "status": "Added"
+                },
+                {
+                  "label": "Route tap",
+                  "status": "Accepted"
+                }
+              ],
+              "time": "9:41",
+              "title": "Transit",
+              "balance": "320.00",
+              "resultText": "Payment recorded",
+              "recentTitle": "Recent fares",
+              "resultTitle": "Fare accepted",
+              "balanceLabel": "Remaining balance"
+            },
+            "headline": [
+              {
+                "text": "Technology for the way people "
+              },
+              {
+                "text": "move, pay",
+                "accent": true
+              },
+              {
+                "text": " and trade"
+              }
+            ],
+            "transfer": {
+              "rows": [
+                {
+                  "label": "Recipient",
+                  "value": "Added"
+                },
+                {
+                  "label": "Fees & total",
+                  "value": "Shown before confirm"
+                }
+              ],
+              "steps": [
+                "Paid",
+                "Processing",
+                "Delivered"
+              ],
+              "title": "Transfer review",
+              "status": "Processing"
+            },
+            "primaryCta": {
+              "href": "/our-products",
+              "label": "Explore our products"
+            },
+            "floatingChip": "Tap → result in a moment",
+            "secondaryCta": {
+              "href": "/contact-us",
+              "label": "Contact Us"
+            }
+          }
+        },
+        {
+          "id": "cmwnxcipv000dnhemv4c6qw1g",
+          "key": "products",
+          "order": 2,
+          "content": {
+            "intro": "Two products are currently in development. Details on markets, payment methods and availability will be announced when confirmed.",
+            "items": [
+              {
+                "cta": {
+                  "href": "/our-products",
+                  "label": "Learn more"
+                },
+                "key": "bus",
+                "note": "The initial product uses supported transit cards. Participating services and top-up options will be announced when confirmed.",
+                "text": "Passengers add balance, tap a supported transit card on the bus reader and see a clear result. Operators review fare transactions and daily collection records.",
+                "title": "Cashless Bus Fare Platform",
+                "visual": {
+                  "cardBrand": "MAOUAJ",
+                  "cardLabel": "TRANSIT CARD",
+                  "readerHint": "Tap card here",
+                  "operatorText": "Daily collection records",
+                  "readerStatus": "Accepted",
+                  "operatorTitle": "Operator view"
+                },
+                "journey": [
+                  "Add balance",
+                  "Tap on the bus",
+                  "See the result",
+                  "Review history"
+                ],
+                "features": [
+                  "Transit cards linked to balances and history",
+                  "Fare results shown clearly at the reader",
+                  "Route, vehicle and collection records for operators"
+                ]
+              },
+              {
+                "cta": {
+                  "href": "/our-products",
+                  "label": "Learn more"
+                },
+                "key": "payment",
+                "note": "Supported markets, currencies, payment and delivery options, pricing and launch availability will be announced when confirmed.",
+                "text": "A clear and convenient way to send money. Enter the recipient and amount, review transaction details and applicable charges, then confirm and follow the status of every transfer.",
+                "title": "Payment & Money Transfer Platform",
+                "visual": {
+                  "rows": [
+                    {
+                      "label": "Recipient",
+                      "value": "Details added"
+                    },
+                    {
+                      "label": "Amount to send",
+                      "value": "Entered by sender"
+                    },
+                    {
+                      "label": "Applicable fees",
+                      "value": "Shown before confirming"
+                    },
+                    {
+                      "label": "Total to pay",
+                      "value": "Clear before you pay"
+                    },
+                    {
+                      "label": "Estimated delivery",
+                      "value": "Shown before confirming"
+                    }
+                  ],
+                  "confirm": "Confirm and pay",
+                  "panelTitle": "Review your transfer",
+                  "panelStatus": "Ready",
+                  "trackerSteps": [
+                    "Awaiting payment",
+                    "Processing",
+                    "Completed"
+                  ],
+                  "trackerTitle": "Transfer status"
+                },
+                "journey": [
+                  "Recipient",
+                  "Amount",
+                  "Review",
+                  "Confirm",
+                  "Track"
+                ],
+                "features": [
+                  "Transfer details reviewed before you confirm",
+                  "Status tracking and transaction history",
+                  "A reference to use when you need help"
+                ]
+              }
+            ],
+            "title": [
+              {
+                "text": "Our "
+              },
+              {
+                "text": "Products",
+                "accent": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "cmwnxciq0000enhem92wkj4f1",
+          "key": "busfare",
+          "order": 3,
+          "content": {
+            "lead": "Passengers tap a supported transit card; the system processes the fare and gives clear transaction information.",
+            "cards": [
+              {
+                "text": "Link a supported transit card, add balance and review your transaction history.",
+                "title": "Cards & balances"
+              },
+              {
+                "text": "Tap the card on a supported reader and get a clear result.",
+                "title": "Fare payments"
+              },
+              {
+                "text": "Manage routes and vehicles, review fares and daily revenue.",
+                "title": "Operator tools"
+              }
+            ],
+            "title": [
+              {
+                "text": "Cashless "
+              },
+              {
+                "text": "Bus Fare",
+                "accent": true
+              },
+              {
+                "text": " Platform"
+              }
+            ],
+            "animation": {
+              "alt": "Animation: a passenger taps a transit card, the fare is paid and the card balance updates",
+              "src": "/animations/bus-fare.svg",
+              "staticImage": "/animations/bus-fare-static.webp"
+            }
+          }
+        },
+        {
+          "id": "cmwnxciq4000fnhemftc71fva",
+          "key": "payment",
+          "order": 4,
+          "content": {
+            "lead": "A payment product that makes transfer steps, transaction information and progress easy to follow.",
+            "steps": [
+              {
+                "no": "01",
+                "label": "Choose a recipient"
+              },
+              {
+                "no": "02",
+                "label": "Enter the amount"
+              },
+              {
+                "no": "03",
+                "label": "Review details and charges"
+              },
+              {
+                "no": "04",
+                "label": "Confirm and follow its status"
+              }
+            ],
+            "title": [
+              {
+                "text": "Payment / "
+              },
+              {
+                "text": "Money Transfer",
+                "accent": true
+              }
+            ],
+            "animation": {
+              "alt": "Animation: money transfers delivered around the world on a dotted globe",
+              "src": "/animations/global-transfer.svg",
+              "staticImage": "/animations/global-transfer-static.webp"
+            }
+          }
+        },
+        {
+          "id": "cmwnxciq8000gnhem9tbzcl85",
+          "key": "focus",
+          "order": 5,
+          "content": {
+            "title": [
+              {
+                "text": "Our "
+              },
+              {
+                "text": "Focus",
+                "accent": true
+              }
+            ],
+            "pillars": [
+              {
+                "icon": "move",
+                "text": "Cashless fare payments that connect passengers, balances and operators.",
+                "word": "Move",
+                "title": "Transportation"
+              },
+              {
+                "icon": "pay",
+                "text": "A clearer way to send money, review details and follow progress.",
+                "word": "Pay",
+                "title": "Payments"
+              },
+              {
+                "icon": "trade",
+                "text": "Future e-commerce and an existing wholesale spice export business.",
+                "word": "Trade",
+                "title": "Commerce"
+              }
+            ],
+            "subtitle": "Practical technology for everyday movement, payments and trade.",
+            "description": "We focus on the activities people and businesses rely on every day: traveling, paying for services, transferring money and buying or selling goods."
+          }
+        },
+        {
+          "id": "cmwnxciqc000hnhemtq5lq0fe",
+          "key": "projects",
+          "order": 6,
+          "content": {
+            "lead": "New platforms we are planning and businesses we already run.",
+            "items": [
+              {
+                "icon": "ride",
+                "text": "A future service connecting riders and drivers.",
+                "title": "Ride-Hailing Platform",
+                "textWidth": 380
+              },
+              {
+                "icon": "ecommerce",
+                "text": "A future service connecting customers with products and sellers.",
+                "title": "E-commerce Platform",
+                "textWidth": 485
+              },
+              {
+                "icon": "textile",
+                "text": "Our textile offering and its place in the wider portfolio.",
+                "title": "Textile business",
+                "textWidth": 380
+              },
+              {
+                "icon": "retail",
+                "text": "Our existing wholesale spice and agricultural export business.",
+                "title": "hossainandmoallema.com",
+                "textWidth": 439
+              }
+            ],
+            "title": [
+              {
+                "text": "Our "
+              },
+              {
+                "text": "Portfolio",
+                "accent": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "cmwnxciqg000inhemypxklog8",
+          "key": "faq",
+          "order": 7,
+          "content": {
+            "lead": "Short answers about availability while both products are in development.",
+            "titleLines": [
+              {
+                "text": "Frequently",
+                "accent": true
+              },
+              {
+                "text": "asked questions",
+                "accent": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "cmwnxciqk000jnhem9ynt5osx",
+          "key": "blog",
+          "order": 8,
+          "content": {
+            "lead": "Product explanations, project progress and company news.",
+            "title": [
+              {
+                "text": "Blog & "
+              },
+              {
+                "text": "Updates",
+                "accent": true
+              }
+            ],
+            "linkHref": "/blog",
+            "linkLabel": "View all updates",
+            "postSlugs": [
+              "how-the-cashless-bus-fare-platform-will-work",
+              "an-introduction-to-the-payment-platform",
+              "an-introduction-to-the-payment-platform-2"
+            ]
+          }
+        },
+        {
+          "id": "cmwnxciqp000knhemeg602cmn",
+          "key": "cta",
+          "order": 9,
+          "content": {
+            "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
+            "lines": [
+              "Let’s talk about",
+              "what comes next."
+            ],
+            "eyebrow": "LET’S TALK",
+            "primary": {
+              "href": "/contact-us",
+              "label": "Contact us"
+            },
+            "secondary": {
+              "href": "/our-products",
+              "label": "Explore products"
+            }
+          }
+        },
+        {
+          "id": "cmwnxciqt000lnhemxp431tbk",
+          "key": "contact",
+          "order": 10,
+          "content": {
+            "form": {
+              "title": "Send us an inquiry",
+              "fields": {
+                "name": {
+                  "label": "Full name",
+                  "placeholder": "Your full name"
+                },
+                "email": {
+                  "label": "Email",
+                  "placeholder": "you@company.com"
+                },
+                "phone": {
+                  "label": "Phone (optional)",
+                  "placeholder": "Your phone number"
+                },
+                "message": {
+                  "label": "Message",
+                  "placeholder": "Tell us how we can help"
+                },
+                "interest": {
+                  "label": "Area of interest",
+                  "options": [
+                    "Cashless Bus Fare Platform",
+                    "Payment / Money Transfer Platform",
+                    "Ride-Hailing Platform",
+                    "E-commerce Platform",
+                    "Partnership",
+                    "Other"
+                  ],
+                  "placeholder": "Select an area"
+                },
+                "organisation": {
+                  "label": "Organization (optional)",
+                  "placeholder": "Company or agency"
+                }
+              },
+              "submit": "Send inquiry",
+              "consent": "I agree to the Privacy Policy and consent to MAOUAJ Technology contacting me.",
+              "successText": "Your inquiry has been sent. We will be in touch soon.",
+              "successTitle": "Thank you"
+            },
+            "lead": "Product questions, business inquiries or partnerships — tell us which area interests you and how we can help.",
+            "title": [
+              {
+                "text": "Contact",
+                "accent": true
+              },
+              {
+                "text": " Us"
+              }
+            ],
+            "details": [
+              {
+                "icon": "email",
+                "field": "email",
+                "label": "Email"
+              },
+              {
+                "icon": "phone",
+                "field": "phone",
+                "label": "Telephone"
+              },
+              {
+                "icon": "address",
+                "field": "address",
+                "label": "Address"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "vision": {
+      "page": "vision",
+      "seo": {
+        "title": "Our Vision | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Our ambition is to make transport, payments and commerce easier through practical technology."
+      },
+      "sections": [
+        {
+          "id": "cmwnxcisy0013nhemz93k9zsz",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "lead": "Our ambition is to make transport, payments and commerce easier through practical technology.",
+            "title": [
+              {
+                "text": "Making everyday movement, payments and commerce "
+              },
+              {
+                "text": "easier",
+                "accent": true
+              },
+              {
+                "text": "."
+              }
+            ],
+            "eyebrow": "Our Vision"
+          }
+        },
+        {
+          "id": "cmwnxcit30014nhemgotjrzmo",
+          "key": "vision-mission",
+          "order": 2,
+          "content": {
+            "vision": {
+              "text": "To make everyday movement, payments and commerce easier to access and simpler to use through practical digital technology.",
+              "label": "Our Vision"
+            },
+            "mission": {
+              "text": "To develop useful technology products that address everyday needs for people and businesses, beginning with cashless bus travel and digital money transfers.",
+              "label": "Our Mission"
+            }
+          }
+        },
+        {
+          "id": "cmwnxcit60015nhem88oal8ao",
+          "key": "pillars",
+          "order": 3,
+          "content": {
+            "items": [
+              {
+                "icon": "move",
+                "text": "Cashless fare payments that connect passengers, balances and operators.",
+                "word": "Move",
+                "title": "Transportation"
+              },
+              {
+                "icon": "pay",
+                "text": "A clearer way to send money, review details and follow progress.",
+                "word": "Pay",
+                "title": "Payments"
+              },
+              {
+                "icon": "trade",
+                "text": "Future e-commerce and an existing wholesale spice export business.",
+                "word": "Trade",
+                "title": "Commerce"
+              }
+            ],
+            "header": {
+              "title": [
+                {
+                  "text": "Move, "
+                },
+                {
+                  "text": "pay",
+                  "accent": true
+                },
+                {
+                  "text": " and trade"
+                }
+              ],
+              "subtitle": "Transport, payments and commerce",
+              "description": "Three everyday needs shape the products and business interests behind MAOUAJ Technology."
+            }
+          }
+        },
+        {
+          "id": "cmwnxcitb0016nhemw0pbs0fh",
+          "key": "roadmap",
+          "order": 4,
+          "content": {
+            "items": [
+              {
+                "text": "Transit-card fare payments, passenger balances, top-ups and operating records for bus services.",
+                "title": "Cashless Bus Fare Platform",
+                "number": "01",
+                "status": "In development"
+              },
+              {
+                "text": "A digital product intended to simplify sending money, reviewing transaction details and following transfer progress.",
+                "title": "Payment / Money Transfer Platform",
+                "number": "02",
+                "status": "In development"
+              },
+              {
+                "text": "A future service connecting riders and drivers.",
+                "title": "Ride-Hailing Platform",
+                "number": "03",
+                "status": "Planned"
+              },
+              {
+                "text": "A future digital commerce service connecting customers with products and sellers.",
+                "title": "E-commerce Platform",
+                "number": "04",
+                "status": "Planned"
+              }
+            ],
+            "header": {
+              "title": [
+                {
+                  "text": "From vision to "
+                },
+                {
+                  "text": "products",
+                  "accent": true
+                }
+              ],
+              "subtitle": "Where we begin, and what comes next",
+              "description": "We are beginning with cashless bus travel and digital money transfers, with ride-hailing and e-commerce planned next."
+            }
+          }
+        },
+        {
+          "id": "cmwnxcitf0017nhemw09mv6lr",
+          "key": "cta",
+          "order": 5,
+          "content": {
+            "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
+            "lines": [
+              "Let’s talk about",
+              "what comes next."
+            ],
+            "eyebrow": "LET’S TALK",
+            "primary": {
+              "href": "/contact-us",
+              "label": "Contact us"
+            },
+            "secondary": {
+              "href": "/our-products",
+              "label": "Explore products"
+            }
+          }
+        }
+      ]
+    },
+    "about": {
+      "page": "about",
+      "seo": {
+        "title": "About Us | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "MAOUAJ Technology is building a portfolio of products across transportation, payments and commerce."
+      },
+      "sections": [
+        {
+          "id": "cmwnxcio60001nhem31n3y5me",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "lead": "MAOUAJ Technology is building a portfolio of products across transportation, payments and commerce.",
+            "title": [
+              {
+                "text": "Technology for the activities people "
+              },
+              {
+                "text": "rely on every day.",
+                "accent": true
+              }
+            ],
+            "eyebrow": "About Us"
+          }
+        },
+        {
+          "id": "cmwnxcioi0002nhem1ioeo5n8",
+          "key": "who-we-are",
+          "order": 2,
+          "content": {
+            "body": "Our two main development projects are a cashless bus fare platform and a payment and money-transfer platform. We are also planning initiatives in ride-hailing and e-commerce. Our wider business interests include textiles and Hossain and Moallema, a wholesale spice and agricultural export business.",
+            "lead": "Our work focuses on activities that people and businesses rely on every day: traveling, paying for services, transferring money and buying or selling goods.",
+            "heading": [
+              {
+                "text": "Practical products for the things people do "
+              },
+              {
+                "text": "every day",
+                "accent": true
+              },
+              {
+                "text": "."
+              }
+            ]
+          }
+        },
+        {
+          "id": "cmwnxcion0003nhemo6vulf27",
+          "key": "areas",
+          "order": 3,
+          "content": {
+            "items": [
+              {
+                "text": "Transit-card fare payments, passenger balances, top-ups and operating records for bus services.",
+                "title": "Cashless Bus Fare Platform",
+                "number": "01",
+                "status": "In development"
+              },
+              {
+                "text": "A digital product intended to simplify sending money, reviewing transaction details and following transfer progress.",
+                "title": "Payment / Money Transfer Platform",
+                "number": "02",
+                "status": "In development"
+              },
+              {
+                "text": "A future service connecting riders and drivers.",
+                "title": "Ride-Hailing Platform",
+                "number": "03",
+                "status": "Planned"
+              },
+              {
+                "text": "A future digital commerce service connecting customers with products and sellers.",
+                "title": "E-commerce Platform",
+                "number": "04",
+                "status": "Planned"
+              },
+              {
+                "text": "An existing business within the wider MAOUAJ Technology portfolio.",
+                "title": "Textile business",
+                "number": "05",
+                "status": "Existing business"
+              },
+              {
+                "text": "An existing wholesale spice and agricultural export business.",
+                "title": "hossainandmoallema.com",
+                "number": "06",
+                "status": "Existing business"
+              }
+            ],
+            "header": {
+              "title": [
+                {
+                  "text": "Areas we "
+                },
+                {
+                  "text": "work in",
+                  "accent": true
+                }
+              ],
+              "subtitle": "Products, projects and business interests",
+              "description": "Two products in development, two planned initiatives and two existing businesses."
+            }
+          }
+        },
+        {
+          "id": "cmwnxcior0004nhemey242s97",
+          "key": "purpose",
+          "order": 4,
+          "content": {
+            "tags": [
+              "Traveling",
+              "Paying for services",
+              "Transferring money",
+              "Buying and selling goods"
+            ],
+            "title": "Useful technology for everyday needs, for people and businesses.",
+            "eyebrow": "The purpose behind our products"
+          }
+        }
+      ]
+    },
+    "team": {
+      "page": "team",
+      "seo": {
+        "title": "Our Team | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Meet the leadership and team shaping MAOUAJ Technology’s products and business portfolio."
+      },
+      "sections": [
+        {
+          "id": "cmwnxcise000ynhem246wuz6y",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "lead": "The leadership and team shaping our products and business portfolio, introduced through their names, roles and short biographies.",
+            "title": [
+              {
+                "text": "Meet the "
+              },
+              {
+                "text": "people",
+                "accent": true
+              },
+              {
+                "text": " behind MAOUAJ Technology."
+              }
+            ],
+            "eyebrow": "Our Team"
+          }
+        },
+        {
+          "id": "cmwnxcisi000znhem7ax9gw2p",
+          "key": "leadership",
+          "order": 2,
+          "content": {
+            "image": "/content-images/team-vision-card.webp",
+            "header": {
+              "title": [
+                {
+                  "text": "Our "
+                },
+                {
+                  "text": "leadership",
+                  "accent": true
+                }
+              ],
+              "subtitle": "The people leading MAOUAJ Technology",
+              "description": "Names, roles and brief professional biographies will be added here."
+            },
+            "imageAlt": "Business leader in a navy suit with arms crossed against a concrete wall",
+            "paragraphs": [
+              "Our work focuses on activities that people and businesses rely on every day: traveling, paying for services, transferring money and buying or selling goods.",
+              "Our two main development projects are a cashless bus fare platform and a payment and money-transfer platform. We are also planning initiatives in ride-hailing and e-commerce. Our wider business interests include textiles and Hossain and Moallema, a wholesale spice and agricultural export business."
+            ]
+          }
+        },
+        {
+          "id": "cmwnxcism0010nhemqjgq4yr4",
+          "key": "team-carousel",
+          "order": 3,
+          "content": {
+            "header": {
+              "title": [
+                {
+                  "text": "Meet our "
+                },
+                {
+                  "text": "team",
+                  "accent": true
+                }
+              ],
+              "subtitle": "The people behind our products",
+              "description": "Names, roles and brief professional biographies will be added here."
+            },
+            "nextLabel": "Next",
+            "prevLabel": "Prev"
+          }
+        }
+      ]
+    },
+    "contact": {
+      "page": "contact",
+      "seo": {
+        "title": "Contact Us | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership."
+      },
+      "sections": [
+        {
+          "id": "cmwnxcipa0008nhemgxx9dxwr",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "lead": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
+            "title": [
+              {
+                "text": "Let’s talk about our products and "
+              },
+              {
+                "text": "what comes next.",
+                "accent": true
+              }
+            ],
+            "eyebrow": "CONTACT US"
+          }
+        },
+        {
+          "id": "cmwnxcipe0009nhemrrjxrvid",
+          "key": "topics",
+          "order": 2,
+          "content": {
+            "items": [
+              {
+                "text": "Ask about the cashless bus fare platform or the payment and money-transfer platform.",
+                "title": "Product questions",
+                "number": "01"
+              },
+              {
+                "text": "Talk to us about our projects, planned initiatives and wider business interests.",
+                "title": "Business inquiries",
+                "number": "02"
+              },
+              {
+                "text": "Tell us how you would like to work with MAOUAJ Technology.",
+                "title": "Partnerships",
+                "number": "03"
+              }
+            ]
+          }
+        },
+        {
+          "id": "cmwnxcipj000anhemwbsxl98i",
+          "key": "details",
+          "order": 3,
+          "content": {
+            "title": "Reach MAOUAJ Technology directly.",
+            "eyebrow": "BUSINESS DETAILS",
+            "emailLabel": "EMAIL",
+            "phoneLabel": "TELEPHONE",
+            "addressLabel": "OTHER DETAILS"
+          }
+        },
+        {
+          "id": "cmwnxcipn000bnhem08xd7bpz",
+          "key": "form",
+          "order": 4,
+          "content": {
+            "title": "Send us an inquiry",
+            "fields": {
+              "name": {
+                "label": "Name",
+                "placeholder": "Your name"
+              },
+              "email": {
+                "label": "Email",
+                "placeholder": "you@example.com"
+              },
+              "phone": {
+                "label": "Phone (optional)",
+                "placeholder": "Your phone number"
+              },
+              "message": {
+                "label": "Message",
+                "placeholder": "Tell us how we can help"
+              },
+              "interest": {
+                "label": "Area of interest",
+                "options": [
+                  "Product questions",
+                  "Business inquiries",
+                  "Partnerships"
+                ],
+                "placeholder": "Select an area"
+              },
+              "organisation": {
+                "label": "Organization (optional)",
+                "placeholder": "Company or organization"
+              }
+            },
+            "submit": "Send inquiry",
+            "successText": "Your inquiry has been sent. We will be in touch soon.",
+            "successTitle": "Thank you"
+          }
+        }
+      ]
+    },
+    "products": {
+      "page": "products",
+      "seo": {
+        "title": "Our Products | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Two products in development for everyday transport and payments: the Cashless Bus Fare Platform and the Payment / Money Transfer Platform."
+      },
+      "sections": [
+        {
+          "id": "cmwnxcir7000onhem61mwjra4",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "lead": "Two products in development for everyday transport and payments, with more technology products planned.",
+            "title": [
+              {
+                "text": "What our "
+              },
+              {
+                "text": "products",
+                "accent": true
+              },
+              {
+                "text": " "
+              },
+              {
+                "text": "do",
+                "accent": true
+              },
+              {
+                "text": "."
+              }
+            ],
+            "eyebrow": "OUR PRODUCTS"
+          }
+        },
+        {
+          "id": "cmwnxcirb000pnhemyieo8zxi",
+          "key": "busFare",
+          "order": 2,
+          "content": {
+            "tone": "soft",
+            "items": [
+              {
+                "text": "Register or link a supported transit card and keep its balance and transaction records.",
+                "title": "Passenger cards and balances"
+              },
+              {
+                "text": "Process the agreed fare when a card is presented to a supported reader, with a clear payment outcome.",
+                "title": "Fare payments"
+              },
+              {
+                "text": "Add balance through the supported top-up process.",
+                "title": "Balance top-ups"
+              },
+              {
+                "text": "Secure access to your own balance and transaction history.",
+                "title": "Passenger information"
+              },
+              {
+                "text": "Manage route and vehicle information, review fare transactions and check daily revenue and reconciliation records.",
+                "title": "Operator tools"
+              }
+            ],
+            "steps": [
+              "Add balance",
+              "Tap the supported transit card on the bus",
+              "Receive the transaction result",
+              "Review balance and history"
+            ],
+            "title": [
+              {
+                "text": "Cashless "
+              },
+              {
+                "text": "Bus Fare",
+                "accent": true
+              },
+              {
+                "text": " Platform"
+              }
+            ],
+            "status": "In development",
+            "subtitle": "A simpler way to pay for the bus.",
+            "animation": {
+              "alt": "Transit card tapped on a phone reader showing a 2.75 fare paid, alongside the card balance and recent trips",
+              "src": "/animations/bus-fare.svg",
+              "staticImage": "/animations/bus-fare-static.webp"
+            },
+            "listTitle": "WHAT WE ARE GOING TO DEVELOP",
+            "imageWidth": 752,
+            "description": "Passengers pay their bus fare with a supported transit card. The system connects the card with a balance record, processes the fare when the passenger taps, and provides transaction information for passengers and bus operators.",
+            "imageHeight": 426,
+            "journeyTitle": "PASSENGER JOURNEY"
+          }
+        },
+        {
+          "id": "cmwnxcirg000qnhemnt28zlph",
+          "key": "payment",
+          "order": 3,
+          "content": {
+            "tone": "white",
+            "items": [
+              {
+                "text": "Sign up and manage your details.",
+                "title": "User accounts"
+              },
+              {
+                "text": "Add who the money is going to.",
+                "title": "Recipient details"
+              },
+              {
+                "text": "Enter how much you want to send.",
+                "title": "Transfer amount entry"
+              },
+              {
+                "text": "See the transaction details and applicable charges before you confirm.",
+                "title": "Review of details and charges"
+              },
+              {
+                "text": "Confirm the transfer, follow its status and revisit past transactions.",
+                "title": "Confirmation, status and history"
+              }
+            ],
+            "steps": [
+              "Choose a recipient",
+              "Enter the amount",
+              "Review the transaction details",
+              "Confirm the transfer",
+              "Follow its status"
+            ],
+            "title": [
+              {
+                "text": "Payment / "
+              },
+              {
+                "text": "Money Transfer",
+                "accent": true
+              },
+              {
+                "text": " Platform"
+              }
+            ],
+            "status": "In development",
+            "subtitle": "A clear and convenient way to send money.",
+            "animation": {
+              "alt": "Animation: money transfers delivered on a dotted globe, each shown with its amount and a delivered status",
+              "src": "/animations/global-transfer.svg",
+              "staticImage": "/animations/global-transfer-static.webp"
+            },
+            "listTitle": "PLANNED CAPABILITIES",
+            "imageWidth": 752,
+            "description": "A digital payment and money-transfer product that helps users send money through a straightforward process, with the transfer steps, transaction information and progress easy to understand.",
+            "imageHeight": 627,
+            "journeyTitle": "INTENDED USER JOURNEY"
+          }
+        },
+        {
+          "id": "cmwnxcirk000rnhemd8cckaql",
+          "key": "planned",
+          "order": 4,
+          "content": {
+            "items": [
+              {
+                "text": "A future service connecting riders and drivers.",
+                "title": "Ride-Hailing Platform",
+                "status": "Planned"
+              },
+              {
+                "text": "A future digital commerce service connecting customers with products and sellers.",
+                "title": "E-commerce Platform",
+                "status": "Planned"
+              }
+            ],
+            "title": [
+              {
+                "text": "More technology "
+              },
+              {
+                "text": "to come",
+                "accent": true
+              }
+            ],
+            "subtitle": "Planned technology products",
+            "description": "Beyond our two main platforms, we are planning ride-hailing and e-commerce services."
+          }
+        },
+        {
+          "id": "cmwnxcirp000snhemol08ow93",
+          "key": "cta",
+          "order": 5,
+          "content": {
+            "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
+            "lines": [
+              "Let’s talk about",
+              "what comes next."
+            ],
+            "eyebrow": "LET’S TALK",
+            "primary": {
+              "href": "/contact-us",
+              "label": "Contact us"
+            },
+            "secondary": {
+              "href": "/our-products",
+              "label": "Explore products"
+            }
+          }
+        }
+      ]
+    },
+    "projects": {
+      "page": "projects",
+      "seo": {
+        "title": "Our Projects | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Our current development priorities are cashless bus fares and digital payments, with ride-hailing and broader digital commerce planned."
+      },
+      "sections": [
+        {
+          "id": "cmwnxcirt000tnhemvn6ewyf0",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "lead": "Our current development priorities are cashless bus fares and digital payments. Our future plans extend into ride-hailing and broader digital commerce.",
+            "title": [
+              {
+                "text": "Technology projects and "
+              },
+              {
+                "text": "business interests.",
+                "accent": true
+              }
+            ],
+            "eyebrow": "Our Projects"
+          }
+        },
+        {
+          "id": "cmwnxcirx000unhemh5m437h4",
+          "key": "main",
+          "order": 2,
+          "content": {
+            "header": {
+              "title": [
+                {
+                  "text": "Main "
+                },
+                {
+                  "text": "development",
+                  "accent": true
+                },
+                {
+                  "text": " projects"
+                }
+              ],
+              "subtitle": "Two products in development",
+              "description": "The cashless bus fare and payment platforms are our current development priorities."
+            }
+          }
+        },
+        {
+          "id": "cmwnxcis2000vnhemk8zxt8oa",
+          "key": "planned",
+          "order": 3,
+          "content": {
+            "header": {
+              "title": [
+                {
+                  "text": "Planned",
+                  "accent": true
+                },
+                {
+                  "text": " initiatives"
+                }
+              ],
+              "subtitle": "Future ride-hailing and e-commerce",
+              "description": "Future initiatives, each developed around its own distinctive service proposition."
+            }
+          }
+        },
+        {
+          "id": "cmwnxcis6000wnhemeqz4g6dk",
+          "key": "existing",
+          "order": 4,
+          "content": {
+            "header": {
+              "title": [
+                {
+                  "text": "Existing "
+                },
+                {
+                  "text": "businesses",
+                  "accent": true
+                }
+              ],
+              "subtitle": "Our wider business portfolio",
+              "description": "Established businesses that sit alongside our technology projects."
+            }
+          }
+        },
+        {
+          "id": "cmwnxcisa000xnhemstaev1wa",
+          "key": "cta",
+          "order": 5,
+          "content": {
+            "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
+            "lines": [
+              "Let’s talk about",
+              "what comes next."
+            ],
+            "eyebrow": "LET’S TALK",
+            "primary": {
+              "href": "/contact-us",
+              "label": "Contact us"
+            },
+            "secondary": {
+              "href": "/our-products",
+              "label": "Explore products"
+            }
+          }
+        }
+      ]
+    },
+    "blog": {
+      "page": "blog",
+      "seo": {
+        "title": "Blog & Updates | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Explore product explanations, project progress and company news from MAOUAJ Technology."
+      },
+      "sections": [
+        {
+          "id": "cmwnxciow0005nhemw1anlugp",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "lead": "Explore product explanations, project progress and company news from MAOUAJ Technology.",
+            "title": [
+              {
+                "text": "Recent updates and\n"
+              },
+              {
+                "text": "project news.",
+                "accent": true
+              }
+            ],
+            "eyebrow": "Blog & Updates"
+          }
+        },
+        {
+          "id": "cmwnxcioz0006nhemloof8c5w",
+          "key": "articles",
+          "order": 2,
+          "content": {
+            "filters": [
+              "All",
+              "Product explainers",
+              "Project updates",
+              "Company news"
+            ],
+            "pageSize": 3,
+            "emptyText": "New explainers and updates will appear here as our projects progress.",
+            "nextLabel": "Next",
+            "prevLabel": "Prev",
+            "readLabel": "Read article",
+            "emptyTitle": "More articles soon"
+          }
+        },
+        {
+          "id": "cmwnxcip40007nhemnb7qpv1j",
+          "key": "cta",
+          "order": 3,
+          "content": {
+            "text": "Contact MAOUAJ Technology to discuss a product, a business inquiry or a potential partnership.",
+            "lines": [
+              "Let’s talk about",
+              "what comes next."
+            ],
+            "eyebrow": "LET’S TALK",
+            "primary": {
+              "href": "/contact-us",
+              "label": "Contact us"
+            },
+            "secondary": {
+              "href": "/our-products",
+              "label": "Explore products"
+            }
+          }
+        }
+      ]
+    },
+    "terms": {
+      "page": "terms",
+      "seo": {
+        "title": "Terms of Use | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "A straightforward guide to using the MAOUAJ Technology website, its content and external links."
+      },
+      "sections": [
+        {
+          "id": "cmwnxcisp0011nhemxs72hm8y",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "lead": "A straightforward guide to using the MAOUAJ Technology website, its content and external links.",
+            "title": [
+              {
+                "text": "A clearer way\nto understand our "
+              },
+              {
+                "text": "terms",
+                "accent": true
+              },
+              {
+                "text": "."
+              }
+            ],
+            "eyebrow": "MAOUAJ  /  TERMS OF USE"
+          }
+        },
+        {
+          "id": "cmwnxcisu0012nhemzr0xgapc",
+          "key": "policy",
+          "order": 2,
+          "content": {
+            "intro": [
+              "**Effective date:** 16 November 2026",
+              "These Terms of Use (\"Terms\") govern your use of the MAOUAJ Technology website (the \"website\"). By using the website, you agree to these Terms. If you do not agree, please do not use the website."
+            ],
+            "title": "Terms of Use",
+            "articles": [
+              {
+                "title": "About this website",
+                "number": "01",
+                "paragraphs": [
+                  "The website is operated by MAOUAJ Technology, meaning Grupo Maouaj S.A. (Guatemala) and Maouaj Technology Corporation (USA) (\"MAOUAJ Technology\", \"we\", \"us\" or \"our\"). It provides general information about our company, our technology products and projects, and the business interests connected with us.",
+                  "The website is for information only. Nothing on it is an offer to sell, a contract, or financial, legal or professional advice."
+                ]
+              },
+              {
+                "title": "Products in development",
+                "number": "02",
+                "paragraphs": [
+                  "Several products described on the website, including the Cashless Bus Fare Platform and the Payment / Money Transfer Platform, are **in development**. Others, such as the Ride-Hailing Platform and the E-commerce Platform, are **planned**.",
+                  "Descriptions of these products explain what we intend to build. They are not promises that a product will be released, released on a particular date, available in a particular country, or include any particular feature, payment method or price. Product scope, availability and service terms may change, and they will be published separately when a product launches."
+                ]
+              },
+              {
+                "title": "Ownership of content",
+                "number": "03",
+                "paragraphs": [
+                  "All content on the website, including text, graphics, logos, images, designs and the arrangement of that content, belongs to MAOUAJ Technology or is used with permission, and is protected by intellectual property laws.",
+                  "You may view the website and print or save pages for your own personal, non-commercial reference. You may not copy, reproduce, modify, distribute, publish or use any content for commercial purposes without our prior written permission.",
+                  "Names and logos of MAOUAJ Technology and connected businesses are trademarks or trade names of their owners. Nothing on the website gives you a right to use them."
+                ]
+              },
+              {
+                "title": "Acceptable use",
+                "number": "04",
+                "paragraphs": [
+                  "When using the website, you agree not to:",
+                  "- use it in any way that breaks applicable law\n- send false, misleading, offensive or unlawful information through our contact form\n- send spam, advertising or unsolicited bulk messages\n- attempt to gain unauthorized access to the website, its servers or any connected system\n- introduce viruses, malware or other harmful code\n- disrupt or overload the website, or use automated tools to scrape or copy it at scale",
+                  "We may restrict access to the website for anyone who breaks these rules."
+                ]
+              },
+              {
+                "title": "Inquiries you send us",
+                "number": "05",
+                "paragraphs": [
+                  "When you contact us, you confirm that the information you send is accurate and that you are entitled to share it. Please do not send confidential information through the contact form. Sending an inquiry does not create a business relationship or any obligation on either side.",
+                  "How we handle the personal information in your inquiry is explained in our [Privacy Policy](/privacy-policy)."
+                ]
+              },
+              {
+                "title": "External links",
+                "number": "06",
+                "paragraphs": [
+                  "The website contains links to external websites, including websites of businesses connected with MAOUAJ Technology. These links are provided for convenience. We do not control those websites and are not responsible for their content, availability, products or privacy practices. Visiting them is at your own risk and subject to their own terms."
+                ]
+              },
+              {
+                "title": "Accuracy and availability",
+                "number": "07",
+                "paragraphs": [
+                  "We work to keep the website accurate and up to date, but we do not guarantee that all information is complete, current or free of errors. The website is provided \"as is\" and \"as available\". We may change, suspend or remove any part of it at any time without notice."
+                ]
+              },
+              {
+                "title": "Limitation of liability",
+                "number": "08",
+                "paragraphs": [
+                  "To the fullest extent permitted by law, MAOUAJ Technology is not liable for any indirect, incidental or consequential loss, or for any loss of data, profit or business, arising from your use of, or inability to use, the website or any linked website. Nothing in these Terms excludes or limits liability that cannot be excluded or limited by law."
+                ]
+              },
+              {
+                "title": "Changes to these Terms",
+                "number": "09",
+                "paragraphs": [
+                  "We may update these Terms from time to time. The updated version will be posted on this page with a new effective date. Continuing to use the website after a change means you accept the updated Terms."
+                ]
+              },
+              {
+                "title": "Governing law",
+                "number": "10",
+                "paragraphs": [
+                  "These Terms are governed by the laws of the country of the MAOUAJ Technology company you deal with (Guatemala for Grupo Maouaj S.A., the State of New York, USA for Maouaj Technology Corporation), without regard to conflict-of-law rules. Any dispute will be handled by the courts of that country, unless the law of your country of residence gives you the right to bring a claim locally."
+                ]
+              },
+              {
+                "title": "Contact us",
+                "number": "11",
+                "paragraphs": [
+                  "For questions about these Terms, contact us:",
+                  "- **Email:** info@maouaj.com\n- **Guatemala:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala. Phone: +502-51850811\n- **USA:** Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA. Phone: +1 (716) 533-2271"
+                ]
+              }
+            ],
+            "sidebarTitle": "ON THIS PAGE"
+          }
+        }
+      ]
+    },
+    "privacy": {
+      "page": "privacy",
+      "seo": {
+        "title": "Privacy Policy | MAOUAJ Technology",
+        "ogImage": "",
+        "description": "Understand how information shared through the MAOUAJ Technology website is collected, used and handled."
+      },
+      "sections": [
+        {
+          "id": "cmwnxciqy000mnhemx16x37yk",
+          "key": "hero",
+          "order": 1,
+          "content": {
+            "lead": "Understand how information shared through the MAOUAJ Technology website is collected, used and handled.",
+            "title": [
+              {
+                "text": "Your "
+              },
+              {
+                "text": "privacy,",
+                "accent": true
+              },
+              {
+                "text": "\nour responsibility."
+              }
+            ],
+            "eyebrow": "MAOUAJ  /  PRIVACY POLICY"
+          }
+        },
+        {
+          "id": "cmwnxcir2000nnhemi5v8pe9z",
+          "key": "policy",
+          "order": 2,
+          "content": {
+            "intro": [
+              "**Effective date:** 16 November 2026",
+              "This Privacy Policy explains how MAOUAJ Technology, meaning Grupo Maouaj S.A. (Guatemala) and Maouaj Technology Corporation (USA) (\"MAOUAJ Technology\", \"we\", \"us\" or \"our\") collects, uses, shares and protects information when you visit our website or contact us through it.",
+              "This website is a corporate information website. It does not offer user accounts, online purchases or payments."
+            ],
+            "heading": "Privacy Policy",
+            "articles": [
+              {
+                "title": "Information we collect",
+                "number": "01",
+                "paragraphs": [
+                  "**Information you give us.** When you send an inquiry through our contact form, we collect:",
+                  "- your name\n- your email address\n- the area you are interested in (for example, a product, a business inquiry or a partnership)\n- your phone number and organization, if you choose to give them (optional)\n- the message you write",
+                  "If you email or call us directly, we receive the information you choose to share in that email or call.",
+                  "**Information collected automatically.** When you visit the website, our hosting and infrastructure providers automatically record standard technical information, such as your IP address, browser type, device type, the pages you visit, the date and time of your visit and the referring website. This information is used to deliver the website, keep it secure and fix problems.",
+                  "**Cookies.** The website uses only cookies and similar technologies that are necessary for it to work and stay secure. We do not use advertising or tracking cookies. If we introduce analytics or other non-essential cookies in the future, we will update this policy and, where required, ask for your consent first."
+                ]
+              },
+              {
+                "title": "How we use your information",
+                "number": "02",
+                "paragraphs": [
+                  "We use the information described above to:",
+                  "- respond to your inquiry and continue the conversation you started\n- consider business inquiries and partnership proposals\n- operate, maintain, secure and improve the website\n- detect and prevent spam, abuse and security incidents\n- comply with legal obligations and protect our legal rights",
+                  "We do not sell your personal information, and we do not use it for automated decision-making."
+                ]
+              },
+              {
+                "title": "Legal bases for processing",
+                "number": "03",
+                "paragraphs": [
+                  "Where data protection laws require a legal basis, we rely on:",
+                  "- **your consent**, when you choose to send us an inquiry\n- **our legitimate interests** in responding to inquiries, running and securing our website, and developing our business\n- **legal obligations**, where we must keep or disclose information by law"
+                ]
+              },
+              {
+                "title": "Who we share information with",
+                "number": "04",
+                "paragraphs": [
+                  "We share personal information only with service providers that help us run the website and handle inquiries, such as website hosting, database, file storage and email providers. They may process information only on our instructions and must protect it.",
+                  "We may also disclose information if required by law, to protect our rights or the safety of others, or as part of a merger, acquisition or sale of all or part of our business."
+                ]
+              },
+              {
+                "title": "International transfers",
+                "number": "05",
+                "paragraphs": [
+                  "We have offices in more than one country, and our service providers may store or process information in other countries, including the United States. Where we transfer personal information internationally, we take reasonable steps to make sure it remains protected in line with this policy and applicable law."
+                ]
+              },
+              {
+                "title": "How long we keep information",
+                "number": "06",
+                "paragraphs": [
+                  "We keep inquiry information for as long as needed to respond to you and follow up, and in any case no longer than 24 months after our last contact, unless we need to keep it longer for legal reasons or an ongoing business relationship. Technical logs are kept for the limited periods set by our hosting providers."
+                ]
+              },
+              {
+                "title": "How we protect information",
+                "number": "07",
+                "paragraphs": [
+                  "We use reasonable technical and organizational measures to protect personal information, including encrypted connections (HTTPS) and restricted access to inquiry data. No method of transmission or storage is completely secure, so we cannot guarantee absolute security."
+                ]
+              },
+              {
+                "title": "Your rights and choices",
+                "number": "08",
+                "paragraphs": [
+                  "Depending on where you live, you may have the right to:",
+                  "- ask what personal information we hold about you and request a copy\n- ask us to correct inaccurate information\n- ask us to delete your information\n- object to or ask us to restrict certain processing\n- withdraw your consent at any time, where we rely on consent\n- complain to your local data protection authority\n- confirm that we do not sell or share your personal information for cross-context behavioral advertising, as described under US state privacy laws such as those of California and New York",
+                  "To make a request, contact us using the details below. We may need to verify your identity before acting on it. We will not treat you differently for exercising your rights."
+                ]
+              },
+              {
+                "title": "Children",
+                "number": "09",
+                "paragraphs": [
+                  "This website is not directed at children under 13 (or under 16 in certain jurisdictions, such as the European Economic Area), and we do not knowingly collect personal information from them. If you believe a child has sent us information, please contact us and we will delete it."
+                ]
+              },
+              {
+                "title": "Links to other websites",
+                "number": "10",
+                "paragraphs": [
+                  "Our website links to external websites, including websites of businesses connected with MAOUAJ Technology. We are not responsible for the privacy practices of those websites. Please read their privacy policies."
+                ]
+              },
+              {
+                "title": "Changes to this policy",
+                "number": "11",
+                "paragraphs": [
+                  "We may update this policy from time to time. The updated version will be posted on this page with a new effective date. If the changes are significant, we will make that clear on the website."
+                ]
+              },
+              {
+                "title": "Contact us",
+                "number": "12",
+                "paragraphs": [
+                  "For privacy questions or requests, contact us:",
+                  "- **Email:** info@maouaj.com\n- **Guatemala:** Grupo Maouaj S.A., 3ra Calle E 14-70, Sector B7, San Cristobal II, Zona 8 De Mixco, Guatemala. Phone: +502-51850811\n- **USA:** Maouaj Technology Corporation, The Broadway Market, 999 Broadway, Buffalo, NY 14212, USA. Phone: +1 (716) 533-2271"
+                ]
+              }
+            ],
+            "sidebarTitle": "ON THIS PAGE"
+          }
+        }
+      ]
+    }
+  },
+  "services": [
+    {
+      "id": "seed-service-bus-fare",
+      "slug": "cashless-bus-fare-platform",
+      "title": "Cashless Bus Fare Platform",
+      "category": "product",
+      "status": "In development",
+      "summary": "Transit-card fare payments, passenger balances, top-ups and operating records for bus services.",
+      "description": null,
+      "image": "/content-images/project-cashless-bus.webp",
+      "gradient": "linear-gradient(144.97deg, #1d4ed8 13.139%, #6d28d9 56.934%, #0e7490 86.131%)",
+      "ctaLabel": "Learn more",
+      "ctaHref": "/our-products",
+      "order": 0,
+      "visible": true,
+      "extra": null,
+      "createdAt": "2026-11-19T19:09:57.846Z",
+      "updatedAt": "2026-11-19T19:10:07.436Z"
+    },
+    {
+      "id": "seed-service-payment",
+      "slug": "payment-money-transfer-platform",
+      "title": "Payment / Money Transfer Platform",
+      "category": "product",
+      "status": "In development",
+      "summary": "A digital product intended to simplify sending money, reviewing transaction details and following transfer progress.",
+      "description": null,
+      "image": "/content-images/project-payment.webp",
+      "gradient": "linear-gradient(144.97deg, #6d28d9 13.139%, #2f4bff 86.131%)",
+      "ctaLabel": "Learn more",
+      "ctaHref": "/our-products",
+      "order": 1,
+      "visible": true,
+      "extra": null,
+      "createdAt": "2026-11-19T19:09:57.849Z",
+      "updatedAt": "2026-11-19T19:10:07.443Z"
+    },
+    {
+      "id": "seed-service-ride-hailing",
+      "slug": "ride-hailing-platform",
+      "title": "Ride-Hailing Platform",
+      "category": "planned",
+      "status": "Planned",
+      "summary": "A future service connecting riders and drivers. The project will be developed around its own distinctive service proposition.",
+      "description": null,
+      "image": "/content-images/project-ride-hailing.webp",
+      "gradient": "linear-gradient(146.48deg, #0e7490 13.139%, #1d4ed8 86.131%)",
+      "ctaLabel": "Learn more",
+      "ctaHref": "/our-projects",
+      "order": 2,
+      "visible": true,
+      "extra": null,
+      "createdAt": "2026-11-19T19:09:57.851Z",
+      "updatedAt": "2026-11-19T19:10:07.448Z"
+    },
+    {
+      "id": "seed-service-ecommerce",
+      "slug": "e-commerce-platform",
+      "title": "E-commerce Platform",
+      "category": "planned",
+      "status": "Planned",
+      "summary": "A future digital commerce service connecting customers with products and sellers. This is separate from our existing businesses.",
+      "description": null,
+      "image": "/content-images/project-ecommerce.webp",
+      "gradient": "linear-gradient(146.48deg, #6d28d9 13.139%, #2f4bff 86.131%)",
+      "ctaLabel": "Learn more",
+      "ctaHref": "/our-projects",
+      "order": 3,
+      "visible": true,
+      "extra": null,
+      "createdAt": "2026-11-19T19:09:57.854Z",
+      "updatedAt": "2026-11-19T19:10:11.081Z"
+    },
+    {
+      "id": "seed-service-textile",
+      "slug": "textile-business",
+      "title": "Textile business",
+      "category": "business",
+      "status": "Existing business",
+      "summary": "An existing business within the wider MAOUAJ Technology portfolio.",
+      "description": null,
+      "image": "/content-images/project-textile.webp",
+      "gradient": "linear-gradient(146.48deg, #0e7490 13.139%, #1d4ed8 86.131%)",
+      "ctaLabel": "Learn more",
+      "ctaHref": "/our-projects",
+      "order": 4,
+      "visible": true,
+      "extra": null,
+      "createdAt": "2026-11-19T19:09:57.856Z",
+      "updatedAt": "2026-11-19T19:10:12.865Z"
+    },
+    {
+      "id": "seed-service-hossainandmoallema",
+      "slug": "hossainandmoallema-com",
+      "title": "hossainandmoallema.com",
+      "category": "business",
+      "status": "Existing business",
+      "summary": "A wholesale supplier and exporter of spices and agricultural products, led by green cardamom from Guatemala, serving importers and distributors worldwide.",
+      "description": null,
+      "image": "/content-images/project-hossain-moallema-warehouse.webp",
+      "gradient": "linear-gradient(159.16deg, #60a5fa 14.789%, #2f4bff 85.211%)",
+      "ctaLabel": "Learn more",
+      "ctaHref": "https://hossainandmoallema.com/",
+      "order": 5,
+      "visible": true,
+      "extra": {
+        "image2x": "/content-images/project-hossain-moallema-warehouse-2x.webp"
+      },
+      "createdAt": "2026-11-19T19:09:57.858Z",
+      "updatedAt": "2026-11-19T19:10:09.243Z"
+    }
+  ],
+  "team": [],
+  "faqs": [
+    {
+      "id": "cmw18tmpw001wqoxsnpmp2png",
+      "question": "Are these products available now?",
+      "answer": "Both products are in development. Availability will be announced when confirmed.",
+      "order": 0,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.864Z",
+      "updatedAt": "2026-11-19T19:09:57.864Z"
+    },
+    {
+      "id": "cmw18tmpw001xqoxsw93qy249",
+      "question": "Which card will the bus platform support?",
+      "answer": "The initial product uses supported transit cards. Participating services and top-up options will be announced when confirmed.",
+      "order": 1,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.867Z",
+      "updatedAt": "2026-11-19T19:09:57.867Z"
+    },
+    {
+      "id": "cmw18tmpw001yqoxs5oi6jk6t",
+      "question": "Where will users be able to send money?",
+      "answer": "Supported markets, currencies, payment and delivery options, pricing and launch availability will be announced when confirmed.",
+      "order": 2,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.868Z",
+      "updatedAt": "2026-11-19T19:09:57.868Z"
+    },
+    {
+      "id": "cmw18tmpw001zqoxsxjfck5c0",
+      "question": "What will a transfer cost, and how long will it take?",
+      "answer": "Applicable fees and the estimated delivery time will be shown before you confirm a transfer. Pricing and launch availability will be announced when confirmed.",
+      "order": 3,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.870Z",
+      "updatedAt": "2026-11-19T19:09:57.870Z"
+    }
+  ],
+  "testimonials": [],
+  "posts": [
+    {
+      "id": "seed-post-blog-bus-fare",
+      "slug": "how-the-cashless-bus-fare-platform-will-work-explained",
+      "title": "How the cashless bus fare platform will work",
+      "category": "Product explainer",
+      "excerpt": "Passengers add balance, tap a supported transit card on the bus and receive a clear payment result, while operators review fare records.",
+      "body": null,
+      "image": "/content-images/blog-featured-bus.webp",
+      "author": "MAOUAJ Technology Team",
+      "publishedAt": "2026-12-30T09:00:00.000Z",
+      "dateLabel": null,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.875Z",
+      "updatedAt": "2026-11-19T19:10:12.887Z"
+    },
+    {
+      "id": "seed-post-blog-payment",
+      "slug": "payment-platform-introduction-steps",
+      "title": "An introduction to the payment platform",
+      "category": "Product explainer",
+      "excerpt": "A look at the intended steps for sending money, reviewing costs and following a transfer’s progress.",
+      "body": null,
+      "image": "/content-images/blog-payment.webp",
+      "author": "MAOUAJ Technology Team",
+      "publishedAt": "2026-12-29T09:00:00.000Z",
+      "dateLabel": null,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.879Z",
+      "updatedAt": "2026-11-19T19:10:12.887Z"
+    },
+    {
+      "id": "seed-post-blog-company-news",
+      "slug": "maouaj-technologys-current-projects-and-future-plans",
+      "title": "MAOUAJ Technology’s current projects and future plans",
+      "category": "Company News",
+      "excerpt": "Our current priorities in bus fares and payments, and what comes next in ride-hailing and e-commerce.",
+      "body": null,
+      "image": "/content-images/blog-laptop.webp",
+      "author": "MAOUAJ Technology Team",
+      "publishedAt": "2026-12-28T09:00:00.000Z",
+      "dateLabel": null,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.882Z",
+      "updatedAt": "2026-11-19T19:10:12.887Z"
+    },
+    {
+      "id": "seed-post-home-bus-fare",
+      "slug": "how-the-cashless-bus-fare-platform-will-work",
+      "title": "How the cashless bus fare platform will work",
+      "category": "Product explainer",
+      "excerpt": "Add balance, tap a supported transit card on the bus, receive the result and review your history.",
+      "body": null,
+      "image": "/content-images/home-blog-1.webp",
+      "author": "MAOUAJ Technology Team",
+      "publishedAt": "2026-06-30T09:00:00.000Z",
+      "dateLabel": null,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.884Z",
+      "updatedAt": "2026-11-19T19:10:12.887Z"
+    },
+    {
+      "id": "seed-post-home-payment",
+      "slug": "an-introduction-to-the-payment-platform",
+      "title": "An introduction to the payment platform",
+      "category": "Product introduction",
+      "excerpt": "A first look at the payment platform in development: choose a recipient, enter the amount, review the details and charges, then confirm.",
+      "body": null,
+      "image": "/content-images/home-blog-2.webp",
+      "author": "MAOUAJ Technology Team",
+      "publishedAt": "2026-06-29T09:00:00.000Z",
+      "dateLabel": null,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.886Z",
+      "updatedAt": "2026-11-19T19:10:13.865Z"
+    },
+    {
+      "id": "seed-post-home-payment-2",
+      "slug": "an-introduction-to-the-payment-platform-2",
+      "title": "An introduction to the payment platform",
+      "category": "Product introduction",
+      "excerpt": "How the payment platform will keep transfers clear: details and charges shown before you confirm, then status updates until it is complete.",
+      "body": null,
+      "image": "/content-images/home-blog-3.webp",
+      "author": "MAOUAJ Technology Team",
+      "publishedAt": "2026-06-28T09:00:00.000Z",
+      "dateLabel": null,
+      "visible": true,
+      "createdAt": "2026-11-19T19:09:57.888Z",
+      "updatedAt": "2026-11-19T19:10:13.868Z"
+    }
+  ]
+}
