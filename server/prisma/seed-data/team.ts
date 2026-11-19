@@ -29,8 +29,8 @@ const team: PageSeed = {
           subtitle: 'The people leading MAOUAJ Technology',
           description: 'Names, roles and brief professional biographies will be added here.',
         },
-        // The founder's photo (server/seed-media/team-founder-1x.webp, with a -2x.webp next to it for the srcset).
-        image: '/uploads/seed/team-founder-1x.webp',
+        // The founder's photo (server/seed-media/team-founder-v2-1x.webp, with a -2x.webp next to it for the srcset).
+        image: '/uploads/seed/team-founder-v2-1x.webp',
         imageAlt: 'Portrait of the founder of MAOUAJ Technology',
         paragraphs: [
           'Our work focuses on activities that people and businesses rely on every day: traveling, paying for services, transferring money and buying or selling goods.',

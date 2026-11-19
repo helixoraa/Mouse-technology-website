@@ -79,10 +79,11 @@
  *    A member whose fixed id or exact name is already in the database is left as it is (a difference is listed).
  *    The hidden placeholder members are not touched.
  * --step=r9-founder-photo
- *  - Our Team page, "Our leadership": the stock photo seed/team-vision-card.webp (local /uploads path or its Blob URL)
- *    -> the founder's photo seed/team-founder-1x.webp (1x + 2x uploaded to Blob or copied into UPLOAD_DIR/seed), and
- *    its alt text -> "Portrait of the founder of MAOUAJ Technology". Only while the section still shows the stock
- *    photo; an image set in the admin is kept. Nothing else in the section changes; the old file is left in place.
+ *  - Our Team page, "Our leadership": the stock photo seed/team-vision-card.webp, or the first founder photo
+ *    seed/team-founder-1x.webp (local /uploads path or its Blob URL) -> the current founder photo
+ *    seed/team-founder-v2-1x.webp (1x + 2x uploaded to Blob or copied into UPLOAD_DIR/seed), and its alt text ->
+ *    "Portrait of the founder of MAOUAJ Technology". Only while the section still shows one of those two; an image
+ *    set in the admin is kept. Nothing else in the section changes; old files are left in place.
  */
 import 'dotenv/config';
 import crypto from 'node:crypto';
@@ -864,8 +865,9 @@ async function r8Team() {
 
 /* ---------- Round 9 ---------- */
 
-const STOCK_LEADER_IMAGE = /^(?:https:\/\/[^\s"'()]+\/|\/uploads\/)seed\/team-vision-card\.webp$/;
-const FOUNDER_IMAGE = 'team-founder-1x.webp';
+/** The images this step replaces: the stock photo and the first founder photo (Round 9, replaced by the v2 photo). */
+const STOCK_LEADER_IMAGE = /^(?:https:\/\/[^\s"'()]+\/|\/uploads\/)seed\/(?:team-vision-card|team-founder-1x)\.webp$/;
+const FOUNDER_IMAGE = 'team-founder-v2-1x.webp';
 const FOUNDER_ALT = 'Portrait of the founder of MAOUAJ Technology';
 
 async function r9FounderPhoto() {
@@ -877,7 +879,7 @@ async function r9FounderPhoto() {
       console.log(
         image.endsWith(`seed/${FOUNDER_IMAGE}`)
           ? '  PageSection team/leadership already shows the founder photo'
-          : `  note: PageSection team/leadership image is ${JSON.stringify(image)} (not the stock photo); kept`,
+          : `  note: PageSection team/leadership image is ${JSON.stringify(image)} (not the stock or first founder photo); kept`,
       );
       continue;
     }
