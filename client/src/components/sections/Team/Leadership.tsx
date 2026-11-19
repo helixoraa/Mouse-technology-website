@@ -1,5 +1,5 @@
 import type { Segment } from '@/lib/types';
-import { mediaUrl } from '@/lib/api';
+import { mediaUrl, retinaSrcSet } from '@/lib/api';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { InnerBand } from '../InnerBand';
 
@@ -12,12 +12,14 @@ export interface LeadershipContent {
 
 export function Leadership({ content }: { content: LeadershipContent }) {
   const [lead, ...rest] = content.paragraphs;
+  const src = mediaUrl(content.image);
   return (
     <InnerBand tone="soft">
       <SectionHeader {...content.header} />
       <div className="flex flex-col items-center gap-10 lg:grid lg:grid-cols-[minmax(0,552fr)_minmax(0,648fr)] lg:gap-24">
         <img
-          src={mediaUrl(content.image)}
+          src={src}
+          srcSet={retinaSrcSet(src)}
           alt={content.imageAlt}
           width={552}
           height={451}

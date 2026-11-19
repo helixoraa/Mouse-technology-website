@@ -44,6 +44,10 @@ export function mediaUrl(src?: string | null): string {
   return `${BASE}${src}`;
 }
 
+/** An image saved as "<name>-1x.webp" has a "<name>-2x.webp" next to it (seed media and the static site): its srcset. */
+export const retinaSrcSet = (url: string) =>
+  /-1x\.webp$/.test(url) ? `${url} 1x, ${url.replace(/-1x\.webp$/, '-2x.webp')} 2x` : undefined;
+
 const stale = { staleTime: 30_000 };
 export const useSite = () => useQuery({ queryKey: ['site'], queryFn: () => api<SiteSettings>('/site'), ...stale });
 export const usePage = (page: string) => useQuery({ queryKey: ['page', page], queryFn: () => api<PageData>(`/pages/${page}`), ...stale });

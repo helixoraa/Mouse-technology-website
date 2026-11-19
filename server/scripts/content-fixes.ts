@@ -78,6 +78,11 @@
  *    photos (1x + 2x WebP, uploaded to Blob or copied into UPLOAD_DIR/seed like --step=image), visible, in that order.
  *    A member whose fixed id or exact name is already in the database is left as it is (a difference is listed).
  *    The hidden placeholder members are not touched.
+ * --step=r9-founder-photo
+ *  - Our Team page, "Our leadership": the stock photo seed/team-vision-card.webp (local /uploads path or its Blob URL)
+ *    -> the founder's photo seed/team-founder-1x.webp (1x + 2x uploaded to Blob or copied into UPLOAD_DIR/seed), and
+ *    its alt text -> "Portrait of the founder of MAOUAJ Technology". Only while the section still shows the stock
+ *    photo; an image set in the admin is kept. Nothing else in the section changes; the old file is left in place.
  */
 import 'dotenv/config';
 import crypto from 'node:crypto';
@@ -857,6 +862,39 @@ async function r8Team() {
   return rows;
 }
 
+/* ---------- Round 9 ---------- */
+
+const STOCK_LEADER_IMAGE = /^(?:https:\/\/[^\s"'()]+\/|\/uploads\/)seed\/team-vision-card\.webp$/;
+const FOUNDER_IMAGE = 'team-founder-1x.webp';
+const FOUNDER_ALT = 'Portrait of the founder of MAOUAJ Technology';
+
+async function r9FounderPhoto() {
+  let rows = 0;
+  for (const sec of await prisma.pageSection.findMany({ where: { page: 'team', key: 'leadership' } })) {
+    const content = isObject(sec.content) ? sec.content : {};
+    const image = typeof content.image === 'string' ? content.image : '';
+    if (!STOCK_LEADER_IMAGE.test(image)) {
+      console.log(
+        image.endsWith(`seed/${FOUNDER_IMAGE}`)
+          ? '  PageSection team/leadership already shows the founder photo'
+          : `  note: PageSection team/leadership image is ${JSON.stringify(image)} (not the stock photo); kept`,
+      );
+      continue;
+    }
+    await newImageUrl(FOUNDER_IMAGE.replace(/-1x\.webp$/, '-2x.webp')); // the 2x file must sit next to the 1x one
+    const url = await newImageUrl(FOUNDER_IMAGE);
+    rows++;
+    console.log(`  PageSection team/leadership: image ${JSON.stringify(image)}\n    -> ${JSON.stringify(url)}`);
+    console.log(`    imageAlt ${JSON.stringify(content.imageAlt)} -> ${JSON.stringify(FOUNDER_ALT)}`);
+    if (apply)
+      await prisma.pageSection.update({
+        where: { id: sec.id },
+        data: { content: { ...content, image: url, imageAlt: FOUNDER_ALT } as Prisma.InputJsonValue },
+      });
+  }
+  return rows;
+}
+
 const report = (n: number, what: string) => console.log(n ? `${n} ${what} ${apply ? 'updated' : 'would change'}.` : 'Nothing to change.');
 
 const steps: Record<string, () => Promise<void>> = {
@@ -905,6 +943,10 @@ const steps: Record<string, () => Promise<void>> = {
   'r8-team': async () => {
     console.log('Round 8: real team members (Uzair Bin Abdul Hameed, Ahmed):');
     report(await r8Team(), 'row(s)');
+  },
+  'r9-founder-photo': async () => {
+    console.log('Round 9: founder photo in "Our leadership" (Our Team page):');
+    report(await r9FounderPhoto(), 'row(s)');
   },
   'seed-ids': async () => {
     console.log('Seed services/posts -> fixed ids:');

@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Segment, TeamMember } from '@/lib/types';
-import { mediaUrl } from '@/lib/api';
+import { mediaUrl, retinaSrcSet } from '@/lib/api';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { InnerBand } from '../InnerBand';
 
@@ -25,9 +25,6 @@ export function balancedColumns(count: number, options: number[]): number {
 /** Seed/design placeholder cards ("Full name", "Role / title") are not real people and are never shown. */
 export const isPlaceholderMember = (m: Pick<TeamMember, 'name' | 'role'>) =>
   !m.name?.trim() || /^full\s+name$/i.test(m.name.trim()) || /^role\s*\/\s*title$/i.test(m.role?.trim() ?? '');
-
-/** A portrait saved as "<name>-1x.webp" has a "<name>-2x.webp" next to it (seed media and the static site). */
-const retinaSrcSet = (url: string) => (/-1x\.webp$/.test(url) ? `${url} 1x, ${url.replace(/-1x\.webp$/, '-2x.webp')} 2x` : undefined);
 
 function MemberCard({ m }: { m: TeamMember }) {
   const vector = m.photo?.endsWith('.svg');
